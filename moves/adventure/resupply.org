@@ -1,0 +1,26 @@
+** Resupply
+
+When you hunt, forage, or scavenge, roll +wits.
+
+On a *strong hit*, you bolster your resources. Take +2 supply.
+
+On a *weak hit*, take up to +2 supply, but suffer -1 momentum for each.
+
+On a *miss*, you find nothing helpful. [[file:../fate/pay-the-price.org][Pay the Price]].
+
+*** Details
+:PROPERTIES:
+:move-stats: wits
+:VISIBILITY: folded
+:END:
+
+When you’re in the field and need to bolster your supply track, make this move. Fictionally, this represents hunting and gathering. You might also search an area where supplies might be found, such as an abandoned camp or field of battle.
+
+If you’re adventuring with allies, you share the same supply value. When one of you makes this move, each of you adjust your supply track.
+
+If you have the unprepared condition marked, you can’t resupply. Instead, you need to find help in a community when you [[file:../relationship/sojourn.org][Sojourn]].
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

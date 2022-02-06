@@ -1,0 +1,31 @@
+#+TITLE:  Trap: Event
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-27 December
+#+TAGS:   rpg ironsworn
+
+Ambush
+Attack
+Block
+Break
+Change
+Collapse
+Conceal
+Create
+Crush
+Cut
+Divert
+Drop
+Enclose
+Entangle
+Imitate
+Lure
+Move
+Obscure
+Puncture
+Release
+Smother
+Snare
+Summon
+Surprise
+Trigger

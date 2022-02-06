@@ -1,0 +1,53 @@
+#+TITLE:  Runes
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2022-01-04 January
+#+TAGS:   rpg ironsworn
+
+- ᚠ FEHU (Livestock) Wealth, Abundance, Success, Security, Fertility.
+
+- ᚢ URUZ (a Bull) Strength, Tenacity, Courage, Untamed Potential, Freedom.
+
+- ᚦ THURISAZ (a Thorn) Reaction, Defense, Conflict, Catharsis, Regeneration.
+
+- ᚨ ANSUZ (an Estuary) the Mouth, Communication, Understanding, Inspiration.
+
+- ᚱ RAIDHO (a Wagon) Travel, Rhythm, Spontaneity, Evolution, Decisions.
+
+- ᚲ KENNAZ (a Torch) Vision, Creativity, Inspiration, Improvement, Vitality.
+
+- ᚷ GEBO (a Gift) Balance, Exchange, Partnership, Generosity, Relationships.
+
+- ᚹ WUNJO (Joy) Pleasure, Comfort, Harmony, Prosperity, Reward, Success.
+
+- ᚼ HAGALAZ (Hail) Nature, Wrath, Being Tested, Overcoming Obstacles.
+
+- ᚾ NAUTHIZ (Need) Restriction, Conflict, Willpower, Endurance, Self-Reliance.
+
+- ᛁ ISA (Ice) Clarity, Stasis, Challenges, Introspection, Watching & Waiting.
+
+- ᛃ JERA (the Year) Cycles, Completion, Changes, Harvest, Reaping Rewards.
+
+- ᛇ EIHWAZ (a Yew Tree) Balance, Enlightenment, Death, The World Tree.
+
+- ᛈ PERTHRO (a Dice Cup) Fate, Chance, Mystery, Destiny, Secrets.
+
+- ᛉ ALGIZ (an Elk) Protection, Defense, Instinct, Group Effort, Guardianship.
+
+- ᛋ SOWILO (the Sun) Health, Honor, Resources, Victory, Wholeness, Cleansing.
+
+- ᛏ TIWAZ (the god Tyr) Masculinity, Justice, Leadership, Logic, Battle.
+
+- ᛒ BERKANA (a Birch Tree) Femininity, Fertility, Healing, Regeneration, Birth.
+
+- ᛖ EHWAZ (a Horse) Transportation, Movement, Progress, Trust, Change.
+
+- ᛗ MANNAZ (Humanity) Individuality, Friendship, Society, Cooperation, Help.
+
+- ᛚ LAGUZ (Water) Intuition, Emotions, Flow, Renewal, Dreams, Hopes & Fears.
+
+- ᛜ INGUZ (a Seed) Goals, Growth, Change, Common Sense, The Hearth (Home).
+
+- ᛟ OTHALA (Inheritance) Ancestry, Possessions, Heritage, Experience, Value.
+
+- ᛞ DAGAZ (Dawn) Awakening, Certainty, Illumination, Completion, Hope.

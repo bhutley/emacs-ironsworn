@@ -1,0 +1,56 @@
+#+TITLE:  Combat Event: Target
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-27 December
+#+TAGS:   rpg ironsworn
+
+  - Control
+  - Weapon
+  - Armor
+  - Defense
+  - Focus
+  - Range
+  - Sense
+  - Opening
+  - Instinct
+  - Environment
+  - Surprise
+  - Wound
+  - Ally
+  - Courage
+  - Object
+  - Skill
+  - Protection
+  - Ferocity
+  - Ammo
+  - Opportunity
+  - Position
+  - Strategy
+  - Power
+  - Technique
+  - Body
+  - Limbs
+  - Pride
+  - Resolve
+  - Advantage
+  - Precision
+  - Shield
+  - Stress
+  - Ground
+  - Anger
+  - Weakness
+  - Companion
+  - Balance
+  - Fear
+  - Momentum
+  - Speed
+  - Strength
+  - Supply
+  - Terrain
+  - Barrier
+  - Footing
+  - Maneuver
+  - Reach
+  - Harm
+  - Finesse
+  - Grasp

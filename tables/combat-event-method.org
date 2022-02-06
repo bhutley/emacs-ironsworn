@@ -1,0 +1,56 @@
+#+TITLE:  Combat Event: Method
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-27 December
+#+TAGS:   rpg ironsworn
+
+  - Abort
+  - Assist
+  - Break
+  - Charge
+  - Collide
+  - Defy
+  - Entangle
+  - Escalate
+  - Evade
+  - Overwhelm
+  - Seize
+  - Shatter
+  - Stagger
+  - Withdraw
+  - Deflect
+  - Clash
+  - Batter
+  - Shove
+  - Affect
+  - Force
+  - Distract
+  - Brawl
+  - Overrun
+  - Sunder
+  - Amplify
+  - Trick
+  - Aim
+  - Feint
+  - Protect
+  - Counter
+  - Embed
+  - Persevere
+  - Impact
+  - Probe
+  - Await
+  - Hold
+  - Intensify
+  - Block
+  - Drop
+  - Lose
+  - Sweep
+  - Secure
+  - Cover
+  - Challenge
+  - Focus
+  - Advance
+  - Breach
+  - Endure
+  - Assault
+  - Coordinate

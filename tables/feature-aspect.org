@@ -1,0 +1,56 @@
+#+TITLE:  Feature: Aspect
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-26 December
+#+TAGS:   rpg ironsworn
+
+Abandoned
+Abundant
+Active
+Ancient
+Blocked
+Broken
+Collapsed
+Complex
+Confined
+Crafted
+Dead
+Deadly
+Decaying
+Deep
+Defended
+Depleted
+Destroyed
+Elevated
+Ensnaring
+Expansive
+Flooded
+Foreboding
+Forgotten
+Fortified
+Foul
+Fragile
+Guarded
+Hidden
+Inaccessible
+Isolated
+Makeshift
+Marked
+Moving
+Mysterious
+Mystical
+Natural
+Open
+Pillaged
+Ruined
+Sacred
+Sealed
+Secret
+Sunken
+Toxic
+Trapped
+Treacherous
+Unnatural
+Unstable
+Unusual
+Veiled

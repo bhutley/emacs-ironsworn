@@ -1,0 +1,76 @@
+#+TITLE:  Settlement Names
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-26 December
+#+TAGS:   rpg, ironsworn
+
+Brackwater
+Deepwater
+Redcrest
+Graycliff
+Lonefort
+Stonetower
+Redhall
+Cinderhome
+Bearmark
+Foxhollow
+Eaglespire
+Elkfield
+Highmount
+Stoneford
+Frostwood
+Whitefall
+Grimtree
+Three Rivers
+Whitebridge
+Timberwall
+Highcairn
+Thornhall
+Darkwell
+Fallowfield
+Ravencliff
+Boarwood
+Wolfcrag
+Elderwatch
+Wyvern's Rest
+Dragonshadow
+Fool's Fall
+Brokenhelm
+Lostwater
+Lastmarch
+Swordbreak
+Olgar's Stand
+Firstmeet
+Rojirra's Lament
+Mournhaunt
+Rockfall
+Daveza
+Khazu
+Essus
+Nabuma
+Abon
+Kazeera
+Damula
+Sova
+Sina
+Tiza
+Windhaven
+Bleakfrost
+Frostcrag
+Icebreak
+Winterhome
+Duskmoor
+Stormrest
+Springbrook
+Springtide
+Summersong
+Ironhome
+New Arkesh
+Elisora
+Elfbrook
+Ghostwalk
+Forsaken
+Kei's Hall
+Blackhelm
+Nessana
+Hope

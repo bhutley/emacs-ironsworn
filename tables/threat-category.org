@@ -1,0 +1,15 @@
+#+TITLE:  Threat: Category
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-27 December
+#+TAGS:   rpg ironsworn
+
+ - Burgeoning Conflict
+ - Ravaging Horde
+ - Cursed Site
+ - Malignant Plague
+ - Scheming Leader
+ - Zealous Cult
+ - Environmental Calamity
+ - Power-Hungry Mystic
+ - Rampaging Creature

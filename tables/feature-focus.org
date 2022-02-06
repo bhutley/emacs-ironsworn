@@ -1,0 +1,56 @@
+#+TITLE:  Feature: Focus
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-26 December
+#+TAGS:   rpg ironsworn
+
+Alarm
+Attack
+Boundary
+Breach
+Container
+Corruption
+Craft
+Creature
+Crossing
+Darkness
+Death
+Debris
+Denizen
+Enclosure
+Entry
+Environment
+Equipment
+Exit
+Function
+Grave
+Habitation
+Hideaway
+History
+Illumination
+Information
+Lair
+Location
+Material
+Message
+Nature
+Obstacle
+Opening
+Passage
+Person
+Power
+Prisoner
+Refuge
+Remains
+Resource
+Route
+Shelter
+Sign
+Supply
+Threshold
+Trail
+Trap
+Trigger
+Valuables
+Water
+Weapon

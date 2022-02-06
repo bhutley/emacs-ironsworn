@@ -1,0 +1,34 @@
+#+TITLE:  Settlement Prefixes
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-09 December
+#+TAGS:   rpg, ironsworn
+
+ - Axe
+ - Black
+ - Bleak
+ - Frost
+ - Glen
+ - Gray
+ - Great
+ - Green
+ - Grim
+ - High
+ - Long
+ - Lost
+ - Low
+ - Mourn
+ - New
+ - Raven
+ - Red
+ - Rock
+ - Shield
+ - Small
+ - Stone
+ - Storm
+ - Sword
+ - Thorn
+ - White
+ - Wolf
+ - Wood
+ - Yellow

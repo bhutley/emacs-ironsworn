@@ -1,0 +1,160 @@
+#+TITLE:  Ironsworn Solo Play Example
+#+AUTHOR: Howard Abrams
+#+EMAIL:  howard@imac.local
+#+DATE:   2022-01-24 January
+#+TAGS:   rpg ironsworn
+
+# Local Variables:
+# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load (concat rpgdm-ironsworn-project "tables")))
+# End:
+* Travels of Kannan
+:PROPERTIES:
+:ironsworn-edge: 2
+:ironsworn-heart: 1
+:ironsworn-iron: 1
+:ironsworn-shadow: 2
+:ironsworn-wits: 3
+:ironsworn-health: 5
+:ironsworn-spirit: 5
+:ironsworn-supply: 5
+:ironsworn-momentum: 2
+:ironsworn-progress-bonds: "Bonds" 1 2
+:ironsworn-progress-story: "Learn the Magic of the Runes" 1 0
+:END:
+My name is Kannan from a small circle called Elkfield near the great Primeval woods. This is my story.
+
+*Bonds:*
+  - Home Circle of Elkfield
+** Background
+:PROPERTIES:
+:ironsworn-supply: 5
+:END:
+
+Before my mother died, she told me the hunter who died when I was 10, was not my father. She gave me an iron disk on a leather thong, and made me swear a vow that I would leave Elkfield and journey to Cinderhome to meet my father and face my destiny.
+
+#+BEGIN_SRC emacs-lisp :results silent
+(rpgdm-ironsworn-character :heart 1 :shadow 2 :wits 3 :iron 1 :edge 2)
+#+END_SRC
+
+*Assets*
+
+  - Companion: Raven
+    *Sly:* When you Secure an Advantage or Face Danger +shadow using your raven to perform trickery (such as creating a distraction or stealing a small object) add +1 and take +1 momentum on a hit.
+
+  - Ritual: *Invoke* (Illusions) +wits
+    When you consume the mystical essence of your surroundings, roll +wits. On a strong hit, add the value of your action die to your essence track (max 6). You may then Secure an Advantage or Face Danger +essence to create minor mystical effects or illusions. If you do, suffer -1 essence and take +1 momentum on a hit. On a weak hit, as above, but capturing these energies is harrowing; Endure Stress (2 stress).
+
+  - Ritual: *Communion* (Talk to the Dead) +heart
+    When you surround the remains of a recently deceased intelligent creature with lit candles, and summon its spirit, roll +heart. Add +1 if you share a bond. On a strong hit, the spirit appears and you may converse for a few minutes. Make moves as appropriate (add +1). On a weak hit, as above, but the spirit also delivers troubling news unrelated to your purpose. Envision what it tells you (Ask the Oracle if unsure) and Endure Stress (1 stress).
+
+*** Bonds
+:PROPERTIES:
+:progress: epic
+:END:
+  |---+---+---+---+---+---+---+---+---+---|
+  | - |   |   |   |   |   |   |   |   |   |
+  |---+---+---+---+---+---+---+---+---+---|
+
+People and communities where I share a bond:
+
+#+NAME: character-bonds
+  - Elkfield :: My home circle
+** Inciting Vow: Find my Father
+:PROPERTIES:
+:ironsworn-progress-vow-inciting: "Find my Father" 8 16
+:END:
+
+*Milestones:*
+
+  - Reaching Cinderhome
+*** Journey to Cinderhome
+:PROPERTIES:
+:ironsworn-progress-journey-to-cinderhome: "Journey to Cinderhome" troublesome 8 32
+:END:
+# Seems like a /troublesome/ journey. Do we want to mark with a table? Generate with a Snippet?
+
+# Undertake a Journey ... Strong hit :: 10 (6 + 4) → 6 / 3  - small glade
+
+Followed the path through the forest described to me by Kendi, the Circle's shaman, and arrived at a /small glade/. The place was idyllic.
+
+# Undertake a Journey ... Weak hit :: 9 (6 + 3) → 10 / 3  - abandoned river ford
+
+My path reached a rapidly moving river that was too treacherous to ford. I found a place to cross further downstream, and back-tracked to the path to continue on my journey.
+
+# Undertake a Journey ... Weak hit :: 8 (5 + 3) → 9 / 3  - Occupied Cliff
+
+The path passed underneath a towering cliff swarming with ravens roosting in natural holes near the ridgeline... Odin's Voice. I am getting close. On the ground, I found a near-dead baby bird. I first caught a cricket, and made it into a paste with water, and attempted to feed the baby bird, as I walked.
+
+# Reach Your Destination ... Strong hit :: 9 (9 + 0) → 4 / 5
+
+The first person I met outside of Cinderhome was Katania, a warrior with a strong shield and spear. I told her of my journey, and she told me to go to the Long House and introduce myself there, and that I might be welcomed.
+*** The People of Cinderhome
+(Note: This just /came to me/ and I didn't roll anything, but names)
+
+I had wrapped Mimir in a cloth, but was careful when dropping my pack, my bow and quiver before going through the door. The Long House was nicely furnished, much nicer than ours in Elkfield. A woman, dressed in darker shades, greeted me. I told of my uneventful journey from Elkfield. She saw my kindness with the baby bird in my hand, and welcomed me to stay.
+She was Kori, and her tattoos hinted at her journeys behind the veil. She reached out and blessed Mimir, and I noticed the outstretched flying raven on her forearm.
+
+I offered to help the Circle during my stay, and was quickly shown a pot of yams to peel.
+
+That evening, after eating at the long table and meeting many residents, we entertained ourselves by telling stories and singing songs. I told a story, popular in Elkfield, of the three boys crossing the bridge own by a troll.
+
+As the fire died down, and many left to their own lodgings, I retrieved my mother's disk from around my neck, and asked *Kori* if she knew of a man with a connection to it.
+
+"You do not see it. Do you?" she touched my eyes, and when I saw the disk again, three intertwined symbols blazed on its surface. "The man you seek, is not here. But you will know where to go when the moon is full again."
+
+I stayed in Cinderhome, hunting in the forest and weeding the gardens, until the moon, once again, was full.
+
+That night, I slept outdoors, wracked with dreams. In the morning, one word stood out to me: Redcrest.
+
+Kori told me that Redcrest is a village perched on an island in the Barrier Islands, and that perhaps my father was there.
+
+*** COMMENT Journey to the Coast
+:PROPERTIES:
+:ironsworn-progress-journey-to-coast: "Journey to the Coast" 8 16
+:ironsworn-supply: 1
+:END:
+# Create a progress tracker, granted, F12 p n works too:
+#+BEGIN_SRC emacs-lisp :results silent
+(rpgdm-ironsworn-progress-create "Journey to the Coast" "Dangerous")
+#+END_SRC
+
+# Undertake a Journey ... Weak hit :: 6 (2 + 4) → 6 / 1 - Ruined Moor
+
+Cinderhome, on the edge of a large clearing in the forest, shows the remains of a huge fire. While this happened a long time ago, as the greenery has crept back, I could still see the charred remains of stone walls.
+
+# Undertake a Journey ... Weak hit :: 8 (5 + 3) → 3 / 10  - Diverse Hill
+
+The moor gave way to a collection of hills, and the path west became vague. The people of Cinderhome had said to walk between the hills that look like two hares, but I must have wandered around like one, before I recognized the hills that they meant. Burning up time, as the sun past it zenith.
+
+# Undertake a Journey ... Weak hit :: 8 (5 + 3) → 6 / 9  - Withered Village
+
+It was way past sunset when I arrived in the shambles of a village, Whitebridge. The name sounded much better than its appearance, but I felt it safer than sleeping out in the woods. I knocked on the door of the large structure, hoping for the typical community of a Circle.
+
+# Sojourn ... Miss :: 2 (1 + 1) → 10 / 2
+
+But no one answered my knock. I swear I could hear voices within. I called out that I was a traveler from Cinderhome looking for shelter for the night. I might have heard someone within say that only the roofless barn would accept me. I saw the walls of what might be a unfinished or abandoned barn near a stream, and made a bit of a camp there.
+
+# Make Camp ... Miss :: 6 (3 + 3) → 9 / 6
+
+I tucked myself in a corner behind some growth, and placed /Curio/ on a branch of a shrub near me. Attempted to take solace, however, I could barely rest wondering what the denizens of this dilapidated village feared. I soon found out.
+**** Conflict with a Horror
+:PROPERTIES:
+:ironsworn-progress-b5f243e0: "Battle with Monstrosity" 8 16
+:ironsworn-health: 4
+:END:
+# Danger: Tiny / Crustecean with Claws, Mandibles and stinger (Scorpion?) ...  Move between realities / Poisonous
+
+# Am I ambushed? Likely: Yes
+
+# Enter the Fray ... Strong hit :: 7 (4 + 3) → 4 / 3
+
+My raven, Curio, was looking around suspiciously ... I grab my dagger and swing out towards the first movement I see.
+
+# Strike ... Weak hit :: 3 (1 + 2) → 1 / 3
+
+The strike hits the crustacean sending it flying, but I loose my balance, and fall into the undergrowth as I see more of them.
+
+# Clash ... Miss :: 3 (2 + 1) → 8 / 9
+
+One of the scorpion-like creatures appears next to me, I try to swat it away with a branch, but miss, as a bugger I didn't see stings me.
+The pain is intense, and I realize I have to get out of here.

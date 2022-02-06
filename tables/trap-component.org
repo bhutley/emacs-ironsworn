@@ -1,0 +1,32 @@
+#+TITLE:  Trap: Component
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-27 December
+#+TAGS:   rpg ironsworn
+
+Alarm
+Barrier
+Cold
+Corruption/Radiant
+Darkness
+Debris
+Decay
+Denizen
+Earth
+Fall
+Fear
+Fire
+Light
+Magic
+Overhead
+Passage
+Path
+Pit
+Poison
+Projectile
+Stone
+Terrain
+Toxin
+Trigger
+Water
+Weapon

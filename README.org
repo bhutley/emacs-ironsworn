@@ -1,0 +1,1056 @@
+#+TITLE:  Ironsworn RPG Help System
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-21 December
+#+TAGS:   rpg
+#+PROPERTY:    header-args:sh :tangle no
+#+PROPERTY:    header-args:emacs-lisp  :tangle emacs-ironsworn.el
+#+PROPERTY:    header-args   :results none   :eval no-export   :comments no
+
+#+OPTIONS:     num:nil toc:nil todo:nil tasks:nil tags:nil date:nil
+#+OPTIONS:     skip:nil author:nil email:nil creator:nil timestamp:nil
+#+INFOJS_OPT:  view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+
+While my original goal for creating my [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] for Emacs was to help running a role playing game using a laptop instead of a /Dungeon Master Screen/. However, once all my games moved online, having my notes in an org file next to all my friend's faces, was doubly helpful. But what I used the most from my project was a random tables. Need a name? ~F12 c name~ ... What's the weather like? ~F12 c weather~ (and with completing helpers like [[https://github.com/raxod502/selectrum][selectrum]] and the like, I only needed to type ~we~).
+
+However, the struggles for getting friends to play online proved as challenging as getting them around the table, so I started looking for [[https://www.dicebreaker.com/categories/roleplaying-game/how-to/how-to-play-tabletop-rpgs-by-yourself][solo rpg options]] and discovered [[https://www.ironswornrpg.com/][Ironsworn RPG]]. The bulk of the games are its /moves/ and its /oracles/ (random tables for /everything/). I easily copied sections of the [[https://docs.google.com/document/d/11ypqt6GfLuBhGDJuBGWKlHa-Ru48Tf3G_6zbrYKmXgY/edit#heading=h.xl9vk0d7wwn3][SRD]] into org files, [[file:tables][tables]].
+
+After listening to the author, [[https://twitter.com/ShawnTomkin][Shawn Tomkin]], play the game in his podcast, [[https://ironsworn.podbean.com/][Ask the Oracle]], he used [[https://roll20.net][Roll20]]. The [[https://wiki.roll20.net/Ironsworn][character sheet]] was brilliant, as each move was /described/ along with being able to roll on them. While I love physically rolling dice, perhaps mimicking the approach in org files in Emacs for [[https://www.ironswornrpg.com/products-ironsworn][solo play]] may be ideal.
+* Getting Started
+Neither this, nor the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] are currently in MELPA, so you'll need to clone both repos, and add them to your =load-path= variable with =add-to-list=, or use something like [[https://github.com/raxod502/straight.el][straight]]:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (straight-use-package
+   '(el-patch :type git :host gitlab :repo "howardabrams/emacs-rpgdm"))
+
+  (straight-use-package
+   '(el-patch :type git :host gitlab :repo "howardabrams/emacs-ironsworn"))
+#+END_SRC
+
+Next, either turn on the =rpgdm-mode= (minor mode), or simply define a globally accessible shortcut:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (global-set-key (kbd "<f6>") 'hydra-rpgdm/body)
+#+END_SRC
+
+What I do, is add the following "code" somewhere in my Ironsworn-specific org files:
+
+#+BEGIN_SRC org :tangle no
+# Local Variables:
+# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load "ironsworn"))
+# End:
+#+END_SRC
+
+Finally, define your character. Currently, do this /code/ in your org file:
+#+BEGIN_EXAMPLE
+,#+BEGIN_SRC emacs-lisp
+(rpgdm-ironsworn-character :heart 2 :shadow 2 :wits 3 :iron 1 :edge 1)
+,#+END_SRC
+#+END_EXAMPLE
+
+And evaluate that with ~C-c C-c~, and you are now ready to work the system with your key-binding (or ~F12~) to bring up the Hydra of commands:
+** Character Sheets
+A character sheet, for this project, is just an org mode file where you take notes, and =:PROPERTIES:= drawers contain the current stats for your character. While most of it is /whatever you like/ you need to keep a few things in mind.
+
+*** Character Attributes
+Specify unchanging *Character Attibutes* like =iron= and =shadow= in a drawer at Level One Headling, for instance:
+#+BEGIN_EXAMPLE
+,* The Adventures of Bred
+:PROPERTIES:
+:ironsworn-edge: 2
+:ironsworn-heart: 1
+:ironsworn-iron: 1
+:ironsworn-shadow: 2
+:ironsworn-wits: 3
+:END:
+#+END_EXAMPLE
+*** Character Stats
+Set changeable *Character Stats* like =health= and =supply= under any header, keeping in mind that a calculation that requires that value will start at the point (er, cursor), and works its way up. This means that if you had =spirit= set to =5= at /level 1/, set to =3= at a /level 2/, and in now describing a battle with a Gaunt as a /level 3/ subheader, where you haven't specified, your =spirit= at that point is =3=.
+
+#+BEGIN_EXAMPLE
+,* The Adventures of Bred
+:PROPERTIES:
+:ironsworn-spirit: 5
+...
+:END:
+,** Journey to Stormlook
+:PROPERTIES:
+:ironsworn-spirit: 3
+:END:
+,*** Battle with a Gaunt
+With the point here, Bred's spirit is 3.
+,** Sojourn in Stormlook
+However, at this level two heading, Bred's spirit is 5 (as it would read the level 1 setting).
+#+END_EXAMPLE
+You might say, of course, this makes sense, and it should. However, sibling headers as well as lower-level headers are ignored.
+*** Progress Tracks
+Set *Progress Tracks* from Iron vows and bonds to tracking monstrous conflicts, once, at some headline. That progress is available to that header section and any subsections.
+
+Since /bonds/ and your character's overarching /epic vow/ should always be available, set these at Level 1.
+* Code
+To begin, we'll need the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] cloned in the =load-path= variable so that we can load:
+
+#+BEGIN_SRC emacs-lisp
+(require 'rpgdm)
+#+END_SRC
+
+We also need the name of the directory for this project, so that we can load tables and other documentation.
+
+#+BEGIN_SRC emacs-lisp
+(defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
+  "The root directory to the emacs-ironsworn project")
+#+END_SRC
+** Dice Roller
+In *Ironsworn*, all dice rolls follow a pattern where you set the challenge level for a check by rolling /challenge dice/ (two d10s) and compare that against rolling an /action die/ (a single d6 ... adding all modifiers to that six-sided die). You always three possible values:
+
+  - A *strong hit* where your action die + modifiers is larger than both d10 challenge dice.
+  - A *weak hit* is where your action die + modifiers is larger than /only one/ of the d10 challenge dice.
+  - A *miss* happens when your action die + modifiers is equal to or less than both d10 challenge dice.
+
+I describe the =rpgdm-ironsworn-roll= that implements this below, but I need a helper function.
+
+When we roll, I want one of those three results printed, but in different colors, to easily distinguish. I also want to see the numbers, so we can display those too. Oh, and if the same number shows on both d10s, you should introduce a significant plot twist, so this function, given all the numbers, returns a nicely formatted string:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge)
+    (let* ((action-results (+ action modifier))
+           (str-results (cond
+                         ((and (> action-results one-challenge) (> action-results two-challenge))
+                          (propertize "Strong hit" 'face '(:foreground "green")))
+                         ((or  (> action-results one-challenge) (> action-results two-challenge))
+                          (propertize "Weak hit" 'face '(:foreground "yellow")))
+                         (t (propertize "Miss" 'face '(:foreground "red")))))
+           (matched-msg  (if (= one-challenge two-challenge)
+                             (propertize " ← Create a Twist" 'face '(:foreground "orange"))
+                           "")))
+      (format "%s %s %d %s%d %s %d%s %s %d %s %d %s" str-results
+              (propertize "::" 'face '(:foreground "#888"))
+              (+ action modifier)
+              (propertize "(" 'face '(:foreground "#888"))
+              action
+              (propertize "+" 'face '(:foreground "#888"))
+              modifier
+              (propertize ")" 'face '(:foreground "#888"))
+              (propertize "→" 'face '(:foreground "light blue"))
+              one-challenge
+              (propertize "/" 'face '(:foreground "#888"))
+              two-challenge matched-msg)))
+#+END_SRC
+
+So the following messages, given various /rolls/ should cover those possibilities with text properties:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (rpgdm-ironsworn--results 3 2 4 1)  ; "Strong hit :: 5 (3 + 2) → 4 / 1"
+  (rpgdm-ironsworn--results 3 2 8 1)  ; "Weak hit :: 5 (3 + 2) → 8 / 1"
+  (rpgdm-ironsworn--results 3 2 8 6)  ; "Miss :: 5 (3 + 2) → 8 / 6"
+  (rpgdm-ironsworn--results 3 2 6 6)  ; "Miss :: 5 (3 + 2) → 6 / 6  ← Create a Twist"
+#+END_SRC
+
+The basic interface will query for a modifer, roll all three dice, and then display the results using the [[https://gitlab.com/howardabrams/emacs-rpgdm/-/blob/main/rpgdm.el#L76][rpgdm-message]] function:
+
+#+BEGIN_SRC emacs-lisp :results silent
+  (defun rpgdm-ironsworn-roll (modifier)
+    "Display a Hit/Miss message based on comparing a d6 action
+  roll (added to MODIFIER) vs. two d10 challenge dice."
+    (interactive "nModifier: ")
+    (let ((one-challenge (rpgdm--roll-die 10))
+          (two-challenge (rpgdm--roll-die 10))
+          (action-roll   (rpgdm--roll-die 6)))
+      (rpgdm-message (rpgdm-ironsworn--results action-roll modifier
+                                               one-challenge two-challenge))))
+#+END_SRC
+
+** Character Information
+But what might be nice is to have a character sheet that has the default modifiers, and then we wouldn't have to /give/ the modifiers, at least, not the basic ones. You will store these stats and other numbers in your org file, and we'll work [[*Org Interface][the details of that later]].
+
+We need an /internal representation/ of a character using a hash table of the attributes and other stats. One key feature is that I want to be able to look up a stat by either symbol or string, e.g. ='edge= or ="edge"= or even =:edge=. For this, I define a /comparator/, er, a Lisp test that uses a function to convert to a common format, a string:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-to-string (a)
+    "Return a lowercase string from either a string, keyword or symbol."
+    (downcase
+     (cond
+      ((keywordp a) (substring (symbol-name a) 1))
+      ((symbolp  a) (symbol-name a))
+      (t            a))))
+
+  (define-hash-table-test 'str-or-keys
+    (lambda (a b)
+      (string-equal (rpgdm-ironsworn-to-string a) (rpgdm-ironsworn-to-string b)))
+
+    (lambda (s) (sxhash-equal (rpgdm-ironsworn-to-string s))))
+#+END_SRC
+
+Don't talk to me about efficiency. This will be nice!
+
+Currently, I will have a global variable holding the character's stats. Not ideal, but sufficient for the moment:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar rpgdm-ironsworn-character (make-hash-table :test 'str-or-keys)
+    "Stats and attributes for the currently loaded character")
+#+END_SRC
+
+This helper function can set them all the stats at one time using the Common Lisp function define, where we can specify the keys.  Someday, we may want another function that could parse an Org table or something.
+
+#+BEGIN_SRC emacs-lisp :results silent
+  (cl-defun rpgdm-ironsworn-character (&key (edge 1) (heart 1) (iron 1) (shadow 1) (wits 1)
+                                            (health 5) (spirit 5) (supply 5) (momentum 2))
+    "Store the player character's stats, as well as set up the defaults for the values."
+    (clrhash rpgdm-ironsworn-character)
+    ;; (setq rpgdm-ironsworn-character (make-hash-table :test 'str-or-keys))
+    (puthash 'edge edge rpgdm-ironsworn-character)
+    (puthash 'heart heart rpgdm-ironsworn-character)
+    (puthash 'iron iron rpgdm-ironsworn-character)
+    (puthash 'shadow shadow rpgdm-ironsworn-character)
+    (puthash 'wits wits rpgdm-ironsworn-character)
+
+    (puthash 'health health rpgdm-ironsworn-character)
+    (puthash 'spirit spirit rpgdm-ironsworn-character)
+    (puthash 'supply supply rpgdm-ironsworn-character)
+    (puthash 'momentum momentum rpgdm-ironsworn-character))
+#+END_SRC
+
+This allows us to define our character:
+
+#+BEGIN_SRC emacs-lisp :tangle no :results silent
+(rpgdm-ironsworn-character :heart 2 :shadow 2 :wits 3)
+#+END_SRC
+
+And a help function to retrieve the stats of the character is just a wrapper around =gethash=:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-character-stat (stat &optional character)
+    "Return integer value associated with a character's STAT."
+    (when (null character)
+      (setq character (rpgdm-ironsworn-current-character-state)))
+    (gethash stat character 1))
+#+END_SRC
+
+Just to prove it to ourselves, all of the following expressions return the same number:
+
+#+BEGIN_SRC emacs-lisp :tangle no :results silent
+  (rpgdm-ironsworn-character-stat 'wits)
+  (rpgdm-ironsworn-character-stat "wits")
+  (rpgdm-ironsworn-character-stat "Wits")
+  (rpgdm-ironsworn-character-stat :wits)
+#+END_SRC
+
+We need to modify /some/ of the stored values, like =health= and =supply=:
+
+#+BEGIN_SRC emacs-lisp :results silent
+  (defun rpgdm-ironsworn-adjust-stat (stat adj &optional default)
+    "Increase or decrease the current character's STAT by ADJ."
+    (let ((value (+ (gethash stat rpgdm-ironsworn-character default) adj)))
+      ;; TODO: Delete this hash bidness
+      (puthash stat value rpgdm-ironsworn-character)
+      (rpgdm-ironsworn-store-character-state stat value)))
+
+  (defun rpgdm-ironsworn-adjust-health (health-adj)
+    "Increase or decrease the current character's health by HEALTH-ADJ."
+    (interactive "nHealth Adjustment: ")
+    (rpgdm-ironsworn-adjust-stat 'health health-adj 5))
+
+  (defun rpgdm-ironsworn-adjust-spirit (spirit-adj)
+    "Increase or decrease the current character's spirit by SPIRIT-ADJ."
+    (interactive "nSpirit Adjustment: ")
+    (rpgdm-ironsworn-adjust-stat 'spirit spirit-adj 5))
+
+  (defun rpgdm-ironsworn-adjust-supply (supply-adj)
+    "Increase or decrease the current character's supply by SUPPLY-ADJ."
+    (interactive "nSupply Adjustment: ")
+    (rpgdm-ironsworn-adjust-stat 'supply supply-adj 5))
+
+  (defun rpgdm-ironsworn-adjust-momentum (momentum-adj)
+    "Increase or decrease the current character's momentum by MOMENTUM-ADJ."
+    (interactive "nMomentum Adjustment: ")
+    (rpgdm-ironsworn-adjust-stat 'momentum momentum-adj 2))
+#+END_SRC
+
+Perhaps we need a special way to display these changing stats? An updated org table? A separate buffer? For the moment, I am just going to display it in the buffer whenever I want to see it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--display-stat (stat character)
+    (let* ((value (gethash stat character))
+           (s-val (number-to-string value))
+           (color (cond
+                   ((< value 1) "red")
+                   ((< value 3) "orange")
+                   ((< value 4) "yellow")
+                   (t "green"))))
+      (propertize s-val 'face `(:foreground ,color))))
+
+  (defun rpgdm-ironsworn-character-display ()
+    "Easily display the character's stats and other things."
+    (interactive)
+    (let ((character (rpgdm-ironsworn-current-character-state)))
+      (rpgdm-message "Edge: %d  Heart: %d  Iron: %d  Shadow: %d  Wits: %d
+  Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
+                     (rpgdm-ironsworn-character-stat 'edge character)
+                     (rpgdm-ironsworn-character-stat 'heart character)
+                     (rpgdm-ironsworn-character-stat 'iron character)
+                     (rpgdm-ironsworn-character-stat 'shadow character)
+                     (rpgdm-ironsworn-character-stat 'wits character)
+
+                     (rpgdm-ironsworn--display-stat 'health character)
+                     (rpgdm-ironsworn--display-stat 'spirit character)
+                     (rpgdm-ironsworn--display-stat 'supply character)
+
+                     (gethash 'momentum character 5))))
+#+END_SRC
+** Roll against Character Stats
+Which allows us to create character stat-specific rolling functions:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-roll-stat (stat modifier)
+    "Roll an action based on a loaded character's STAT with a MODIFIER."
+    (interactive (list (completing-read "Stat Modifier: " '(Edge Heart Iron Shadow Wits))
+                       (read-string "Other Modifier: ")))
+    (let ((all-mods (+ (rpgdm-ironsworn-character-stat stat)
+                       (string-to-number modifier))))
+      (rpgdm-ironsworn-roll all-mods)))
+#+END_SRC
+
+And we could have a function for each:
+#+BEGIN_SRC emacs-lisp :results silent
+  (defun rpgdm-ironsworn-roll-edge (modifier)
+    "Roll an action based on a loaded character's Edge stat with a MODIFIER."
+    (interactive (list (read-string "Edge + Modifier: ")))
+    (rpgdm-ironsworn-roll-stat :edge modifier))
+
+  (defun rpgdm-ironsworn-roll-heart (modifier)
+    "Roll an action based on a loaded character's Heart stat with a MODIFIER."
+    (interactive (list (read-string "Heart + Modifier: ")))
+    (rpgdm-ironsworn-roll-stat :heart modifier))
+
+  (defun rpgdm-ironsworn-roll-iron (modifier)
+    "Roll an action based on a loaded character's Iron stat with a MODIFIER."
+    (interactive (list (read-string "Iron + Modifier: ")))
+    (rpgdm-ironsworn-roll-stat :iron modifier))
+
+  (defun rpgdm-ironsworn-roll-shadow (modifier)
+    "Roll an action based on a loaded character's Shadow stat with a MODIFIER."
+    (interactive (list (read-string "Shadow + Modifier: ")))
+    (rpgdm-ironsworn-roll-stat :shadow modifier))
+
+  (defun rpgdm-ironsworn-roll-wits (modifier)
+    "Roll an action based on a loaded character's Wits stat with a MODIFIER."
+    (interactive (list (read-string "Wits + Modifier: ")))
+    (rpgdm-ironsworn-roll-stat :wits modifier))
+#+END_SRC
+** Moves
+The [[file:moves][moves]] directory contains one org file for each move. These files contains properties for how a move should behave. To make "a move" involves opening the move description file in a side-buffer, getting details about the move from the file, and then rolling some dice.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--move-tuple (file)
+    (let* ((regx (rx "moves/"
+                     (group (one-or-more (not "/")))
+                     "/"
+                     (group (one-or-more (not ".")))
+                     ".org" eol))
+           (mtch (string-match regx file))
+           (type (match-string 1 file))
+           (name (thread-last (match-string 2 file)
+                   (s-replace-regexp "-" " ")
+                   (s-titleize))))
+      (list (format "%s:: %s" type name) file)))
+#+END_SRC
+
+And let's verify the format:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (ert-deftest rpgdm-ironsworn--move-tuple-test ()
+    (let ((file "moves/fate/ask-the-oracle.org")
+          (full "~/other/over/here/moves/fate/ask-the-oracle.org"))
+      (should (equal (list "fate:: Ask The Oracle" file)
+                     (rpgdm-ironsworn--move-tuple file)))
+      (should (equal (list "fate:: Ask The Oracle" full)
+                     (rpgdm-ironsworn--move-tuple full)))))
+#+END_SRC
+
+Once I read the list of moves, I want to /cache/ it, using a poor-person's /memoize/ feature:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar rpgdm-ironsworn-moves () "A list of tuples of the move and the file containing its goodness.")
+#+END_SRC
+
+Oh, one issue... how do I know where the data files for the moves are?
+
+#+BEGIN_SRC emacs-lisp
+    (defun rpgdm-ironsworn-moves ()
+      "Return a list containing available moves, and the filename containing
+      the moves instructions, and other properties. Note that this function is
+      memoized, in that re-calling this function will return a cached copy."
+      (unless rpgdm-ironsworn-moves
+        (setq rpgdm-ironsworn-moves
+              (mapcar 'rpgdm-ironsworn--move-tuple
+                      (directory-files-recursively
+                       (concat rpgdm-ironsworn-project "moves")
+                       ".*\.org$"))))
+      rpgdm-ironsworn-moves)
+
+#+END_SRC
+
+Choosing a move comes from using the =completing-read= along with a /list/ of all moves, like this:
+
+#+BEGIN_SRC emacs-lisp :tangle no :results value
+  (completing-read "Move: " (rpgdm-ironsworn-moves))
+#+END_SRC
+
+We'll wrap that in a function to let the user choose a nicely formatted move, but return the file containing the move.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-choose-move ()
+    (let* ((move (completing-read "Move: " (rpgdm-ironsworn-moves)))
+           (tuple (assoc move (rpgdm-ironsworn-moves))))
+      (cadr tuple)))
+#+END_SRC
+
+Another feature I want, is that after completing a move, to put the results in a register, so that I can paste it into my notes file:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--store-move (results)
+    "Store the results in a `m' register. It should also include
+  the name of the move, based on the current file."
+    (set-register ?m
+                  (format "# %s ... %s "
+                          (progn
+                            (goto-char (point-min))
+                            (cdr (assoc "ITEM" (org-entry-properties))))
+                          results)))
+#+END_SRC
+Now, let's do the Move interface. We need to load the documentation, and retrieve its =move-stats= property, and then possibly /do something/, like roll:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-make-move (move-file)
+    "Make an Ironsworn move by loading MOVE-FILE, and optionally querying the
+  user to make an initial roll based on the properties in the file."
+    (interactive (list (rpgdm-ironsworn-choose-move)))
+
+    ;; Normally, we'd call `save-window-excursion', however, that buries the file
+    ;; we show, and I think we should leave it up for study.
+    (let (props
+          (orig-buf (window-buffer)))
+      (find-file-other-window move-file)
+      (setq props (first (org-property-values "move-stats")))
+      (pop-to-buffer orig-buf)
+      (rpgdm-ironsworn--store-move (rpgdm-ironsworn--make-move props))))
+#+END_SRC
+
+The =rpgdm-ironsworn--make-move= call does something based on the properties stored in the file:
+
+  - If nil, do nothing
+  - If single stat that is =progress=, call =rpgdm-ironsworn-progress-roll=
+  - If single stat, call =rpgdm-ironsworn-roll-stat= with that stat as a symbol, e.g. ='wits=
+  - If first entry is =>=, call =rpgdm-ironsworn-roll-stat= with the largest of the listed character's stats
+  - If first entry is =<=, call =rpgdm-ironsworn-roll-stat= with the lowest of the listed character's stats
+  - Otherwise, let the user choose the stat, from the property list, and can call =rpgdm-ironsworn-roll-stat=
+
+Seems like a job for =cond=:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--make-move (move-props)
+    "Query user for rolls based on the MOVE-PROPS."
+   (let* ((props (s-split " " (or move-props "")))
+          (count (seq-length props))
+          (stats (seq-filter (lambda (s) (string-match (rx (one-or-more alpha)) s)) props))
+          (first (first props)))
+     (cond
+      ((seq-empty-p stats)       nil)
+      ((equal first "progress")  (call-interactively 'rpgdm-ironsworn-progress-roll))
+      ((= count 1)               (rpgdm-ironsworn-roll-with first))
+      ((equal first ">")         (rpgdm-ironsworn-roll-best stats))
+      (t                         (rpgdm-ironsworn-roll-stat
+                                  (completing-read "Stat Choice: " stats)
+                                  (read-string "Modifier: "))))))
+
+  (defun rpgdm-ironsworn-roll-with (stat)
+    "Roll against a character STAT, as a string, and prompt for modifier.
+  See `rpgdm-ironsworn-roll-stat' for details."
+    (rpgdm-ironsworn-roll-stat stat (read-string "Modifier: ")))
+
+  (defun rpgdm-ironsworn-roll-best (options)
+    "Call `rpgdm-ironsworn-roll' with a characters largest stat from OPTIONS."
+    (let* ((values  (seq-map 'rpgdm-ironsworn-character-stat options))
+           (largest (seq-max values))
+           (modifier (read-string "Modifier: "))
+           (all-mods (+ largest (string-to-number modifier))))
+      (rpgdm-ironsworn-roll all-mods)))
+#+END_SRC
+** Progress
+The concept of a /progress/ can be anything from an overland journey to a battle with an Elder Boar. A function to create a new one (asking for a name), another function to mark progress, and a third to remove it.
+
+While the 10 boxes are easy for pen-and-paper games, we really need the number a /ticks/ marking progress amounts:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar rpgdm-ironsworn-progress-levels '(("Troublesome" . 12)
+                                            ("Dangerous" . 8) ("Formidable" . 4)
+                                            ("Extreme" . 2) ("Epic" . 1))
+    "The five levels of progression for an Ironsworn progress track.")
+#+END_SRC
+
+Given a label, can we get the level as a value:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-level (label)
+    "Return the level (number of ticks to mark) of progress LABEL.
+  For instance, if LABEL is `Dangerous', this returns `8'."
+    (alist-get label rpgdm-ironsworn-progress-levels 8 nil 'equal))
+#+END_SRC
+
+Since we'll store only the numbers, we might want to get back the label:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-level-label (level)
+    "Return the label associated with the progress LEVEL, e.g. dangerous."
+    (car (rassoc level rpgdm-ironsworn-progress-levels)))
+#+END_SRC
+
+A helper function for allowing the user to choose which track to mark progress against:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-track-choose (&optional allow-other)
+    "Query the user for a particular stored track. If ALLOW-OTHER is non-nil,
+  we append a choice, <other>, which allows the user to choose the number
+  of squares that have been marked against some progress."
+    (let* ((other "<other>")
+           (tracks  (rpgdm-ironsworn-character-progresses))
+           (choices (if allow-other
+                        (append tracks (list other))
+                      tracks))
+           (original (completing-read "Progress Track: " choices)))
+      (if (and allow-other (equal original other))
+          (read-number "Completed Track Amount [0-10]: ")
+        original)))
+#+END_SRC
+
+Adding a progress to a character amounts to an arbitrary name, and the number of ticks, that amount to a /level/. For instance, we want to mark two boxes against a /dangerous/ track, which is =8= ticks. We store this in the character's hash-table, under the key, =progress-tracks=:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-create (name level)
+    "Add a new progress track, NAME, of a particular LEVEL.
+  Stored as a property in the org file. Keep in mind that the
+  NAME should be a short title, not a description."
+    (interactive (list (read-string "Progress Name: ")
+                       (completing-read "Progress Level: "
+                                        rpgdm-ironsworn-progress-levels)))
+
+    (let* ((level-value (rpgdm-ironsworn-progress-level level))
+           (track-id    (substring (secure-hash 'md5 name) 0 8))
+           (track-prop  (format "ironsworn-progress-%s" track-id))
+           (track-val   (format "\"%s\" %d %d" name level-value 0)))
+      (org-set-property track-prop track-val)))
+#+END_SRC
+
+Interactively, we can call the =-mark= function multiple times, but we might want to be able to call it multiple times (for instance, in a battle using a sword, we can mark progress /twice/). Regardless, we call =rpgdm-ironsworn--mark-progress-track= to update the character sheet.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-mark (name &optional times)
+    "Mark progress against a track, NAME. Instead of calling this function multiple
+  times, you can specify the number of TIMES to mark progress."
+    (interactive (list (rpgdm-ironsworn-progress-track-choose)))
+    (unless times (setq times 1))
+    (dotimes (idx times)
+      (rpgdm-ironsworn-mark-progress-track name)))
+#+END_SRC
+
+If we call the =-amount= function /interactively/, we should get the current results displayed, otherwise, we really just want the number of full boxes marked:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-amount (name)
+    "Display the progress made against a track, NAME."
+    (interactive (list (rpgdm-ironsworn-progress-track-choose)))
+    (let* ((tracks  (rpgdm-ironsworn-character-progresses))
+           (matched (--filter (equal name (first it)) tracks))
+           (track   (first matched))
+           (value   (second track))
+           (level   (rpgdm-ironsworn-progress-level-label value))
+           (ticks   (third track))
+           (boxes   (/ ticks 4)))
+      (if (called-interactively-p 'any)
+          (rpgdm-message "[%d] Progress on %s: %d  (Ticks: %d)" level name boxes ticks)
+        boxes)))
+#+END_SRC
+
+Rolling against the progress just means we need to request that value instead of rolling the d6, but in this case, we should either take a currently registered progress track, or simply specify a completed amount:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-roll (progress-value)
+    "Display a Hit/Miss message based on comparing the PROGRESS-VALUE
+  to rolling two d10 challenge dice."
+    (interactive (list (rpgdm-ironsworn-progress-track-choose t)))
+    (unless (numberp progress-value)
+      (setq progress-value (rpgdm-ironsworn-progress-amount progress-value)))
+
+    (let ((one-challenge (rpgdm--roll-die 10))
+          (two-challenge (rpgdm--roll-die 10)))
+      (rpgdm-message (rpgdm-ironsworn--results progress-value 0
+                                               one-challenge two-challenge))))
+#+END_SRC
+
+When we've finished a track, we can remove it from the hash to not clutter the interace:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-progress-delete (name)
+    "Remove the progress track, NAME."
+    (interactive (list (rpgdm-ironsworn-progress-track-choose)))
+    (let ((tracks      (gethash 'progress-tracks rpgdm-ironsworn-character)))
+      (ignore-errors
+        (remhash name tracks))))
+#+END_SRC
+
+Let's make sure these function work as we expect:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (ert-deftest rpgdm-ironsworn-progress-test ()
+    (let ((track "Battling a Grue"))
+      (rpgdm-ironsworn-progress-delete track)
+      (rpgdm-ironsworn-progress-create track "Dangerous")
+      (should (= (rpgdm-ironsworn-progress-amount track) 0))
+      (rpgdm-ironsworn-progress-mark track)
+      (should (= (rpgdm-ironsworn-progress-amount track) 2))
+      (rpgdm-ironsworn-progress-mark track 2)
+      (should (= (rpgdm-ironsworn-progress-amount track) 6))))
+
+  (ert-deftest rpgdm-ironsworn-progress-test ()
+    (let ((track "Battling an Extreme Grue"))
+      (rpgdm-ironsworn-progress-delete track)
+      (rpgdm-ironsworn-progress-create track "Extreme")
+      (should (= (rpgdm-ironsworn-progress-amount track) 0))
+      (rpgdm-ironsworn-progress-mark track)
+      (should (= (rpgdm-ironsworn-progress-amount track) 0))
+      (rpgdm-ironsworn-progress-mark track 2)
+      (should (= (rpgdm-ironsworn-progress-amount track) 1))))
+#+END_SRC
+** Oracles
+*** Action-Theme
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-action-theme ()
+    "Rolls on two tables at one time."
+    (interactive)
+    (let ((action (rpgdm-tables-choose "actions"))
+          (theme  (rpgdm-tables-choose "themes")))
+      (rpgdm-message "%s / %s" action theme)))
+#+END_SRC
+*** Character
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-npc ()
+    (interactive)
+    (let ((name        (rpgdm-tables-choose "names-ironlander"))
+          (goal        (rpgdm-tables-choose "character-goal"))
+          (role        (rpgdm-tables-choose "character-role"))
+          (activity    (rpgdm-tables-choose "character-activity"))
+          (description (rpgdm-tables-choose "character-descriptor"))
+          (disposition (rpgdm-tables-choose "character-disposition")))
+      (rpgdm-message "%s, %s %s (Activity: %s  Disposition: %s  Goal: %s)"
+                     name description role activity disposition goal)))
+
+#+END_SRC
+*** Combat Action
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-combat ()
+    (interactive)
+    (let ((action (rpgdm-tables-choose "combat-action"))
+          (method (rpgdm-tables-choose "combat-event-method"))
+          (target (rpgdm-tables-choose "combat-event-target")))
+      (rpgdm-message "%s %s or %s" method target action)))
+#+END_SRC
+*** Feature
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-feature ()
+    "Rolls on two tables at one time for a Site's feature."
+    (interactive)
+    (let ((aspect (rpgdm-tables-choose "feature-aspect"))
+          (focus  (rpgdm-tables-choose "feature-focus")))
+      (rpgdm-message "%s / %s" aspect focus)))
+#+END_SRC
+*** Site Nature
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-site-nature ()
+    "Rolls on two tables at one time for a random Site."
+    (interactive)
+    (let* ((theme  (rpgdm-tables-choose "site-theme"))
+           (domain (rpgdm-tables-choose "site-domain"))
+           (place  (downcase domain))
+           (name   (rpgdm-ironsworn-oracle-site-name place)))
+      (rpgdm-message "%s %s :: %s" theme domain name)))
+#+END_SRC
+*** Site Name
+Using the interesting random name generator from the Ironsworn: Delve source book.
+Requires a =place-type= to help limit the values that can be in /place/ and then looks up the details on the tables in the =ironsworn= directory.
+
+#+BEGIN_SRC emacs-lisp
+    (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
+      "Rolling on multiple tables to return a random site name."
+      (interactive (list (completing-read "Place type: "
+                                          '(barrow cavern icereach mine pass ruin
+                                                   sea-cave shadowfen stronghold
+                                                   tanglewood underkeep))))
+      (unless place-type
+        (setq place-type "unknown"))
+      (let ((description (rpgdm-tables-choose "site-name-description"))
+            (detail (rpgdm-tables-choose "site-name-detail"))
+            (namesake (rpgdm-tables-choose "site-name-namesake"))
+            (place  (rpgdm-tables-choose (format "site-name-place-%s" place-type)))
+            (roll   (rpgdm--roll-die 100)))
+        (rpgdm-message
+         (cond
+          ((<= roll 25) (format "%s %s" description place))
+          ((<= roll 50) (format "%s of %s" place detail))
+          ((<= roll 70) (format "%s of %s %s" place description detail))
+          ((<= roll 80) (format "%s of %s's %s" place namesake detail))
+          ((<= roll 85) (format "%s's %s" namesake place))
+          ((<= roll 95) (format "%s %s of %s" description place namesake))
+          (t            (format "%s of %s" place namesake))))))
+#+END_SRC
+
+So, let's generate some random place names:
+#+BEGIN_SRC emacs-lisp :tangle no
+(rpgdm-ironsworn-oracle-site-name "barrow")     ; "Tomb of Storms"
+(rpgdm-ironsworn-oracle-site-name "cavern")     ; "Lair of Khulan’s Truth"
+(rpgdm-ironsworn-oracle-site-name "icereach")   ; "Barrens of Erisia’s Winter"
+(rpgdm-ironsworn-oracle-site-name "mine")       ; "Lode of Ashen Lament"
+(rpgdm-ironsworn-oracle-site-name "pass")       ; "Sunken Highlands"
+(rpgdm-ironsworn-oracle-site-name "ruin")       ; "Sanctum of Khulan’s Truth"
+(rpgdm-ironsworn-oracle-site-name "sea-cave")   ; "Silent Caves"
+(rpgdm-ironsworn-oracle-site-name "shadowfen")  ; "Floodlands of Nightmare Despair"
+(rpgdm-ironsworn-oracle-site-name "stronghold") ; "Crumbling Bastion"
+(rpgdm-ironsworn-oracle-site-name "tanglewood") ; "Bramble of Endless Strife"
+(rpgdm-ironsworn-oracle-site-name "underkeep")  ; "Underkeep of Lament"
+(rpgdm-ironsworn-oracle-site-name)              ; "Sundered Mists of Khulan"
+#+END_SRC
+*** Threat
+Generate a random threat and its motivations.
+#+BEGIN_SRC emacs-lisp
+  (defvar rpgdm-ironsworn-oracle-threats '("Burgeoning Conflict" "Ravaging Horde"
+                                           "Cursed Site" "Malignant Plague"
+                                           "Scheming Leader" "Zealous Cult"
+                                           "Environmental Calamity" "Power-Hungry Mystic"
+                                           "Rampaging Creature")
+    "A list of threats that correspond to tables")
+
+  (defun rpgdm-ironsworn-oracle-threat-goal (&optional category)
+    "Given a CATEGORY, display a threat goal."
+    (interactive (list (completing-read "Threat: " rpgdm-ironsworn-oracle-threats)))
+    (unless category
+      (setq category (seq-random-elt rpgdm-ironsworn-oracle-threats)))
+    (let ((table-name (format "threat-%s" (downcase (string-replace " " "-" category)))))
+      (rpgdm-message "%s: %s" category (rpgdm-tables-choose table-name))))
+#+END_SRC
+
+And we can have a random threat:
+#+BEGIN_SRC emacs-lisp :tangle no
+(rpgdm-ironsworn-oracle-threat-goal)
+#+END_SRC
+** Ironsworn Interface
+Ironsworn introduces a simplified /flip-a-coin/ oracle, that might be nice to integrate.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle ()
+    "Given a LIKLIHOOD as a single character, return weighted coin flip."
+    (interactive)
+    (let* ((prompt "What are the odds?
+    c) Almost Certain  l) Likely  h) 50/50  u) Unlikely  n) Small Chance ")
+           (odds (read-char prompt))
+           (roll (rpgdm--roll-die 100))
+           (yes! (when (or (and (= roll 11) (eq odds ?c))
+                           (and (= roll 26) (eq odds ?l))
+                           (and (= roll 51) (eq odds ?h))
+                           (and (= roll 76) (eq odds ?u))
+                           (and (= roll 91) (eq odds ?n)))
+                   t))
+           (yes  (when (or (and (> roll 11) (eq odds ?c))
+                           (and (> roll 26) (eq odds ?l))
+                           (and (> roll 51) (eq odds ?h))
+                           (and (> roll 76) (eq odds ?u))
+                           (and (> roll 91) (eq odds ?n)))
+                   t)))
+      (rpgdm-message "%s %s %s"
+                     (if yes! "Extreme" "")
+                     (if yes "Yes" "No")
+                     (if yes! "or a twist." ""))))
+#+END_SRC
+
+Most tables and charts in the books require rolling a percentile die:
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-roll-d6 ()
+    "Roll and display a six-sided die roll."
+    (interactive)
+    (rpgdm-roll "d6"))
+
+  (defun rpgdm-roll-d10 ()
+    "Roll and display a ten-sided die roll."
+    (interactive)
+    (rpgdm-roll "d10"))
+
+  (defun rpgdm-roll-d100 ()
+    "Roll and display a percentage die roll."
+    (interactive)
+    (rpgdm-roll "d100"))
+#+END_SRC
+
+Can a Hydra call a hydra?
+
+#+BEGIN_SRC emacs-lisp
+  (defhydra hydra-rpgdm-oracles (:color blue)
+    "Oracles"
+    ("a" rpgdm-ironsworn-oracle-action-theme "Action/Theme")
+    ("c" rpgdm-ironsworn-oracle-combat       "Combat")
+    ("f" rpgdm-ironsworn-oracle-feature      "Feature")
+    ("n" rpgdm-ironsworn-oracle-npc          "NPC")
+    ("p" rpgdm-ironsworn-oracle-site-name    "Site Name")
+    ("s" rpgdm-ironsworn-oracle-site-nature  "Site Nature")
+    ("t" rpgdm-ironsworn-oracle-threat-goal  "Threat's Goal"))
+
+  (defhydra hydra-rpgdm-progress (:color blue)
+    "Progress Tracks"
+    ("n" rpgdm-ironsworn-progress-create "new")
+    ("m" rpgdm-ironsworn-progress-mark   "mark")
+    ("p" rpgdm-ironsworn-progress-amount "show")
+    ("d" rpgdm-ironsworn-progress-delete "delete")
+    ("r" rpgdm-ironsworn-progress-roll   "roll"))
+#+END_SRC
+
+I'd like to repurpose the RPGDM Hydra to be more specific to Ironsworn:
+
+#+BEGIN_SRC emacs-lisp
+  (defhydra hydra-rpgdm (:color blue :hint nil)
+    "
+      ^Dice^     0=d100 1=d10 6=d6       ^Adjust^      ^Oracles/Tables^     ^Moving^              ^Messages^
+   ----------------------------------------------------------------------------------------------------------------------------------------------------
+      _d_: Roll Dice  _p_: Progress       _H_: Health   _z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
+      _e_: Roll Edge  _s_: Roll Shadow    _S_: Spirit   _c_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
+      _h_: Roll Heart _w_: Roll Wits      _G_: Supply   _O_: Other Oracles   _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
+      _i_: Roll Iron  _m_: Make Move      _M_: Momentum _T_: Load Oracles                        ⌘-j: ↓ Next   "
+    ("d" rpgdm-ironsworn-roll)    ("D" rpgdm-ironsworn-progress-roll)
+    ("z" rpgdm-ironsworn-oracle)  ("O" rpgdm-oracle)
+
+    ("e" rpgdm-ironsworn-roll-edge)
+    ("h" rpgdm-ironsworn-roll-heart)
+    ("i" rpgdm-ironsworn-roll-iron)
+    ("s" rpgdm-ironsworn-roll-shadow)
+    ("w" rpgdm-ironsworn-roll-wits)
+    ("m" rpgdm-ironsworn-make-move :color pink)
+
+    ("H" rpgdm-ironsworn-adjust-health :color pink)
+    ("S" rpgdm-ironsworn-adjust-spirit :color pink)
+    ("G" rpgdm-ironsworn-adjust-supply :color pink)
+    ("M" rpgdm-ironsworn-adjust-momentum :color pink)
+
+    ("T" rpgdm-tables-load)       ("c" rpgdm-tables-choose)     ("C" rpgdm-tables-choose :color pink)
+    ("O" hydra-rpgdm-oracles/body)
+    ("p" hydra-rpgdm-progress/body)
+
+    ("o" ace-link)                ("N" org-narrow-to-subtree)   ("W" widen)
+    ("K" scroll-down :color pink)             ("J" scroll-up :color pink)
+
+    ("s-h" rpgdm-ironsworn-character-display)
+    ("C-m" rpgdm-last-results :color pink)
+    ("C-n" rpgdm-last-results-next :color pink)
+    ("C-p" rpgdm-last-results-previous :color pink)
+    ("s-l" rpgdm-last-results :color pink)
+    ("s-j" rpgdm-last-results-next :color pink)
+    ("s-k" rpgdm-last-results-previous :color pink)
+
+    ("0" rpgdm-roll-d100 :color pink)
+    ("1" rpgdm-roll-d10 :color pink)
+    ("6" rpgdm-roll-d6 :color pink)
+    ("q" nil "quit") ("<f6>" nil))
+#+END_SRC
+** Org Interface
+Seems that it would be nice to cache all the player information in an org file. That way, it is editable, but also, we could /tuck the data/ away in property drawers, where a value, like Supply or Health, could /change/ from section to section.
+
+Couple of patterns:
+  - We store all data as org properties that begin with =:IRONSWORN-xyz=
+  - A property in a top level will be overwritten by the same property in a lower level header, this allows a /default/ value at the top, and then specifics lower down.
+
+When we want to update a property in the org file, we need to decide its state.
+If it is a numeric state, like /health/ or /supply/, then we set the value in the current tree using [[help:org-set-property][org-set-property]].
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-store-character-state (stat value)
+    "Store the VALUE of a character's STAT in the current org tree property.
+  Note that STAT should be a symbol, like `supply' and VALUE should be a
+  number, but doesn't have to be."
+    (let ((prop (format "ironsworn-%s" (symbol-name stat))))
+      (when (numberp value)
+        (setq value (number-to-string value)))
+      (org-set-property prop value)))
+#+END_SRC
+
+Loading state means looking at properties, and we distinguish Ironsworn-specific with  a few functions:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--property-p (prop)
+    "Given a symbol PROP, return non-nil if it is an ironsworn keyword.
+  Specifically, does it begin with `:IRONSWORN-'"
+    (let ((p (symbol-name prop)))
+      (string-match (rx bos ":IRONSWORN-") p)))
+
+  (defun rpgdm-ironsworn--progress-p (prop)
+    "Given a symbol PROP, return non-nil if it is an ironsworn progress keyword.
+  Specifically, does it begin with `:IRONSWORN-PROGRESS'"
+    (let ((p (symbol-name prop)))
+      (string-match (rx bos ":IRONSWORN-PROGRESS-") p)))
+#+END_SRC
+
+Since we store both normal and progress props together, we need to distingush between the symbols:
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--short-progress-p (prop)
+    (let ((p (symbol-name prop)))
+      (s-starts-with-p "progress-" p)))
+#+END_SRC
+
+Yes, we may set the property in lowercase, but the symbol always comes back in uppercase.
+
+Speaking of which, let's get a property-symbol to string conversion:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--progress-to-str (prop)
+    "Convert a progress symbol, PROP to a string."
+    (downcase (substring (symbol-name prop) 1)))
+#+END_SRC
+
+A test is always explanatory:
+#+BEGIN_SRC emacs-lisp :tangle no
+  (ert-deftest rpgdm-ironsworn--progress-to-str-test ()
+    (should (equal (rpgdm-ironsworn--progress-to-str :IRONSWORN-PROGRESS-EPIC)
+                   "ironsworn-progress-epic")))
+#+END_SRC
+Why do we need it? Well, when we will want this when we /re-set/ the property.
+*** Walking "Up" an Org Tree looking for Properties
+Marking progress on a track amounts to first locating the stored value in the org document, by walking "up" the tree from the current location.
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-heading-level ()
+    "Return heading level of the element at the point. 0 otherwise."
+    (if-let ((level-str (org-element-property :level (org-element-at-point))))
+        level-str
+      0))
+
+  (defun rpgdm-ironsworn--current-character-state (results)
+    "Recursive helper to insert current header properties in RESULTS.
+  Calls itself if it is not looking at the top-level header in the file.
+  If a property is already in the hash table, RESULTS, it is not overwritten,
+  thereby having lower-level subtrees take precendence over similar settings
+  in higher headers."
+    (defun key-convert (ironsworn-prop)
+      (make-symbol (downcase (substring (symbol-name ironsworn-prop) 11))))
+
+    (defun value-convert (value)
+      (if (string-match (rx bos (one-or-more digit) eos) value)
+          (string-to-number value)
+        value))
+
+    (let ((props (org-element--get-node-properties)))
+      (loop for (k v) on props by (function cddr) do
+            ;; If key is ironsworn property, but isn't in the table...
+            (when (rpgdm-ironsworn--property-p k)
+              (let ((key (key-convert k))
+                    (val (value-convert v)))
+                (unless (gethash key results)
+                  (puthash key val results)))))
+
+      (unless (= (org-heading-level) 1)
+        (org-up-element)
+        (rpgdm-ironsworn--current-character-state results))))
+
+  (defun rpgdm-ironsworn-current-character-state ()
+    "Return all set properties based on the position of the cursor in org doc.
+  Note that values in sibling trees are ignored, and settings in lower levels
+  of the tree headings take precedence."
+    (save-excursion
+      (let ((results (make-hash-table :test 'str-or-keys)))
+        (unless (eq 'headline (org-element-type (org-element-at-point)))
+          (org-up-element))
+
+        (rpgdm-ironsworn--current-character-state results)
+        results)))
+#+END_SRC
+***  Reading Progress Tracks from Org Files
+A progress track looks like this:
+
+#+BEGIN_EXAMPLE
+:ironsworn-progress-bonds: "Character Bonds" 1 2
+#+END_EXAMPLE
+Where the property, =ironsworn-progress-ID= ends with a unique ID (more on that later). The value is a three-part list of a name, the number of ticks implied by "marking progress", e.g Epic in 1 tick, where /bothersome/ is 12 ticks. The final element is the amount of progress from 0 to 40.
+
+Org can return the value, but breaking it up requires a regular expression:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--progress-values (value)
+    "Parse a string VALUE returning a list of parts,
+  Including the initial name, the number of ticks to mark,
+  and the current progress of the track."
+    (let ((regxp (rx "\""
+                    (group (one-or-more (not "\"")))
+                    "\"" (one-or-more space)
+                    (group (one-or-more digit))
+                    (one-or-more space)
+                    (group (one-or-more digit)))))
+      (when (string-match regxp value)
+        (list (match-string 1 value)
+              (string-to-number (match-string 2 value))
+              (string-to-number (match-string 3 value))))))
+#+END_SRC
+
+Using the =rpgdm-ironsworn-current-character-state= function to return /all properties/ in the org file, we can filter our all the progress tracks, and then return a list of the parsed values:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-character-progresses ()
+    "Return a list where each element is progress track list.
+  Each sublist has three values, a name, the ticks to mark,
+  and the current progress of the track."
+    (let ((state (rpgdm-ironsworn-current-character-state)))
+      (thread-last state
+                   (hash-table-keys)
+                   (-filter #'rpgdm-ironsworn--short-progress-p)
+                   (--map (gethash it state))
+                   (-map #'rpgdm-ironsworn--progress-values))))
+#+END_SRC
+
+The function works fine for [[help:completing-read][completing-read]], as it accepts a list of lists:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(completing-read "Progress: " (rpgdm-ironsworn-character-progresses))
+#+END_SRC
+
+Unlike the =rpgdm-ironsworn-store-character-state= function, we want up update the /location/ in the org file where a progress track is defined and stored.
+
+I like the recursive notion of walking higher in the org file using [[help:org-up-element][org-up-element]], however, having a function use both Common Lisp's [[help:cl-loop][loop]] as well as the Clojure-inspired [[help:-let*][-let*]] really shows the fusion that Emacs has become:
+
+#+BEGIN_SRC emacs-lisp
+   (defun rpgdm-ironsworn--mark-progress-track (str)
+     "Given a progress track's name, STR, update its progress mark."
+     (let ((props (org-element--get-node-properties)))
+       (loop for (k v) on props by (function cddr) do
+             (when (rpgdm-ironsworn--progress-p k)
+               (-let* (((label level progress) (rpgdm-ironsworn--progress-values v)))
+                 (when (equal str label)
+                   (org-set-property (rpgdm-ironsworn--progress-to-str k)
+                                     (format "\"%s\" %d %d"
+                                             label level (+ level progress)))
+                   (cl-return))))))
+
+     ;; Did not find a match at this level, let's pop up one and try again:
+     (unless (= (org-heading-level) 1)
+       (org-up-element)
+       (rpgdm-ironsworn--mark-progress-track str)))
+#+END_SRC
+
+And since we move the cursor, we need to [[help:save-excursion][save-excursion]], and we'll make this the =interactive= one:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-mark-progress-track (label)
+    "Given a progress track's name, STR, update its progress mark."
+    (interactive (list (completing-read "Progress: " (rpgdm-ironsworn--progresses))))
+    (save-excursion
+      (rpgdm-ironsworn--mark-progress-track label)))
+#+END_SRC
+
+* Summary
+Funny that I wrote the code here before even playing the game. Hope I like playing it as much as hacking this out.
+
+#+BEGIN_SRC emacs-lisp
+(provide 'rpgdm-ironsworn)
+;;; rpgdm-ironsworn.el ends here
+#+END_SRC

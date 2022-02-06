@@ -1,0 +1,32 @@
+#+TITLE:  Settlement Suffixes
+#+AUTHOR: Howard X. Abrams
+#+EMAIL:  howard.abrams@gmail.com
+#+DATE:   2021-12-09 December
+#+TAGS:   rpg, ironsworn
+
+ - moor
+ - ford
+ - crag
+ - watch
+ - hope
+ - wood
+ - ridge
+ - stone
+ - haven
+ - [fall/falls]
+ - river
+ - field
+ - hill
+ - bridge
+ - mark
+ - cairn
+ - land
+ - hall
+ - mount
+ - rock
+ - brook
+ - barrow
+ - stead
+ - home
+ - wick
+ - dale
