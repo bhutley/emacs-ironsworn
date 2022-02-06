@@ -44,7 +44,7 @@ What I do, is add the following "code" somewhere in my Ironsworn-specific org fi
 
 #+BEGIN_SRC org :tangle no
 # Local Variables:
-# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load "ironsworn"))
+# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode))
 # End:
 #+END_SRC
 
@@ -671,7 +671,13 @@ Let's make sure these function work as we expect:
       (should (= (rpgdm-ironsworn-progress-amount track) 1))))
 #+END_SRC
 ** Oracles
-Shawn Tompkin has created some useful oracles (random tables) to consult. He designed many of the tables to work together, for instance, you should roll on both the [[file:tables/actions.org][actions]] and [[file:tables/themes.org][themes]] and combine the result to kick-start your ideas.
+Shawn Tompkin has created some useful oracles (random tables) to consult. I'm breaking my own [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] convention, and having this code automatically load those tables.
+
+#+BEGIN_SRC emacs-lisp
+(rpgdm-tables-load "ironsworn")
+#+END_SRC
+
+He designed many of the tables to work together, for instance, you should roll on both the [[file:tables/actions.org][actions]] and [[file:tables/themes.org][themes]] and combine the result to kick-start your ideas.
 
 Rolling on one table is simple, but here we have a collection of helper function to roll on multiple tables, and display the result altogether.
 *** Action-Theme
@@ -683,6 +689,10 @@ This function displays an entry from both the [[file:tables/actions.org][actions
     (let ((action (rpgdm-tables-choose "actions"))
           (theme  (rpgdm-tables-choose "themes")))
       (rpgdm-message "%s / %s" action theme)))
+
+  (puthash "action-and-theme :: Roll on both tables"
+           'rpgdm-ironsworn-oracle-action-theme
+           rpgdm-tables)
 #+END_SRC
 *** Character
 This function display a single entry of all the character-specific tables, including, a [[file:tables/names-ironlander.org][name]], their [[file:tables/character-role.org][role]] and [[file:tables/character-activity.org][current activity]], a [[file:tables/character-descriptor.org][one-word description]], as well as more hidden aspects, like the character's [[file:tables/character-goal.org][goal]] and [[file:tables/character-disposition.org][disposition]].
@@ -700,6 +710,9 @@ This function display a single entry of all the character-specific tables, inclu
           (disposition (rpgdm-tables-choose "character-disposition")))
       (rpgdm-message "%s, %s %s (Activity: %s  Disposition: %s  Goal: %s)"
                      name description role activity disposition goal)))
+
+  (puthash "npc :: Roll on all character tables"
+           'rpgdm-ironsworn-oracle-npc rpgdm-tables)
 #+END_SRC
 *** Combat Action
 The [[file:tables/combat-action.org][combat action]] table isn't often tactical, and I prefer combining the [[file:tables/combat-event-method.org][method]] and [[file:tables/combat-event-target.org][target]] as an /event/. For instance, the following could be results from this method:
@@ -715,6 +728,9 @@ The [[file:tables/combat-action.org][combat action]] table isn't often tactical,
           (method (rpgdm-tables-choose "combat-event-method"))
           (target (rpgdm-tables-choose "combat-event-target")))
       (rpgdm-message "%s %s or %s" method target action)))
+
+  (puthash "combat-action-events :: Roll on all combat tables"
+           'rpgdm-ironsworn-oracle-combat rpgdm-tables)
 #+END_SRC
 *** Feature
 This function combines the [[file:tables/feature-aspect.org][aspect]] and [[file:tables/feature-focus.org][focus]] of a /feature/, for instance:
@@ -729,6 +745,9 @@ This function combines the [[file:tables/feature-aspect.org][aspect]] and [[file
     (let ((aspect (rpgdm-tables-choose "feature-aspect"))
           (focus  (rpgdm-tables-choose "feature-focus")))
       (rpgdm-message "%s / %s" aspect focus)))
+
+  (puthash "feature-aspect-and-focus :: Roll on both feature tables"
+           'rpgdm-ironsworn-oracle-feature rpgdm-tables)
 #+END_SRC
 *** Site Nature
 In the Ironsworn Delve expansion, you can randomly choose a /dangerous place/, for instance:
@@ -746,34 +765,40 @@ Notice we also generate a name for the place.
            (place  (downcase domain))
            (name   (rpgdm-ironsworn-oracle-site-name place)))
       (rpgdm-message "%s %s :: %s" theme domain name)))
+
+  (puthash "site-nature :: Roll on both site theme and domain tables"
+           'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
 #+END_SRC
 *** Site Name
 Using the interesting random name generator from the Ironsworn: Delve source book.
 Requires a =place-type= to help limit the values that can be in /place/ and then looks up the details on the tables in the =ironsworn= directory.
 
 #+BEGIN_SRC emacs-lisp
-    (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
-      "Rolling on multiple tables to return a random site name."
-      (interactive (list (completing-read "Place type: "
-                                          '(barrow cavern icereach mine pass ruin
-                                                   sea-cave shadowfen stronghold
-                                                   tanglewood underkeep))))
-      (unless place-type
-        (setq place-type "unknown"))
-      (let ((description (rpgdm-tables-choose "site-name-description"))
-            (detail (rpgdm-tables-choose "site-name-detail"))
-            (namesake (rpgdm-tables-choose "site-name-namesake"))
-            (place  (rpgdm-tables-choose (format "site-name-place-%s" place-type)))
-            (roll   (rpgdm--roll-die 100)))
-        (rpgdm-message
-         (cond
-          ((<= roll 25) (format "%s %s" description place))
-          ((<= roll 50) (format "%s of %s" place detail))
-          ((<= roll 70) (format "%s of %s %s" place description detail))
-          ((<= roll 80) (format "%s of %s's %s" place namesake detail))
-          ((<= roll 85) (format "%s's %s" namesake place))
-          ((<= roll 95) (format "%s %s of %s" description place namesake))
-          (t            (format "%s of %s" place namesake))))))
+  (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
+    "Rolling on multiple tables to return a random site name."
+    (interactive (list (completing-read "Place type: "
+                                        '(barrow cavern icereach mine pass ruin
+                                                 sea-cave shadowfen stronghold
+                                                 tanglewood underkeep))))
+    (unless place-type
+      (setq place-type "unknown"))
+    (let ((description (rpgdm-tables-choose "site-name-description"))
+          (detail (rpgdm-tables-choose "site-name-detail"))
+          (namesake (rpgdm-tables-choose "site-name-namesake"))
+          (place  (rpgdm-tables-choose (format "site-name-place-%s" place-type)))
+          (roll   (rpgdm--roll-die 100)))
+      (rpgdm-message
+       (cond
+        ((<= roll 25) (format "%s %s" description place))
+        ((<= roll 50) (format "%s of %s" place detail))
+        ((<= roll 70) (format "%s of %s %s" place description detail))
+        ((<= roll 80) (format "%s of %s's %s" place namesake detail))
+        ((<= roll 85) (format "%s's %s" namesake place))
+        ((<= roll 95) (format "%s %s of %s" description place namesake))
+        (t            (format "%s of %s" place namesake))))))
+
+  (puthash "site-name :: Generate a name for a dangerous site"
+           'rpgdm-ironsworn-oracle-site-name rpgdm-tables)
 #+END_SRC
 
 So, let's generate some random place names:
@@ -809,6 +834,9 @@ Generate a random threat and its motivations by coding the threat, but using the
       (setq category (seq-random-elt rpgdm-ironsworn-oracle-threats)))
     (let ((table-name (format "threat-%s" (downcase (string-replace " " "-" category)))))
       (rpgdm-message "%s: %s" category (rpgdm-tables-choose table-name))))
+
+  (puthash "threat-goal :: Generate a goal for a particular threat"
+           'rpgdm-ironsworn-oracle-threat-goal rpgdm-tables)
 #+END_SRC
 
 And we can have a random threat:
