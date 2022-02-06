@@ -1,0 +1,34 @@
+** Discover a Site
+
+When you resolve to enter a perilous site in pursuit of an objective, choose the theme and domain which best represent its nature ([[file:/Volumes/Personal/personal/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure), and give it a rank.
+
+  - Troublesome site :: 3 progress per area.
+  - Dangerous site :: 2 progress per area.
+  - Formidable site :: 1 progress per area.
+  - Extreme site :: 2 ticks per area.
+  - Epic site :: 1 tick per area.
+
+If you are returning to a previously explored site, roll both challenge dice, take the lowest value, and clear that number of progress boxes.
+
+Then, [[file:delve-the-depths.org][Delve the Depths]] to explore this place.
+
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+
+When you first encounter or introduce a site within your story, make this move. Choose a theme and domain, set the rank, ready your progress track, and prepare to enter. See page 6 for details on setting up your playscape.
+**** Returning to a Previously Explored Site
+
+A site may prove too perilous, forcing you to flee or abandon your delve. Perhaps you are wounded, shaken, or [[file:/Volumes/Personal/personal/ironsworn/moves/suffer/out-of-supply.org][Out of Supply]]. You might face a narrative complication which sends you out of the site.
+
+If you later return to continue your exploration, you can use the existing progress on the site progress track---but not all of it. To determine how much progress remains, roll your challenge dice (two ten-sided dice), take the lowest value, and erase that number of progress boxes. A low result means your experience here is kept as you return, allowing you to speed your way through previously explored terrain. A high result indicates that something has changed, your foes have bolstered their defenses, or the nature of this place is simply too chaotic and unpredictable.
+
+If a progress box is partially filled (fewer than four ticks), you'll count it as one progress for the purposes of clearing boxes.
+
+If you return to a site and your lowest challenge die is greater than your available progress, simply clear all the progress boxes.
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

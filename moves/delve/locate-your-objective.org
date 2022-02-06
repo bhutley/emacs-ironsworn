@@ -1,0 +1,38 @@
+** Locate Your Objective
+/Progress Move/
+
+When your exploration of a site comes to an end, roll the challenge dice and compare to your progress. Momentum is ignored on this roll.
+
+  - On a *strong hit*, you locate your objective and the situation favors you. Choose one:
+
+    - Make another move now (not a progress move), and add +1.
+    - Take +1 momentum.
+
+  - On a *weak hit*, you locate your objective but face an unforeseen hazard or complication. Envision what you find ([[file:~/googoo/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure).
+
+  - On a *miss*, your objective falls out of reach, you have been misled about the nature of your objective, or you discover that this site holds unexpected depths. If you continue your exploration, clear all but one filled progress and raise the site's rank by one (if not already epic).
+
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:move-stats: progress
+:END:
+
+When you are ready to complete your exploration of a site, make this move. Since this is a progress move, you tally the number of filled boxes on your progress track. This is your progress score. Only add fully filled boxes (those with four ticks). Then, roll your challenge dice, compare to your progress score, and resolve a strong hit, weak hit, or miss as normal. You may not burn momentum on this roll, and you are not affected by negative momentum.
+
+This move is structured and functions similarly to [[file:~/googoo/ironsworn/moves/adventure/reach-your-destination.org][Reach Your Destination]]. Have you found what you were looking for? Are there additional obstacles in your path? Roll to find out.
+
+When you score a *strong hit*, you locate your objective. Depending on the context of your objective, your task may be complete or you are well-positioned to take action.
+
+On a *weak hit*, something complicates your objective. Things are not what you expected, or an obstacle stands in your way. Envision what you encounter. Then, play to see what happens.
+
+On a *miss*, things have fallen apart. Your objective lies somewhere else, you were mistaken about the nature of your objective, or you face a turn of events that undermines your purpose. Depending on the circumstances, this might mean your exploration ends in failure, or that you must push on while clearing all but one of your filled progress and raising the site's rank.
+
+If you are traveling with allies, one of you makes this move. Each of you benefits (or suffers) from the narrative outcome of the roll. Only the character making the move takes the mechanical benefit of a strong hit.
+
+Finally, consider how the objective impacts your quest. If this is a milestone, make the [[file:~/googoo/ironsworn/moves/quest/reach-a-milestone.org][Reach a Milestone]] move. If this objective represents what you believe is the completion of your quest, [[file:~/googoo/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]].
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

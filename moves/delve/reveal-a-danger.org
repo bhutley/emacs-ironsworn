@@ -1,0 +1,58 @@
+** Reveal a Danger
+
+When you *encounter a risky situation within a site*, envision the danger
+or [[elisp:(rpgdm-tables-choose "dangers")][roll on the following table]]:
+
+|  Roll | Result                                                      |
+|-------+-------------------------------------------------------------|
+|  1-30 | Check the theme card.                                       |
+| 31-45 | Check the domain card.                                      |
+| 46-57 | You encounter a hostile denizen.                            |
+| 58-68 | You face an environmental or architectural hazard.          |
+| 69-76 | A discovery undermines or complicates your quest.           |
+| 77-79 | You confront a harrowing situation or sensation.            |
+| 80-82 | You face the consequences of an earlier choice or approach. |
+| 83-85 | Your way is blocked or trapped.                             |
+| 86-88 | A resource is diminished, broken, or lost.                  |
+| 89-91 | You face a perplexing mystery or tough choice.              |
+| 92-94 | You lose your way or are delayed.                           |
+| 95-00 | Roll twice more on this table.¹                             |
+
+¹ Both results occur. If they are the same result, make it worse.
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+
+This move is the inverse of Find an Opportunity. It is triggered by a miss or weak hit when you [[file:delve-the-depths.org][Delve the Depths]].
+
+You can also trigger *Reveal a Danger* as a consequence of any complication or failure within a site. If you must [[file:/Volumes/Personal/personal/ironsworn/moves/fate/pay-the-price.org][Pay the Price]] when exploring, and want to introduce an outcome related to the location, make this move instead of referencing the *Pay the Price* table. For example, if you [[file:/Volumes/Personal/personal/ironsworn/moves/adventure/make-camp.org][Make Camp]] within the depths of a Wild Tanglewood, and roll a miss, you can choose to Reveal a Danger instead of rolling on the Pay the Price table.
+**** Envision the Danger
+Much like [[file:/Volumes/Personal/personal/ironsworn/moves/fate/pay-the-price.org][Pay the Price]], you can choose to simply introduce a danger that's a good fit for the current situation. If a dramatic outcome springs to mind immediately, go with it. Otherwise, you can put it in the hands of fate and roll on the included danger table. When you make your oracle roll on this table, the potential result spans three locations:
+
+  - 1-30 is found in the danger table on the theme card.
+  - 31-45 is found in the danger table on the domain card.
+  - 46-100 is found on the main Reveal a Danger table.
+**** Play to Find Out What Happens
+Most results on the danger tables are a setup for a new threat or complication. You encounter an obstacle which must be overcome, or a foe who must be dealt with, or a mystery which must be solved. If you need clarification for an abstract or suggestive result, [[file:/Volumes/Personal/personal/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]]. Then, zoom in and resolve the situation. If a move is triggered, make it.
+
+However, some results may suggest an immediate consequence, such as suffering a loss of spirit, harm, supply, or momentum. If so, make it happen. Varying the focus and nature of the dangers you encounter will help you manage the pace of your session. If it's interesting and dramatic, zoom in. Otherwise, apply the consequence and move on.
+**** Reinforcing a Perilous Environment
+
+When you travel overland using the [[file:/Volumes/Personal/personal/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]] move, your supply
+is reduced on a weak hit. This creates a sense of urgency, forcing you
+to manage your resources or seek help within a community.
+
+When you *Delve the Depths*, the potential consequence of a weak hit is more open-ended. You have more options to absorb a failure through your status tracks and narrative complications. However, you also have fewer options to recover from failure. A [[file:/Volumes/Personal/personal/ironsworn/moves/relationship/sojourn.org][Sojourn]] is probably not possible without retreating entirely from the site. Depending on the nature of a site, you may not have an opportunity to [[file:/Volumes/Personal/personal/ironsworn/moves/adventure/resupply.org][Resupply]] or [[file:/Volumes/Personal/personal/ironsworn/moves/adventure/make-camp.org][Make Camp]]. The deeper you delve, the more you are pushing your limited resources, and the greater the cost if you are forced to retreat or flee.
+
+Also, consider the effect of this place on your morale. You face darkness, fear, aberrant environments, deadly foes, and constant peril. This will wear on you. Consider [[file:/Volumes/Personal/personal/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] as a natural outcome for the sights and situations you encounter in a site. Your stress track should function as an ever-present ticking clock, counting down to an agonizing choice: do you abandon this place, or risk losing yourself to it forever?
+
+**** Adjusting the Severity of a Danger
+The nature of the threat can also reflect your current situation and the outcome of the preceding move. If you trigger Reveal a Danger through a weak hit on Delve the Depths, you might have an opportunity to overcome or avoid the threat. For example, you Face Danger to avoid a sudden rockfall when exploring a Mine, and continue on your way unscathed.
+
+A miss on [[file:delve-the-depths.org][Delve the Depths]] should trigger a danger that is dire, and has greater impact on your story. Even if you manage to overcome the threat, the effort or delay can carry a cost. For example, you escape immediate harm as you dive out of the way of the rockfall. But you must suffer a loss of momentum as you spend time and energy digging your way through the now-blocked passage.
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

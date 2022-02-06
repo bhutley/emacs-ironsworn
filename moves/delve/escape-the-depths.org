@@ -1,0 +1,55 @@
+** Escape the Depths
+When you flee or withdraw from a site, consider the situation and your approach. If you...
+
+  - Find the fastest way out: Roll +edge.
+  - Steel yourself against the horrors of this place: Roll +heart.
+  - Fight your way out: Roll +iron.
+  - Retrace your steps or locate an alternate path: Roll +wits.
+  - Keep out of sight: Roll +shadow.
+
+On a *strong hit*, you make your way safely out of the site. Take +1 momentum.
+
+On a *weak hit*, you find your way out, but this place exacts its price. Choose one:
+
+  - You are weary or wounded: [[file:../suffer/endure-harm.org][Endure Harm]].
+  - The experience leaves you shaken: [[file:../suffer/endure-stress.org][Endure Stress]].
+  - You are delayed, and it costs you.
+  - You leave behind something important.
+  - You face a new complication as you emerge from the depths.
+  - A denizen plots their revenge.
+
+On a *miss*, a dire threat or imposing obstacle stands in your way. [[file:reveal-a-danger.org][Reveal a Danger]]. If you survive, you may make your escape.
+
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:move-stats: edge heart iron wits shadow
+:END:
+
+With the focus and effort devoted to exploring the site, getting back out after you [[file:locate-your-objective.org][Locate Your Objective]] can feel anticlimactic. *Escape the Depths* gives you a zoomed-out method of abstracting your exit from this place. With a single roll, you'll resolve what happens when you journey out of the depths.
+
+You might also need to *Escape the Depths* when your resources are exhausted, the dangers prove too great, or if you are at the brink of calamity. When you need to get the hell out, make this move. If you later return to try again, you'll reduce the amount of accrued progress when you [[file:discover-a-site.org][Discover a Site]].
+
+To escape a site, you can envision reversing course or heading for the nearest exit. To justify the move, feel free to introduce a convenient shortcut or a heretofore unknown exit. In open terrain, such as a Tanglewood or Shadowfen, your exit can be a path leading to safer territory.
+
+If you are playing with allies, one of you will take the leadership role and make this move for the party.
+
+On a *strong hit*, you are free and clear. Envision the escape as a montage. You persevere over any obstacles. For the moment, you are safe.
+
+On a *weak hit*, you escape the site, but not without cost. Envision how the site exacted this price, and pick an option from the move.
+
+If you score a *weak hit* when escaping with allies, consider how the cost impacts the group. You can each choose an option from the weak hit results--- for example, one might suffer harm and another stress---or just inflict the cost on the acting character. A narrative cost such as “you face a new complication” can apply to the group as a whole.
+
+On a *miss*, the depths block your escape. You must [[file:reveal-a-danger.org][Reveal a Danger]]. Zoom in as you deal with this sudden turn of events. Per the text of the move, make it a dire threat or imposing obstacle. /Make it hurt/. If you overcome this challenge, you may then envision your successful escape from the site.
+**** Don't Make This Move When...
+
+Don't make this move when you are not in a position to escape. If you are in the middle of a fight, you must defeat your foes or [[file:../adventure/face-danger.org][Face Danger]] to break away from the battle. If the path is blocked or hindered, deal with that obstacle first.
+
+You also won't make this move if your sole objective in a site is to find your way out. In that case, when you successfully [[file:locate-your-objective.org][Locate Your Objective]], you have the means to escape and can envision doing so without making another move.
+
+Finally, if you would prefer to detail your journey back out of the depths, you can ignore this move. Instead, after you successfully Locate Your Objective, you should [[file:discover-a-site.org][Discover a Site]]. Using the “If you are returning to a previously explored site...” option, roll both challenge dice, take the lowest value, and clear that number of progress boxes from the site progress track. Set a new objective to escape this place. When you successfully [[file:locate-your-objective.org][Locate Your Objective]] again, you have escaped.
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

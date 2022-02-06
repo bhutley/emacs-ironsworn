@@ -1,0 +1,45 @@
+** Check Your Gear
+
+When you check to see if you have a specific helpful item, and you have at least +1 supply, roll +supply.
+
+  - On a *strong hit*, you have it. Take +1 momentum.
+
+  - On a *weak hit*, you have it, but your resources are diminished. Take +1 momentum and suffer -1 supply.
+
+  - On a *miss*, you don't have it and the situation grows more perilous. [[file:~/googoo/ironsworn/moves/fate/pay-the-price.org][Pay the Price]].
+
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:move-stats: supply
+:END:
+
+The isolation and perilous nature of a site may force you to consider what equipment you can bring to bear to overcome an obstacle. By default, the Ironsworn system is not concerned with tracking a detailed inventory. This may lead to situations where you aren't sure if you are prepared for an unexpected challenge. For example:
+
+  - Your enemies are coming across the bridge. Do you have a blade you can use to cut the rope support?
+
+  - Your ally is poisoned. Do you have an antidote in your herbalist's kit?
+
+  - The troll wants something for its collection. Do you have an appropriately shiny trinket?
+
+When you check to see if you have a particular item on-hand, make this move.
+
+On a strong hit, you've got it. You have the fictional framing to make moves (or avoid a move) using this item. Plus, you take a +1 momentum bonus to represent your readiness for this situation.
+
+On a weak hit, you have it, but your resources are reduced. Take the +1 momentum reward and suffer -1 supply.
+
+On a miss, you don't have what you need, and things get worse. You must [[file:~/googoo/ironsworn/moves/fate/pay-the-price.org][Pay the Price]]. This may mean turning the peril of the current situation up a notch, or inflicting an immediate negative outcome.
+
+**** Checking Your Gear Outside of a Site
+
+If you like what it adds to the game, you can consider *Check Your Gear* as part of Ironsworn's default move set. If so, you can trigger this move outside of site-based exploration.
+
+**** Don't Overdo It
+Save this move for dramatic moments. If you are prepared to explore a site, you can assume you are equipped with the basics (such as lighting, rations, and weapons). Make this move when looking for something specific or noteworthy.
+**** Prefer to Ignore this Move?
+Since this move is not essential to resolving your exploration of a site, you can consider it as an optional component. For example, if you prefer to keep a more detailed inventory for your character, this move may not be necessary. Or you might prefer to just handwave equipment entirely. If you think this move delivers an unnecessary level of detail, or not enough detail, you can ignore it and rely on your usual approach for managing gear.
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

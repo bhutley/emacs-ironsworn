@@ -1,0 +1,90 @@
+** Delve the Depths
+
+When you traverse an area within a perilous site, envision your surroundings ([[file:/Volumes/Personal/personal/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure). Then, consider your approach. If you navigate this area...
+
+  - With haste: Roll +edge.
+  - With stealth or trickery: Roll +shadow.
+  - With observation, intuition, or expertise: Roll +wits.
+
+On a *strong hit*, you delve deeper. Mark progress and [[file:find-an-opportunity.org][Find an Opportunity]].
+
+On a *weak hit*, roll on the following table according to your stat.
+
+On a *miss*, [[file:reveal-a-danger.org][Reveal a Danger]].
+
+|  Edge | Shadow |  Wits | Weak Hit Result                                   |
+|-------+--------+-------+---------------------------------------------------|
+|  1-45 |   1-30 |  1-40 | Mark progress and Reveal a Danger.                |
+| 46-65 |  31-65 | 41-55 | Mark progress.                                    |
+| 66-75 |  66-90 | 56-80 | Choose one: Mark progress or Find an Opportunity. |
+| 76-80 |  91-99 | 81-99 | Take both: Mark progress and Find an Opportunity. |
+| 81-00 |     00 |    00 | Mark progress twice and Reveal a Danger.          |
+
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:move-stats: edge shadow wits
+:END:
+
+Make this move when you enter a site, and as you push forward into the depths. Think of this move as a counterpart to [[file:/Volumes/Personal/personal/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]]. It resolves your exploration within a segment of the site and determines whether you mark progress.
+**** What is an Area?
+The portion of the site you traverse when you make this move is called an area. This is an abstract representation of a particular segment of the site. In a Fortified Stronghold, a specific area might consist of a single room. In a Wild Shadowfen, an area can be a deer path winding for miles through a stagnant and misty morass. The size and detail will vary based on the nature of the site and the context of your exploration.
+
+You can adjust the pace and focus of your exploration. Your travel through some areas may pass as a montage that spans hours in the game world. Other areas might become the focus of a high-intensity scene which represents mere seconds or minutes. An area is an imprecise but flexible reference for measuring your progress, framing your surroundings, and introducing dangers and opportunities.
+**** Envision your Surroundings
+When you make the Delve the Depths move, the first step is to define the characteristics of the area you are attempting to traverse. You are moving from a known area (your current location), into an unknown area. What will you find there? Taking a moment to reveal the characteristics of an area will create context for your exploration and the result of your moves.
+
+Have a look at your theme and domain cards. They both include a feature table. When you want to define the characteristics of an area, you may Ask the Oracle using these tables as inspiration.
+
+When you make a standard 1-100 oracle roll, the possible results span both cards. If you roll 1-20, refer to the theme card for your answer. 21-100 is found on the domain card.
+
+Instead of rolling to generate a feature, you may simply envision the nature of the area. Perhaps your current surroundings require additional time to traverse, or you might assume you are moving into a specific terrain or architecture based on your understanding of this place. To reduce the frequency of your dice rolling, and give the place a sense of uniformity interspersed with interesting areas and discoveries, feel free to rely on your instincts or choose a feature from the oracle charts.
+**** Adding Detail
+A result on the feature table might be abstract, mundane, unusual, or specific. If you want to clarify a result or add additional detail, you can use another oracle for inspiration.
+
+The [[elisp:(rpgdm-tables-choose "feature-aspect")][Aspect]] and [[elisp:(rpgdm-tables-choose "feature-focus")][Focus]] oracles are useful prompts to help flesh out your surroundings or give detail for an encounter or event within a site.
+**** Envision Your Approach
+Next, envision how you will attempt to traverse this area. The *Delve the Depths* move gives you three options. Choose one.
+
+  - With haste: Roll +edge.
+  - With stealth or trickery: Roll +shadow.
+  - With observation, intuition, or expertise: Roll +wits.
+
+Your selection should be based on several factors, including the abilities and approach of your character, the terrain or architecture you find yourself in, your current situation, and the nature of the site. For example:
+
+  - Time is of the essence, and you must warn a village of an impending raider attack. Unfortunately, it lies on the other side of a Corrupted Shadowfen. Forced by the narrative circumstances to plunge heedlessly into danger, you roll +edge.
+
+  - A Hallowed Stronghold is held by enemy cultists. To blend in as you move through occupied areas, you wear the robes of their sect. You roll +shadow and hope no one takes notice of you.
+
+  - An Ancient Frozen Cavern holds age-old secrets. This is a perilous place, and your exploration is hindered by traps and dangerous terrain. You move with caution, wary of new dangers, and roll +wits.
+
+If you are playing with allies, only one of you makes this move. Decide who is leading this segment of the exploration. The leadership role may change from area to area as appropriate to the situation and your approach. Another character can attempt to bolster the leader's action by making the Aid Your Ally move, though that carries its own risk of complication.
+**** If You Score a Strong Hit...
+If you roll a strong hit, this phase of your exploration has gone well. You have the advantage, and are pushing farther into the depths of this place. Mark progress per the rank of the site. For example, if this is a dangerous site, mark two progress. If it is extreme, mark two ticks. Then, make the [[file:find-an-opportunity.org][Find an Opportunity]] move.
+**** If You Score a Weak Hit...
+On a weak hit, the outcome is uncertain. Note that this table includes a different potential result for the three stat options: edge, shadow, and wits. Reference the appropriate column and check the result based on the stat used in your action roll. For example, if you Delve the Depths using shadow, rolling a 35 on this table instructs you to mark progress. If you used wits, that same roll tells you to mark progress and [[file:reveal-a-danger.org][Reveal a Danger]].
+
+Each stat choice offers advantages and disadvantages as you Delve the Depths:
+
+  • Edge gives you the potential to move faster through the site, marking additional progress. But you are also more likely to Reveal a Danger and have less chance to Find an Opportunity.
+
+  - Shadow is the safest option, making it likely you will mark progress and not Reveal a Danger. However, your wariness gives you a reduced chance to Find an Opportunity.
+
+  - Wits is a balanced approach, with more potential to Find an Opportunity as you mark progress. But you put yourself at risk to Reveal a Danger.
+
+When you envision your approach, your stat choice should be driven by the situation, your surroundings, and your character's abilities and methods. But you can also be mindful of how the stat will impact the result when you are forced to roll on this table.
+
+If the table directs you to mark progress, do so. “Mark progress twice” means you should double the progress. For example, if you are exploring a dangerous site, you would normally mark two progress boxes. Marking twice gives you four progress boxes.
+**** If You Roll a Miss...
+On a miss, you do not mark progress and must make the Reveal a Danger move. You have been waylaid by a threat.
+
+Reminder: if you are playing with allies, only one of you makes this
+move. They are the leader for this segment of the exploration. Other
+players contribute by helping set the scene and interpreting outcomes.
+Allies can also make the Aid Your Ally move to bolster the leader's
+action.
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:

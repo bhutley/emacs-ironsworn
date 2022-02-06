@@ -1,0 +1,65 @@
+** Find an Opportunity
+
+When you *encounter a helpful situation or feature within a site*, [[elisp:(rpgdm-tables-choose "opportunity")][roll on the following table]]. If you are making this move as a result of a strong hit on [[file:delve-the-depths.org][Delve the Depths]], you may pick or envision an opportunity instead of rolling.
+
+Then, choose one.
+
+  • Gain insight or prepare: Take +1 momentum.
+
+  • Take action now: You and any allies may make a move (not a progress move) which directly leverages the opportunity. When you do, add +1 and take +1 momentum on a hit.
+
+ |   Roll | Result                                                          |
+ |--------+-----------------------------------------------------------------|
+ |   1-25 | The terrain favors you, or you find a hidden path.              |
+ |  26-45 | An aspect of the history or nature of this place is revealed.   |
+ |  46-57 | You locate a secure area.                                       |
+ |  58-68 | A clue offers insight or direction.                             |
+ |  69-78 | You get the drop on a denizen.                                  |
+ |  79-86 | This area provides an opportunity to scavenge, forage, or hunt. |
+ |  87-90 | You locate an interesting or helpful object.                    |
+ |  91-94 | You are alerted to a potential threat.                          |
+ |  95-98 | You encounter a denizen who might support you.                  |
+ | 99-100 | You encounter a denizen in need of help.                        |
+
+*** Details
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+
+This move represents discovering a helpful situation or feature within a site. It is a fortunate circumstance---not a willful action taken by your character--- so is triggered only when you Delve the Depths and score a hit. It is always triggered on a strong hit with that move, and sometimes on a weak hit.
+
+If you are playing with allies, the character who triggered *Find an Opportunity* as they [[file:delve-the-depths.org][Delve the Depths]] is the one to resolve the move. However, everyone at the table can participate in interpreting the outcome and describing the reactions of their character. Also, the rewards of this move may benefit your allies.
+**** Define the Opportunity
+If you *triggered this move through a weak hit* on [[file:delve-the-depths.org][Delve the Depths]], make an oracle roll on the included opportunity table. Check your result and interpret the outcome as appropriate to the nature of the site and your current situation.
+
+If you *scored a strong hit on Delve the Depths*, you may pick an outcome from the table without rolling. Or you can simply envision any moderately helpful circumstance as an opportunity. If you are unsure, or want to leave it in the hands of fate, [[file:../fate/ask-the-oracle.org][Ask the Oracle]].
+**** Interpret the Opportunity
+
+Next, bring the opportunity to life. What do you encounter? How can it help you? The opportunity should make sense in the context of the site, the characteristics of this specific area, and the purpose of your exploration.
+
+If you roll on the *Find an Opportunity* oracle and the response is difficult to interpret for your current situation, you can check up or down one row from your original answer, or reverse the digits (37=73). However, the abstract nature of these results should allow them to fit most circumstances.
+
+When this move is triggered by a weak hit, the opportunity should feel like a minor reward. It is a moment of hope or respite in an otherwise dire circumstance, rather than a dramatic shift in the character’s fortunes. A strong hit on Delve the Depths can prompt a more powerful narrative opportunity, especially when paired with a match on the challenge dice.
+
+If you need additional detail or clarification, [[file:../fate/ask-the-oracle.org][Ask the Oracle]].
+
+*Note:* If you are playing in /guided mode/, the result of the *Delve the Depths* move can define who has narrative control over an opportunity. On a strong hit, the player defines the opportunity. On a weak hit, the GM has control.
+**** Act on the Opportunity
+Finally, per the text of the move, use the opportunity to choose one:
+
+  • Gain insight or prepare: Take +1 momentum.
+
+  • Take action now: You and any allies may make a move (not a progress move) which directly leverages the opportunity. When you do, add +1 and take +1 momentum on a hit.
+
+*Take the first option if you don't want to take the chance of suffering a cost by making a move*, if the opportunity doesn't lend itself to a move, or if you're more interested in building momentum without risk. This reward represents your improved confidence and position as you push deeper into the depths. If you are playing with allies, this benefit is limited to the character making the move.
+
+*Take the second option if you want to make an immediate move to leverage your opportunity.* For example, you might find an area where you can Make Camp in relative comfort or safety. A clear path may allow you to Delve the Depths with renewed determination. Perhaps you can [[file:/Volumes/Personal/personal/ironsworn/moves/adventure/gather-information.org][Gather Information]] to search an area or follow tracks.
+
+If you are exploring with allies, the “take action now” option is usable by anyone, and you may each make one move (not a progress move) which leverages this reward.
+
+However, don't bend the fiction to a breaking point by trying to justify a move which is tangential or unrelated to the opportunity. If there is a clear action for your character, take it. Otherwise, let someone else have the spotlight.
+
+#+STARTUP: showall
+# Local Variables:
+# eval: (writegood-mode -1)
+# End:
