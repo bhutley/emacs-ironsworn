@@ -37,6 +37,66 @@ roll (added to MODIFIER) vs. two d10 challenge dice."
     (rpgdm-message (rpgdm-ironsworn--results action-roll modifier
                                              one-challenge two-challenge))))
 
+(defun rpgdm-ironsworn-new-character ()
+  "Interactively query the user for a new character's attribute.
+This function _appends_ this information to the current buffer,
+which should be using the `org-mode' major mode."
+  (interactive)
+  (let ((name (read-string "What is the new character's name? "))
+        (frmt (seq-random-elt '("* The Adventures of %s"
+                                "* The Journeys of %s"
+                                "* %s, an Epic Saga"
+                                "* The Epic of %s"
+                                "* Travels of %s"))))
+    (when (s-blank? name)
+      (setq name (rpgdm-tables-choose "names-ironlander")))
+    (goto-char (point-max))
+    (insert "# Local Variables:
+# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load (concat rpgdm-ironsworn-project \"tables\")))
+# End:
+")
+    (insert (format frmt name))
+
+    (dolist (stat '(edge heart iron shadow wits))
+      (rpgdm-ironsworn-store-character-state stat
+                                             (read-string (format "What is %s's %s stat: " name stat))))
+
+    (dolist (stat '(health spirit supply))
+      (rpgdm-ironsworn-store-character-state stat 5))
+    (rpgdm-ironsworn-store-character-state 'momentum 2)
+
+    (rpgdm-ironsworn-progress-create "Bonds" 1)
+    (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
+    (message "Alright, the template for %s is complete. Edit away!" name)))
+
+(defun rpgdm-ironsworn--display-stat (stat character)
+  (let* ((value (gethash stat character))
+         (s-val (number-to-string value))
+         (color (cond
+                 ((< value 1) "red")
+                 ((< value 3) "orange")
+                 ((< value 4) "yellow")
+                 (t "green"))))
+    (propertize s-val 'face `(:foreground ,color))))
+
+(defun rpgdm-ironsworn-character-display ()
+  "Easily display the character's stats and other things."
+  (interactive)
+  (let ((character (rpgdm-ironsworn-current-character-state)))
+    (rpgdm-message "Edge: %d  Heart: %d  Iron: %d  Shadow: %d  Wits: %d
+Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
+                   (rpgdm-ironsworn-character-stat 'edge character)
+                   (rpgdm-ironsworn-character-stat 'heart character)
+                   (rpgdm-ironsworn-character-stat 'iron character)
+                   (rpgdm-ironsworn-character-stat 'shadow character)
+                   (rpgdm-ironsworn-character-stat 'wits character)
+
+                   (rpgdm-ironsworn--display-stat 'health character)
+                   (rpgdm-ironsworn--display-stat 'spirit character)
+                   (rpgdm-ironsworn--display-stat 'supply character)
+
+                   (gethash 'momentum character 5))))
+
 (defun rpgdm-ironsworn-to-string (a)
   "Return a lowercase string from either a string, keyword or symbol."
   (downcase
@@ -51,32 +111,16 @@ roll (added to MODIFIER) vs. two d10 challenge dice."
 
   (lambda (s) (sxhash-equal (rpgdm-ironsworn-to-string s))))
 
-(defvar rpgdm-ironsworn-character (make-hash-table :test 'str-or-keys)
-  "Stats and attributes for the currently loaded character")
-
-(cl-defun rpgdm-ironsworn-character (&key (edge 1) (heart 1) (iron 1) (shadow 1) (wits 1)
-                                          (health 5) (spirit 5) (supply 5) (momentum 2))
-  "Store the player character's stats, as well as set up the defaults for the values."
-  (clrhash rpgdm-ironsworn-character)
-  ;; (setq rpgdm-ironsworn-character (make-hash-table :test 'str-or-keys))
-  (puthash 'edge edge rpgdm-ironsworn-character)
-  (puthash 'heart heart rpgdm-ironsworn-character)
-  (puthash 'iron iron rpgdm-ironsworn-character)
-  (puthash 'shadow shadow rpgdm-ironsworn-character)
-  (puthash 'wits wits rpgdm-ironsworn-character)
-
-  (puthash 'health health rpgdm-ironsworn-character)
-  (puthash 'spirit spirit rpgdm-ironsworn-character)
-  (puthash 'supply supply rpgdm-ironsworn-character)
-  (puthash 'momentum momentum rpgdm-ironsworn-character))
-
-(defun rpgdm-ironsworn-character-stat (stat)
+(defun rpgdm-ironsworn-character-stat (stat &optional character)
   "Return integer value associated with a character's STAT."
-  (gethash stat rpgdm-ironsworn-character 1))
+  (when (null character)
+    (setq character (rpgdm-ironsworn-current-character-state)))
+  (gethash stat character 1))
 
 (defun rpgdm-ironsworn-adjust-stat (stat adj &optional default)
   "Increase or decrease the current character's STAT by ADJ."
   (let ((value (+ (gethash stat rpgdm-ironsworn-character default) adj)))
+    ;; TODO: Delete this hash bidness
     (puthash stat value rpgdm-ironsworn-character)
     (rpgdm-ironsworn-store-character-state stat value)))
 
@@ -99,33 +143,6 @@ roll (added to MODIFIER) vs. two d10 challenge dice."
   "Increase or decrease the current character's momentum by MOMENTUM-ADJ."
   (interactive "nMomentum Adjustment: ")
   (rpgdm-ironsworn-adjust-stat 'momentum momentum-adj 2))
-
-(defun rpgdm-ironsworn--display-stat (stat)
-  (let* ((value (gethash stat rpgdm-ironsworn-character))
-         (s-val (number-to-string value))
-         (color (cond
-                 ((< value 1) "red")
-                 ((< value 3) "orange")
-                 ((< value 4) "yellow")
-                 (t "green"))))
-    (propertize s-val 'face `(:foreground ,color))))
-
-(defun rpgdm-ironsworn-character-display ()
-  "Easily display the character's stats and other things."
-  (interactive)
-  (rpgdm-message "Edge: %d  Heart: %d  Iron: %d  Shadow: %d  Wits: %d
-Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
-                 (rpgdm-ironsworn-character-stat 'edge)
-                 (rpgdm-ironsworn-character-stat 'heart)
-                 (rpgdm-ironsworn-character-stat 'iron)
-                 (rpgdm-ironsworn-character-stat 'shadow)
-                 (rpgdm-ironsworn-character-stat 'wits)
-
-                 (rpgdm-ironsworn--display-stat 'health)
-                 (rpgdm-ironsworn--display-stat 'spirit)
-                 (rpgdm-ironsworn--display-stat 'supply)
-
-                 (gethash 'momentum rpgdm-ironsworn-character 5)))
 
 (defun rpgdm-ironsworn-roll-stat (stat modifier)
   "Roll an action based on a loaded character's STAT with a MODIFIER."
@@ -192,28 +209,26 @@ Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
          (tuple (assoc move (rpgdm-ironsworn-moves))))
     (cadr tuple)))
 
-(defun rpgdm-ironsworn--store-move (results)
+(defun rpgdm-ironsworn--store-move (title results)
   "Store the results in a `m' register. It should also include
 the name of the move, based on the current file."
-  (set-register ?m
-                (format "# %s ... %s "
-                        (progn
-                          (goto-char (point-min))
-                          (cdr (assoc "ITEM" (org-entry-properties))))
-                        results)))
+  (set-register ?m (format "# %s ... %s " title results)))
 
 (defun rpgdm-ironsworn-make-move (move-file)
-   "Make an Ironsworn move by loading MOVE-FILE, and optionally querying the
+  "Make an Ironsworn move by loading MOVE-FILE, and optionally querying the
 user to make an initial roll based on the properties in the file."
-   (interactive (list (rpgdm-ironsworn-choose-move)))
+  (interactive (list (rpgdm-ironsworn-choose-move)))
 
-   ;; Normally, we'd call `save-window-excursion', however, that buries the file
-   ;; we show, and I think we should leave it up for study.
-   (let ((orig-buf (window-buffer)) props)
-     (find-file-other-window move-file)
-     (setq props (first (org-property-values "move-stats")))
-     (rpgdm-ironsworn--store-move (rpgdm-ironsworn--make-move props))
-     (pop-to-buffer orig-buf)))
+  ;; Normally, we'd call `save-window-excursion', however, that buries the file
+  ;; we show, and I think we should leave it up for study.
+  (let (props title
+        (orig-buf (window-buffer)))
+    (find-file-other-window move-file)
+    (goto-char (point-min))
+    (setq title (cdr (assoc "ITEM" (org-entry-properties))))
+    (setq props (first (org-property-values "move-stats")))
+    (pop-to-buffer orig-buf)
+    (rpgdm-ironsworn--store-move title (rpgdm-ironsworn--make-move props))))
 
 (defun rpgdm-ironsworn--make-move (move-props)
   "Query user for rolls based on the MOVE-PROPS."
@@ -221,7 +236,6 @@ user to make an initial roll based on the properties in the file."
         (count (seq-length props))
         (stats (seq-filter (lambda (s) (string-match (rx (one-or-more alpha)) s)) props))
         (first (first props)))
-   (message "props: %s  count: %d  stats: %s  first: %s" props count stats first)
    (cond
     ((seq-empty-p stats)       nil)
     ((equal first "progress")  (call-interactively 'rpgdm-ironsworn-progress-roll))
@@ -335,6 +349,8 @@ to rolling two d10 challenge dice."
     (rpgdm-message "%s / %s" action theme)))
 
 (defun rpgdm-ironsworn-oracle-npc ()
+  "Roll on all the character-related tables and show them together.
+You'll need to pick and choose what works and discard what doesn't."
   (interactive)
   (let ((name        (rpgdm-tables-choose "names-ironlander"))
         (goal        (rpgdm-tables-choose "character-goal"))
@@ -445,6 +461,10 @@ to rolling two d10 challenge dice."
   (interactive)
   (rpgdm-roll "d100"))
 
+(defun rpgdm-ironsworn-paste-last-move ()
+  "Insert the contents of the `m' register, which should have last move."
+  (insert "\n" (get-register ?m)))
+
 (defhydra hydra-rpgdm-oracles (:color blue)
   "Oracles"
   ("a" rpgdm-ironsworn-oracle-action-theme "Action/Theme")
@@ -465,12 +485,12 @@ to rolling two d10 challenge dice."
 
 (defhydra hydra-rpgdm (:color blue :hint nil)
   "
-    ^Dice^     0=d100 1=d10 6=d6       ^Adjust^      ^Oracles/Tables^     ^Moving^              ^Messages^
+    ^Dice^     0=d100 1=d10 6=d6       ^Adjust^      ^Oracles/Tables^     ^Moving/Editing^      ^Messages^
  ----------------------------------------------------------------------------------------------------------------------------------------------------
     _d_: Roll Dice  _p_: Progress       _H_: Health   _z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
     _e_: Roll Edge  _s_: Roll Shadow    _S_: Spirit   _c_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
     _h_: Roll Heart _w_: Roll Wits      _G_: Supply   _O_: Other Oracles   _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
-    _i_: Roll Iron  _m_: Make Move      _M_: Momentum _T_: Load Oracles                        ⌘-j: ↓ Next   "
+    _i_: Roll Iron  _m_: Make Move      _M_: Momentum _T_: Load Oracles    _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
   ("d" rpgdm-ironsworn-roll)    ("D" rpgdm-ironsworn-progress-roll)
   ("z" rpgdm-ironsworn-oracle)  ("O" rpgdm-oracle)
 
@@ -490,9 +510,9 @@ to rolling two d10 challenge dice."
   ("O" hydra-rpgdm-oracles/body)
   ("p" hydra-rpgdm-progress/body)
 
-  ("o" ace-link)                ("N" org-narrow-to-subtree)   ("W" widen)
-  ("K" scroll-down :color pink)             ("J" scroll-up :color pink)
-
+  ("o" ace-link)                 ("N" org-narrow-to-subtree)   ("W" widen)
+  ("K" scroll-down :color pink)  ("J" scroll-up :color pink)
+  ("y" rpgdm-paste-last-message) ("Y" rpgdm-ironsworn-paste-last-move)
   ("s-h" rpgdm-ironsworn-character-display)
   ("C-m" rpgdm-last-results :color pink)
   ("C-n" rpgdm-last-results-next :color pink)
@@ -527,6 +547,10 @@ Specifically, does it begin with `:IRONSWORN-PROGRESS'"
   (let ((p (symbol-name prop)))
     (string-match (rx bos ":IRONSWORN-PROGRESS-") p)))
 
+(defun rpgdm-ironsworn--short-progress-p (prop)
+  (let ((p (symbol-name prop)))
+    (s-starts-with-p "progress-" p)))
+
 (defun rpgdm-ironsworn--progress-to-str (prop)
   "Convert a progress symbol, PROP to a string."
   (downcase (substring (symbol-name prop) 1)))
@@ -539,27 +563,37 @@ Specifically, does it begin with `:IRONSWORN-PROGRESS'"
 
 (defun rpgdm-ironsworn--current-character-state (results)
   "Recursive helper to insert current header properties in RESULTS.
-Calls itself if it is not looking at the top-level header in the file.
-If a property is already in the hash table, RESULTS, it is not overwritten,
-thereby having lower-level subtrees take precendence over similar settings
-in higher headers."
+Calls itself if it is not looking at the top-level header in the
+file. If a property is already in the hash table, RESULTS, it is
+not overwritten, thereby having lower-level subtrees take
+precendence over similar settings in higher headers."
+  (defun key-convert (ironsworn-prop)
+    (make-symbol (downcase (substring (symbol-name ironsworn-prop) 11))))
+
+  (defun value-convert (value)
+    (if (string-match (rx bos (one-or-more digit) eos) value)
+        (string-to-number value)
+      value))
+
   (let ((props (org-element--get-node-properties)))
     (loop for (k v) on props by (function cddr) do
-          ;; If a key is an ironsworn property, but isn't already in the table...
+          ;; If key is ironsworn property, but isn't in the table...
           (when (rpgdm-ironsworn--property-p k)
-            (unless (gethash k results)
-              (puthash k v results))))
+            (let ((key (key-convert k))
+                  (val (value-convert v)))
+              (unless (gethash key results)
+                (puthash key val results)))))
 
     (unless (= (org-heading-level) 1)
       (org-up-element)
       (rpgdm-ironsworn--current-character-state results))))
 
 (defun rpgdm-ironsworn-current-character-state ()
-  "Return all set properties based on the position of the cursor in org doc.
-Note that values in sibling trees are ignored, and settings in lower levels
-of the tree headings take precedence."
+  "Return all set properties based on cursor position in org doc.
+Note that values in sibling trees are ignored, and settings in
+lower levels of the tree headings take precedence."
   (save-excursion
-    (let ((results (make-hash-table)))
+    (let ((results (make-hash-table :test 'str-or-keys)))
       (unless (eq 'headline (org-element-type (org-element-at-point)))
         (org-up-element))
 
@@ -588,7 +622,7 @@ and the current progress of the track."
   (let ((state (rpgdm-ironsworn-current-character-state)))
     (thread-last state
                  (hash-table-keys)
-                 (-filter #'rpgdm-ironsworn--progress-p)
+                 (-filter #'rpgdm-ironsworn--short-progress-p)
                  (--map (gethash it state))
                  (-map #'rpgdm-ironsworn--progress-values))))
 

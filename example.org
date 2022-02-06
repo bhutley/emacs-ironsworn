@@ -21,20 +21,14 @@
 :ironsworn-progress-bonds: "Bonds" 1 2
 :ironsworn-progress-story: "Learn the Magic of the Runes" 1 0
 :END:
+
 My name is Kannan from a small circle called Elkfield near the great Primeval woods. This is my story.
 
 *Bonds:*
   - Home Circle of Elkfield
 ** Background
-:PROPERTIES:
-:ironsworn-supply: 5
-:END:
 
 Before my mother died, she told me the hunter who died when I was 10, was not my father. She gave me an iron disk on a leather thong, and made me swear a vow that I would leave Elkfield and journey to Cinderhome to meet my father and face my destiny.
-
-#+BEGIN_SRC emacs-lisp :results silent
-(rpgdm-ironsworn-character :heart 1 :shadow 2 :wits 3 :iron 1 :edge 2)
-#+END_SRC
 
 *Assets*
 
@@ -48,28 +42,22 @@ Before my mother died, she told me the hunter who died when I was 10, was not my
     When you surround the remains of a recently deceased intelligent creature with lit candles, and summon its spirit, roll +heart. Add +1 if you share a bond. On a strong hit, the spirit appears and you may converse for a few minutes. Make moves as appropriate (add +1). On a weak hit, as above, but the spirit also delivers troubling news unrelated to your purpose. Envision what it tells you (Ask the Oracle if unsure) and Endure Stress (1 stress).
 
 *** Bonds
-:PROPERTIES:
-:progress: epic
-:END:
-  |---+---+---+---+---+---+---+---+---+---|
-  | - |   |   |   |   |   |   |   |   |   |
-  |---+---+---+---+---+---+---+---+---+---|
-
 People and communities where I share a bond:
 
-#+NAME: character-bonds
+  - Sibila :: My mother
   - Elkfield :: My home circle
 ** Inciting Vow: Find my Father
 :PROPERTIES:
-:ironsworn-progress-vow-inciting: "Find my Father" 8 16
+:ironsworn-progress-c45edbcc: "Find my Father" 4 8
 :END:
 
 *Milestones:*
 
   - Reaching Cinderhome
+  - Finding information from Kori
 *** Journey to Cinderhome
 :PROPERTIES:
-:ironsworn-progress-journey-to-cinderhome: "Journey to Cinderhome" troublesome 8 32
+:ironsworn-progress-7eaac1a2: "Journey to Cinderhome" 12 36
 :END:
 # Seems like a /troublesome/ journey. Do we want to mark with a table? Generate with a Snippet?
 
@@ -110,13 +98,10 @@ Kori told me that Redcrest is a village perched on an island in the Barrier Isla
 
 *** COMMENT Journey to the Coast
 :PROPERTIES:
-:ironsworn-progress-journey-to-coast: "Journey to the Coast" 8 16
-:ironsworn-supply: 1
+:ironsworn-progress-28fd9563: "Journey to the Coast" 8 24
+:ironsworn-supply: 2
 :END:
 # Create a progress tracker, granted, F12 p n works too:
-#+BEGIN_SRC emacs-lisp :results silent
-(rpgdm-ironsworn-progress-create "Journey to the Coast" "Dangerous")
-#+END_SRC
 
 # Undertake a Journey ... Weak hit :: 6 (2 + 4) → 6 / 1 - Ruined Moor
 
@@ -140,7 +125,8 @@ I tucked myself in a corner behind some growth, and placed /Curio/ on a branch o
 **** Conflict with a Horror
 :PROPERTIES:
 :ironsworn-progress-b5f243e0: "Battle with Monstrosity" 8 16
-:ironsworn-health: 4
+:ironsworn-health: 3
+:ironsworn-momentum: 3
 :END:
 # Danger: Tiny / Crustecean with Claws, Mandibles and stinger (Scorpion?) ...  Move between realities / Poisonous
 
@@ -158,3 +144,15 @@ The strike hits the crustacean sending it flying, but I loose my balance, and fa
 
 One of the scorpion-like creatures appears next to me, I try to swat it away with a branch, but miss, as a bugger I didn't see stings me.
 The pain is intense, and I realize I have to get out of here.
+
+# Secure an Advantage ... Weak hit :: 6 (4 + 2) → 5 / 8
+
+I grab Curio, tucking him under my arms and leap from the thicket.
+
+# Clash ... Miss :: 7 (5 + 2) → 7 / 8
+
+The stinging bugs are appear out of no where, and their barbs hurt. The venom is slowing me down, making it hard to concentrate.
+
+# Secure an Advantage ... Strong hit :: 4 (2 + 2) → 3 / 2
+
+I manage to get to the clearing among the shut houses. Do I dare cry for help, or flee back down the path?
