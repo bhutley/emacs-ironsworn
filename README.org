@@ -4,7 +4,7 @@
 #+DATE:   2021-12-21 December
 #+TAGS:   rpg
 #+PROPERTY:    header-args:sh :tangle no
-#+PROPERTY:    header-args:emacs-lisp  :tangle emacs-ironsworn.el
+#+PROPERTY:    header-args:emacs-lisp  :tangle rpgdm-ironsworn.el
 #+PROPERTY:    header-args   :results none   :eval no-export   :comments no
 
 #+OPTIONS:     num:nil toc:nil todo:nil tasks:nil tags:nil date:nil
@@ -20,8 +20,8 @@ After listening to the author, [[https://twitter.com/ShawnTomkin][Shawn Tomkin]]
 Neither this, nor the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] are currently in MELPA, so if you wish to follow along at home, you'll need to clone both repos, and add them to your =load-path= variable with =add-to-list=:
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/other/emacs-rpgdm")
-(add-to-list 'load-path "~/other/emacs-ironsworn")
+(add-to-list 'load-path (expand-file-name "~/other/rpgdm"))
+(add-to-list 'load-path (expand-file-name "~/other/rpgdm-ironsworn"))
 #+END_SRC
 
 Or better yet, use something like [[https://github.com/raxod502/straight.el][straight]]:
@@ -1014,8 +1014,22 @@ This function combines the [[file:tables/feature-aspect.org][aspect]] and [[file
           (focus  (rpgdm-tables-choose "feature-focus")))
       (rpgdm-message "%s / %s" aspect focus)))
 
-  (puthash "feature-aspect-and-focus :: Roll on both feature tables for a waypoint"
+  (puthash "feature-aspect-and-focus :: Roll on both feature tables"
            'rpgdm-ironsworn-oracle-feature rpgdm-tables)
+#+END_SRC
+
+And a Waypoint is similar:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-waypoint ()
+    "Rolls on two tables at one time for a Site's feature."
+    (interactive)
+    (let ((location     (rpgdm-tables-choose "locations"))
+          (description  (rpgdm-tables-choose "location-descriptors")))
+      (rpgdm-message "%s %s" description (downcase location))))
+
+  (puthash "location-and-descriptor :: Roll on two tables for a waypoint"
+           'rpgdm-ironsworn-oracle-waypoint rpgdm-tables)
 #+END_SRC
 *** Site Nature
 In the Ironsworn Delve expansion, you can randomly choose a /dangerous place/, for instance:

@@ -1,5 +1,5 @@
-(add-to-list 'load-path "~/other/emacs-rpgdm")
-(add-to-list 'load-path "~/other/emacs-ironsworn")
+(add-to-list 'load-path (expand-file-name "~/other/rpgdm"))
+(add-to-list 'load-path (expand-file-name "~/other/rpgdm-ironsworn"))
 
 (require 'rpgdm)
 
