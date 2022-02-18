@@ -11,7 +11,7 @@
 #+OPTIONS:     skip:nil author:nil email:nil creator:nil timestamp:nil
 #+INFOJS_OPT:  view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
 
-While my original goal for creating my [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] for Emacs was to help running a role playing game using a laptop instead of a /Dungeon Master Screen/. However, once all my games moved online, having my notes in an org file next to all my friend's faces, was doubly helpful. However, what I used the most from this project was the random tables. Need a name? ~F12 c name~ ... What's the weather like? ~F12 c weather~ (and with completing helpers like [[https://github.com/raxod502/selectrum][selectrum]] and the like, I only needed to type ~we~).
+While my original goal for creating my [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] for Emacs was to help running a role playing game using a laptop instead of a /Dungeon Master Screen/. However, once all my games moved online, having my notes in an org file next to all my friend's faces, was doubly helpful. However, what I used the most from this project was the random tables. Need a name? ~F6 c name~ ... What's the weather like? ~F6 c weather~ (and with completing helpers like [[https://github.com/raxod502/selectrum][selectrum]] and the like, I only needed to type ~we~).
 
 However, the struggles for getting friends to play online proved as challenging as getting them around the table, so I started looking for [[https://www.dicebreaker.com/categories/roleplaying-game/how-to/how-to-play-tabletop-rpgs-by-yourself][solo rpg options]] and discovered [[https://www.ironswornrpg.com/][Ironsworn RPG]]. The bulk of the game is its /moves/ and its /oracles/ (random tables for /everything/). I easily copied sections of the [[https://docs.google.com/document/d/11ypqt6GfLuBhGDJuBGWKlHa-Ru48Tf3G_6zbrYKmXgY/edit#heading=h.xl9vk0d7wwn3][SRD]] into org files, [[file:tables][tables]].
 
@@ -37,7 +37,7 @@ Or better yet, use something like [[https://github.com/raxod502/straight.el][str
 Next, create an org file, and either turn on the =rpgdm-mode= (minor mode), or simply define a globally accessible shortcut:
 
 #+BEGIN_SRC emacs-lisp :tangle no
-  (global-set-key (kbd "<f12>") 'hydra-rpgdm/body)
+  (global-set-key (kbd "<f6>") 'hydra-rpgdm/body)
 #+END_SRC
 
 What I do, is add the following "code" somewhere in my Ironsworn-specific org files:
@@ -48,7 +48,7 @@ What I do, is add the following "code" somewhere in my Ironsworn-specific org fi
 # End:
 #+END_SRC
 
-Finally, define your character. While I describe the details later, hit ~M-x~ and type: =rpgdm-ironsworn-new-character= and answer the questions. This will create the necessary formatting and you are ready to play with either your key-binding (or ~F12~) to bring up the Hydra of commands:
+Finally, define your character. While I describe the details later, hit ~M-x~ and type: =rpgdm-ironsworn-new-character= and answer the questions. This will create the necessary formatting and you are ready to play with either your key-binding (or ~F6~) to bring up the Hydra of commands:
 
 #+ATTR_HTML: :width 1100px
 [[file:images/ui-screenshot.png]]
@@ -77,7 +77,7 @@ While the interface may change (and I may not update that screenshot too often),
   - ~y~ yanks (pastes) the last display table or other message into your document.
   - ~Y~ yanks the results of the last move (along with the name of the move).
   - The Super or Hyper key can be use to view a previous message or roll results.
-  - And ~q~ (or ~F12~) dismisses the UI.
+  - And ~q~ (or ~F6~) dismisses the UI.
 
 This may be sufficient, but the rest of this document goes into details about how to use this, as well as the code to make it.
 ** Character Sheets
@@ -160,44 +160,76 @@ I describe the =rpgdm-ironsworn-roll= that implements this below, but I need a h
 When we roll, I want one of those three results printed, but in different colors, to easily distinguish. I also want to see the numbers, so we can display those too. Oh, and if the same number shows on both d10s, you should introduce a significant plot twist, so this function, given all the numbers, returns a nicely formatted string:
 
 #+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge)
-    (let* ((action-results (+ action modifier))
-           (str-results (cond
-                         ((and (> action-results one-challenge) (> action-results two-challenge))
-                          (propertize "Strong hit" 'face '(:foreground "green")))
-                         ((or  (> action-results one-challenge) (> action-results two-challenge))
-                          (propertize "Weak hit" 'face '(:foreground "yellow")))
-                         (t (propertize "Miss" 'face '(:foreground "red")))))
-           (matched-msg  (if (= one-challenge two-challenge)
-                             (propertize " ← Create a Twist" 'face '(:foreground "orange"))
-                           "")))
-      (format "%s %s %d %s%d %s %d%s %s %d %s %d %s" str-results
-              (propertize "::" 'face '(:foreground "#888"))
-              (+ action modifier)
-              (propertize "(" 'face '(:foreground "#888"))
-              action
-              (propertize "+" 'face '(:foreground "#888"))
-              modifier
-              (propertize ")" 'face '(:foreground "#888"))
-              (propertize "→" 'face '(:foreground "light blue"))
-              one-challenge
-              (propertize "/" 'face '(:foreground "#888"))
-              two-challenge matched-msg)))
+  (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge
+                                   &optional momentum)
+    (unless momentum
+      (setq momentum 0))
+
+    (cl-flet ((strong-p (value dice1 dice2) (and (> value dice1) (> value dice2)))
+              (weak-p   (value dice1 dice2)  (or (> value dice1) (> value dice2)))
+              (miss-p   (value dice1 dice2) (and (<= value dice1) (<= value dice2)))
+              (faded    (str) (propertize str 'face '(:foreground "#888")))
+              (noted    (str) (propertize str 'face '(:foreground "light blue")))
+              (strong   (str) (propertize str 'face '(:foreground "green")))
+              (weak     (str) (propertize str 'face '(:foreground "yellow")))
+              (interest (str) (propertize str 'face '(:foreground "orange")))
+              (miss     (str) (propertize str 'face '(:foreground "red"))))
+
+      (let* ((action-results (+ action modifier))
+             (str-results (cond
+                           ((strong-p action-results one-challenge two-challenge)
+                            (strong "Strong hit"))
+                           ((weak-p action-results one-challenge two-challenge)
+                            (weak "Weak hit"))
+                           (t (miss "Miss"))))
+             (burn-msg     (if (> momentum action-results)
+                               (cond
+                                ((and (strong-p momentum one-challenge two-challenge)
+                                      (not (strong-p action-results one-challenge two-challenge)))
+                                 (concat " -- Burn momentum for a " (strong "Strong hit")))
+                                ((and (weak-p momentum one-challenge two-challenge)
+                                      (miss-p action-results one-challenge two-challenge))
+                                 (concat " -- Burn momentum for a " (weak "Weak hit")))
+                                (t ""))
+                             ""))
+             (matched-msg  (if (= one-challenge two-challenge)
+                               (concat " ← " (interest "Create a Twist"))
+                             "")))
+
+        (format "%s %s %d %s%d %s %d%s %s %d %s %d%s%s"
+                str-results         (faded "::")
+                (+ action modifier) (faded "(")
+                action              (faded "+")
+                modifier            (faded ")")
+                (noted "→")
+                one-challenge       (faded "/")
+                two-challenge
+                matched-msg burn-msg))))
 #+END_SRC
 
 So the following messages, given various /rolls/ should cover those possibilities with text properties:
 
 #+BEGIN_SRC emacs-lisp :tangle no
-  (rpgdm-ironsworn--results 3 2 4 1)  ; "Strong hit :: 5 (3 + 2) → 4 / 1"
-  (rpgdm-ironsworn--results 3 2 8 1)  ; "Weak hit :: 5 (3 + 2) → 8 / 1"
-  (rpgdm-ironsworn--results 3 2 8 6)  ; "Miss :: 5 (3 + 2) → 8 / 6"
-  (rpgdm-ironsworn--results 3 2 6 6)  ; "Miss :: 5 (3 + 2) → 6 / 6  ← Create a Twist"
+  (ert-deftest rpgdm-ironsworn--results-test ()
+    (should (equal (rpgdm-ironsworn--results 3 2 4 1)
+                   "Strong hit :: 5 (3 + 2) → 4 / 1"))
+    (should (equal (rpgdm-ironsworn--results 3 2 8 1)
+                   "Weak hit :: 5 (3 + 2) → 8 / 1"))
+    (should (equal (rpgdm-ironsworn--results 3 2 8 6)
+                   "Miss :: 5 (3 + 2) → 8 / 6"))
+    (should (equal (rpgdm-ironsworn--results 3 2 6 6)
+                   "Miss :: 5 (3 + 2) → 6 / 6 ← Create a Twist"))
+
+    (should (equal (rpgdm-ironsworn--results 3 2 8 6 7)
+                   "Miss :: 5 (3 + 2) → 8 / 6 -- Burn momentum for a Weak hit"))
+    (should (equal (rpgdm-ironsworn--results 3 2 8 6 9)
+                   "Miss :: 5 (3 + 2) → 8 / 6 -- Burn momentum for a Strong hit")))))
 #+END_SRC
 
 The basic interface will query for a modifer, roll all three dice, and then display the results using the [[https://gitlab.com/howardabrams/emacs-rpgdm/-/blob/main/rpgdm.el#L76][rpgdm-message]] function:
 
 #+BEGIN_SRC emacs-lisp :results silent
-  (defun rpgdm-ironsworn-roll (modifier)
+  (defun rpgdm-ironsworn-roll (modifier &optional momentum)
     "Display a Hit/Miss message based on comparing a d6 action
   roll (added to MODIFIER) vs. two d10 challenge dice."
     (interactive "nModifier: ")
@@ -205,7 +237,8 @@ The basic interface will query for a modifer, roll all three dice, and then disp
           (two-challenge (rpgdm--roll-die 10))
           (action-roll   (rpgdm--roll-die 6)))
       (rpgdm-message (rpgdm-ironsworn--results action-roll modifier
-                                               one-challenge two-challenge))))
+                                               one-challenge two-challenge
+                                               momentum))))
 #+END_SRC
 
 ** Character Information
@@ -234,19 +267,93 @@ We assume you have created an org-file, and the /template/ will just append some
       (insert (format frmt name))))
 #+END_SRC
 **** Character Assets
-We need a way to insert three assets, however, I don't want duplicates, or two companions, or ... well, I may come up with more rules, but I codify those rules into a function that returns a list, if it is good, or =nil= otherwise:
+We store the assets in a collection of org files in the [[file:assets/][assets]] directory. We'd like the user to choose an asset, so we convert a filename into something nicer to read based on extracting the /description/ from the /filename/, for instance, =:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--character-asset-label (filename)
+    "Given a FILENAME of an Ironsworn asset, return an Asset label."
+    (cl-flet* ((convert (str) (s-replace "-" " " str))
+               (uppity   (str) (s-titleize (convert str))))
+      (when (string-match (rx (one-or-more any)
+                              "/"
+                              (group (one-or-more (not "/")))    ; parent directory
+                              "/"
+                              (group (one-or-more (not "/")))    ; base filename
+                              ".org")
+                          filename)
+        (format "%s :: %s"
+                (uppity  (match-string 1 filename))
+                (convert (match-string 2 filename))))))     ; Keep lowercase for ease of access
+#+END_SRC
+
+A variable could store an association list of the nicely formatted asset label and its filename:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar rpgdm-ironsworn-character-assets nil
+    "Association list of descriptive label and the filename of each Ironsworn asset.")
+#+END_SRC
+
+Let's fill in those asset values /lazily/. The first time we call this function, we gather the information. Why yes, we will take advantage of the type of Lisp we are dealing with and have the function and the variable use the same name.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-character-assets ()
+    "Return an association list of all available assets.
+  The `car' is a label for the asset, and the `cdr' is the filename
+  that contains the text. The first time we call this, we read from
+  the `assets' directory, otherwise, we return a cached version."
+    (unless rpgdm-ironsworn-character-assets
+      (let ((asset-files (thread-first rpgdm-ironsworn-project
+                           (f-join "assets")
+                           (directory-files-recursively (rx (one-or-more any) ".org") nil))))
+
+        (setq rpgdm-ironsworn-character-assets
+              (seq-map (lambda (file) (cons (rpgdm-ironsworn--character-asset-label file) file))
+                       asset-files))))
+
+    rpgdm-ironsworn-character-assets)
+#+END_SRC
+
+We can use a function that interactively queries the user for an asset and returns its filename:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--pick-character-asset ()
+    "Completing read for an Ironsworn asset."
+    (let ((choice (completing-read "Which asset? " (rpgdm-ironsworn-character-assets))))
+      (thread-first choice
+        (assoc rpgdm-ironsworn-character-assets 'equal)
+        (cdr))))
+#+END_SRC
+
+Let the user choose an asset and insert it into the file at the current point. We'll allow us to call this interactively for upgrades, but also be able to call it with a random asset ... hrm ... that is an interesting idea.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-insert-character-asset (asset)
+    "Choose and insert the contents of an asset in the current buffer."
+    (interactive (list (rpgdm-ironsworn--pick-character-asset)))
+    (let ((file (if (consp asset) (cdr asset) asset)))
+      (insert-file-contents file nil)
+
+      (when (called-interactively-p)
+        (when (y-or-n-p "Insert another asset? ")
+          (call-interactively 'rpgdm-ironsworn-insert-character-asset)))))
+#+END_SRC
+
+When you start a character, you choose three assets, but what if we choose them randomly from our asset list? Could be fun, however, I don't want duplicates, or two companions, or ... well, I may come up with more rules, but I codify those rules into a function that returns a list, if it is good, or =nil= otherwise:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--good-character-assets (asset-files)
     "Return ASSET-FILES if all given are _good enough_.
-  That is, all are unique, only one companion, etc."
-    (when (and
-           (equal asset-files (seq-uniq asset-files))
-           (<= (seq-length
-                (seq-filter (lambda (file) (string-match (rx "companions") file))
-                            asset-files))
-               1))
-      asset-files))
+    That is, all are unique, only one companion, etc."
+    (cl-flet ((companion-p (entry)
+                           (when (consp entry)
+                             (setq entry (cdr entry)))
+                           (string-match (rx "companions") entry)))
+      (when (and
+             (equal asset-files (seq-uniq asset-files))
+             (<= (seq-length
+                  (seq-filter #'companion-p asset-files))
+                 1))
+        asset-files)))
 #+END_SRC
 
 And I can write a little unit test to verify my test cases:
@@ -257,7 +364,10 @@ And I can write a little unit test to verify my test cases:
     (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "foo")))
     (should-not (rpgdm-ironsworn--good-character-assets '("assets/companions/dog.org"
                                                           "assets/paths/good-guy.org"
-                                                          "assets/companions/monkey.org"))))
+                                                          "assets/companions/monkey.org")))
+    (should-not (rpgdm-ironsworn--good-character-assets '(("Companions :: Dog" . "assets/companions/dog.org")
+                                                          ("Paths :: Good Guy" . "assets/paths/good-guy.org")
+                                                          ("Companions :: Monkey" . "assets/companions/monkey.org"))))))
 #+END_SRC
 
 The rules say to start off with three assets, so let's have a function that can give us three random assets:
@@ -284,35 +394,40 @@ And a function that will read the =assets= directory (recursively) and return a 
 Once we get the list of filenames, we use a inner helper function, =good-enough-list=, that picks three filenames, and if they are not good enough, will call itself until it picks three good ones. Shouldn't take too many iterations.
 
 #+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn--new-character-asset-files ()
-    "Return the file names of three assets from the `assets' directory.
+  (defun rpgdm-ironsworn--random-character-assets (&optional number-of-assets)
+    "Return the file names of NUMBER-OF-ASSETS from the `assets' directory.
   The chosen assets are _good_ in that they won't have duplicates, etc."
-    (let ((asset-files (thread-first rpgdm-ironsworn-project
-                         (f-join "assets")
-                         (directory-files-recursively (rx (one-or-more any) ".org") nil))))
-
       (defun good-enough-list (assets)
         (let ((answer (thread-first assets
-                        rpgdm-ironsworn--some-character-assets
-                        rpgdm-ironsworn--good-character-assets)))
+                        (rpgdm-ironsworn--some-character-assets number-of-assets)
+                        (rpgdm-ironsworn--good-character-assets))))
           (if answer
               answer
             (good-enough-list assets))))
 
-      (good-enough-list asset-files)))
+      (good-enough-list (rpgdm-ironsworn-character-assets)))
 #+END_SRC
 
-Finally, we have a function that inserts the contents of three randomly chosen assets:
+Now we have a function that inserts the contents of three randomly chosen assets:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-random-character-assets (&optional number-of-assets)
+    (interactive "nHow many random assets should we insert? ")
+    (dolist (file (rpgdm-ironsworn--random-character-assets number-of-assets))
+      (rpgdm-ironsworn-insert-character-asset file)))
+#+END_SRC
+
+Whew. We finally can have a function that queries the user about a new character and whether we should insert them randomly or let the user choose.... or do nothing at all.
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--new-character-assets ()
     "Insert the contents of three character assets from the assets directory."
-    (let ((asset-files (rpgdm-ironsworn--new-character-asset-files)))
       (goto-char (point-max))
       (insert "\n** Assets\n")
-      (dolist (file asset-files)
-        (insert-file-contents file nil)
-        (insert "\n\n"))))
+      (if (y-or-n-p "Would you like three random assets? ")
+          (rpgdm-ironsworn-random-character-assets asset-files)
+        (if (y-or-n-p "Would you like to choose your assets? ")
+          (call-interactively 'rpgdm-ironsworn-insert-character-asset))))
 #+END_SRC
 **** Character Stats
 This function will query the user for all of the stats and other properties that we will need to store before we can play the game.
@@ -447,10 +562,9 @@ We need to modify /some/ of the stored values, like =health= and =supply=:
 #+BEGIN_SRC emacs-lisp :results silent
   (defun rpgdm-ironsworn-adjust-stat (stat adj &optional default)
     "Increase or decrease the current character's STAT by ADJ."
-    (let ((value (+ (gethash stat rpgdm-ironsworn-character default) adj)))
-      ;; TODO: Delete this hash bidness
-      (puthash stat value rpgdm-ironsworn-character)
-      (rpgdm-ironsworn-store-character-state stat value)))
+    (let* ((curr (rpgdm-ironsworn-character-stat stat))
+           (new  (+ curr adj)))
+      (rpgdm-ironsworn-store-character-state stat new)))
 
   (defun rpgdm-ironsworn-adjust-health (health-adj)
     "Increase or decrease the current character's health by HEALTH-ADJ."
@@ -482,8 +596,9 @@ Which allows us to create character stat-specific rolling functions:
     (interactive (list (completing-read "Stat Modifier: " '(Edge Heart Iron Shadow Wits))
                        (read-string "Other Modifier: ")))
     (let ((all-mods (+ (rpgdm-ironsworn-character-stat stat)
-                       (string-to-number modifier))))
-      (rpgdm-ironsworn-roll all-mods)))
+                       (string-to-number modifier)))
+          (momentum (rpgdm-ironsworn-character-stat :momentum)))
+      (rpgdm-ironsworn-roll all-mods momentum)))
 #+END_SRC
 
 And we could have a function for each:
@@ -513,6 +628,28 @@ And we could have a function for each:
     (interactive (list (read-string "Wits + Modifier: ")))
     (rpgdm-ironsworn-roll-stat :wits modifier))
 #+END_SRC
+
+Rolling death saves against your health, is similar to a /progress roll/ (which I will define under the section, [[*Progress][Progress]]).
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-roll-health ()
+    "Roll challenge dice and compare with character's current health."
+    (interactive)
+    (rpgdm-ironsworn-progress-roll
+     (rpgdm-ironsworn-character-stat :health)))
+
+  (defun rpgdm-ironsworn-roll-spirit ()
+    "Roll challenge dice and compare with character's current spirit."
+    (interactive)
+    (rpgdm-ironsworn-progress-roll
+     (rpgdm-ironsworn-character-stat :spirit)))
+
+  (defun rpgdm-ironsworn-roll-supply ()
+    "Roll challenge dice and compare with character's current supply."
+    (interactive)
+    (rpgdm-ironsworn-progress-roll
+     (rpgdm-ironsworn-character-stat :supply)))
+#+END_SRC
 ** Moves
 The [[file:moves][moves]] directory contains one org file for each move. These files contains properties for how a move should behave. To make "a move" involves opening the move description file in a side-buffer, getting details about the move from the file, and then rolling some dice.
 
@@ -524,11 +661,13 @@ The [[file:moves][moves]] directory contains one org file for each move. These f
                      (group (one-or-more (not ".")))
                      ".org" eol))
            (mtch (string-match regx file))
-           (type (match-string 1 file))
-           (name (thread-last (match-string 2 file)
-                   (s-replace-regexp "-" " ")
-                   (s-titleize))))
-      (list (format "%s:: %s" type name) file)))
+           (type (thread-last file
+                   (match-string 1)
+                   (s-titleize)))
+           (name (thread-last file
+                   (match-string 2)
+                   (s-replace-regexp "-" " "))))
+      (list (format "%s :: %s" type name) file)))
 #+END_SRC
 
 And let's verify the format:
@@ -537,9 +676,9 @@ And let's verify the format:
   (ert-deftest rpgdm-ironsworn--move-tuple-test ()
     (let ((file "moves/fate/ask-the-oracle.org")
           (full "~/other/over/here/moves/fate/ask-the-oracle.org"))
-      (should (equal (list "fate:: Ask The Oracle" file)
+      (should (equal (list "Fate :: Ask The Oracle" file)
                      (rpgdm-ironsworn--move-tuple file)))
-      (should (equal (list "fate:: Ask The Oracle" full)
+      (should (equal (list "Fate :: Ask The Oracle" full)
                      (rpgdm-ironsworn--move-tuple full)))))
 #+END_SRC
 
@@ -552,17 +691,17 @@ Once I read the list of moves, I want to /cache/ it, using a poor-person's /memo
 Oh, one issue... how do I know where the data files for the moves are?
 
 #+BEGIN_SRC emacs-lisp
-    (defun rpgdm-ironsworn-moves ()
-      "Return a list containing available moves, and the filename containing
-      the moves instructions, and other properties. Note that this function is
-      memoized, in that re-calling this function will return a cached copy."
-      (unless rpgdm-ironsworn-moves
-        (setq rpgdm-ironsworn-moves
-              (mapcar 'rpgdm-ironsworn--move-tuple
-                      (directory-files-recursively
-                       (concat rpgdm-ironsworn-project "moves")
-                       ".*\.org$"))))
-      rpgdm-ironsworn-moves)
+  (defun rpgdm-ironsworn-moves ()
+    "Return a list containing available moves, and the filename containing
+    the moves instructions, and other properties. Note that this function is
+    memoized, in that re-calling this function will return a cached copy."
+    (unless rpgdm-ironsworn-moves
+      (setq rpgdm-ironsworn-moves
+            (mapcar 'rpgdm-ironsworn--move-tuple
+                    (directory-files-recursively
+                     (f-join rpgdm-ironsworn-project "moves")
+                     ".*\.org$"))))
+    rpgdm-ironsworn-moves)
 #+END_SRC
 
 Choosing a move comes from using the =completing-read= along with a /list/ of all moves, like this:
@@ -655,10 +794,15 @@ The concept of a /progress/ can be anything from an overland journey to a battle
 While the 10 boxes are easy for pen-and-paper games, we really need the number a /ticks/ marking progress amounts:
 
 #+BEGIN_SRC emacs-lisp
-  (defvar rpgdm-ironsworn-progress-levels '(("Troublesome" . 12)
-                                            ("Dangerous" . 8) ("Formidable" . 4)
-                                            ("Extreme" . 2) ("Epic" . 1))
-    "The five levels of progression for an Ironsworn progress track.")
+  (cl-flet* ((faded (str) (propertize str 'face '(:foreground "#888")))
+             (msg   (a b) (format "%s %s %s" a (faded "--") (faded b))))
+    (defvar
+      rpgdm-ironsworn-progress-levels `((,(msg "troublesome" "quick") . 12)
+                                        (,(msg "dangerous" "short") . 8)
+                                        (,(msg "formidable" "long") . 4)
+                                        (,(msg "extreme" "very long") . 2)
+                                        (,(msg "epic" "never-ending") . 1))
+      "The five levels of progression for an Ironsworn progress track."))
 #+END_SRC
 
 Given a label, can we get the level as a value:
@@ -798,7 +942,7 @@ Let's make sure these function work as we expect:
 Shawn Tompkin has created some useful oracles (random tables) to consult. I'm breaking my own [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] convention, and having this code automatically load those tables.
 
 #+BEGIN_SRC emacs-lisp
-  (rpgdm-tables-load (concat rpgdm-ironsworn-project "tables"))
+  (rpgdm-tables-load (f-join rpgdm-ironsworn-project "tables"))
 #+END_SRC
 
 He designed many of the tables to work together, for instance, you should roll on both the [[file:tables/actions.org][actions]] and [[file:tables/themes.org][themes]] and combine the result to kick-start your ideas.
@@ -870,7 +1014,7 @@ This function combines the [[file:tables/feature-aspect.org][aspect]] and [[file
           (focus  (rpgdm-tables-choose "feature-focus")))
       (rpgdm-message "%s / %s" aspect focus)))
 
-  (puthash "feature-aspect-and-focus :: Roll on both feature tables"
+  (puthash "feature-aspect-and-focus :: Roll on both feature tables for a waypoint"
            'rpgdm-ironsworn-oracle-feature rpgdm-tables)
 #+END_SRC
 *** Site Nature
@@ -1045,34 +1189,49 @@ Can a Hydra call a hydra? Let's more all the special oracle and progress functio
     ("r" rpgdm-ironsworn-progress-roll   "roll"))
 #+END_SRC
 
-I'd like to repurpose the RPGDM Hydra to be more specific to Ironsworn, so this has both the instructions on how to use it and the key-to-function mapping:
+I'd like to repurpose the RPGDM Hydra to be more specific to Ironsworn, so this has both the instructions on how to use it and the key-to-function mapping. A pattern I would like to follow is that a uppercase letters indicate altering something.
 
-#+BEGIN_SRC emacs-lisp
+I would also like pairings where lowercase ~p~ rolls against Supply, but a ~P~ changes the Supply. If this is the case, then I need to come up with that pattern:
+  - e :: Edge
+  - i :: Iron
+  - r :: Heart
+  - w :: Wits
+  - h :: Shadow
+  - l/L :: health
+  - s/S :: Supply
+  - t/T :: Spirit
+  - M :: Momentum ... no progress roll here
+
+But we roll some of these more than others, especially since "moves" does most of the work.
+
+#+begin_src emacs-lisp
   (defhydra hydra-rpgdm (:color blue :hint nil)
     "
-      ^Dice^     0=d100 1=d10 6=d6       ^Adjust^      ^Oracles/Tables^     ^Moving/Editing^      ^Messages^
+      ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
    ----------------------------------------------------------------------------------------------------------------------------------------------------
-      _d_: Roll Dice  _p_: Progress       _H_: Health   _z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
-      _e_: Roll Edge  _s_: Roll Shadow    _S_: Spirit   _c_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
-      _h_: Roll Heart _w_: Roll Wits      _G_: Supply   _O_: Other Oracles   _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
-      _i_: Roll Iron  _m_: Make Move      _M_: Momentum _T_: Load Oracles    _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
+      _d_: Roll Dice  _p_: Progress      _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
+      _e_: Roll Edge  _h_: Roll Shadow   _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
+      _r_: Roll Heart _w_: Roll Wits     _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
+      _i_: Roll Iron  _m_: Make Move       _M_: Momentum                      _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
     ("d" rpgdm-ironsworn-roll)    ("D" rpgdm-ironsworn-progress-roll)
-    ("z" rpgdm-ironsworn-oracle)  ("O" rpgdm-oracle)
+    ("z" rpgdm-ironsworn-oracle)  ("Z" rpgdm-yes-and-50/50)
 
     ("e" rpgdm-ironsworn-roll-edge)
-    ("h" rpgdm-ironsworn-roll-heart)
+    ("r" rpgdm-ironsworn-roll-heart)
     ("i" rpgdm-ironsworn-roll-iron)
-    ("s" rpgdm-ironsworn-roll-shadow)
+    ("h" rpgdm-ironsworn-roll-shadow)
     ("w" rpgdm-ironsworn-roll-wits)
     ("m" rpgdm-ironsworn-make-move :color pink)
 
-    ("H" rpgdm-ironsworn-adjust-health :color pink)
-    ("S" rpgdm-ironsworn-adjust-spirit :color pink)
-    ("G" rpgdm-ironsworn-adjust-supply :color pink)
+    ("l" rpgdm-ironsworn-roll-health)
+    ("L" rpgdm-ironsworn-adjust-health :color pink)
+    ("t" rpgdm-ironsworn-roll-spirit)
+    ("T" rpgdm-ironsworn-adjust-spirit :color pink)
+    ("s" rpgdm-ironsworn-roll-supply)
+    ("S" rpgdm-ironsworn-adjust-supply :color pink)
     ("M" rpgdm-ironsworn-adjust-momentum :color pink)
 
-    ("T" rpgdm-tables-load)       ("c" rpgdm-tables-choose)     ("C" rpgdm-tables-choose :color pink)
-    ("O" hydra-rpgdm-oracles/body)
+    ("O" rpgdm-tables-load)       ("c" rpgdm-tables-choose)     ("C" rpgdm-tables-choose :color pink)
     ("p" hydra-rpgdm-progress/body)
 
     ("o" ace-link)                 ("N" org-narrow-to-subtree)   ("W" widen)
