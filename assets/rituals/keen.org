@@ -1,0 +1,8 @@
+*** Keen
+
+- [-] When you hold a weapon and sing a keen for those it has killed, roll +heart. On a strong hit, the wielder inflicts +1 harm when they [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]]. If they roll a 1 on their action die when making a move to inflict harm, the magic is spent. On a weak hit, as above, but the voices of those who were slain join in your song; [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (2 stress).
+
+- [ ] As above, and the wielder may also (one time only) add +1 and take +2 momentum on a hit when they [[file:~/other/ironsworn/moves/relationship/draw-the-circle.org][Draw the Circle]], [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]], or [[file:~/other/ironsworn/moves/combat/battle.org][Battle]].
+
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
+

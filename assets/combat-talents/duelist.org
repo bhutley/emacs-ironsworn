@@ -1,0 +1,11 @@
+*** Duelist
+If you wield a bladed weapon in each hand...
+
+- [-] When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]], you may add +2. If you do (decide before rolling), inflict +1 harm on a strong hit and count a weak hit as a miss.
+
+- [ ] Once per fight, when you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] +edge by making a bold display of your combat prowess, you may reroll any dice.
+
+- [ ] When you [[file:~/other/ironsworn/moves/relationship/draw-the-circle.org][Draw the Circle]], choose one (before rolling).
+    - Add +2.
+    - Take +2 momentum on a hit.
+

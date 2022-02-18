@@ -1,0 +1,8 @@
+*** Storyweaver
+
+- [-] When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]], or [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]] by sharing an inspiring or enlightening song, poem, or tale, envision the story you tell. Then, add +1 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/adventure/make-camp.org][Make Camp]] and choose the option to relax, you may share a story with your allies or compose a new story if alone. If you do, envision the story you tell and take +1 spirit or +1 momentum. Any allies who choose to relax in your company may also take +1 spirit or +1 momentum.
+
+- [ ] When you [[file:~/other/ironsworn/moves/relationship/sojourn.org][Sojourn]] within a community with which you share a bond, add +2 (instead of +1).
+

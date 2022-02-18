@@ -1,0 +1,12 @@
+*** Lightbearer
+
+- [-] When you focus on a source of light and capture its essence, roll +wits. On a strong hit, set your light track to +6. On a weak hit, make it +3. Then, when you make a move to overcome or navigate darkness, you may add +2 and suffer -1 light.
+
+- [ ] You may use your light to [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] against a dark-dwelling foe. Choose the amount of light to unleash, and roll +light (instead of +iron or +edge). Suffer -light equal to that amount. On a hit, your harm is 1+your unleashed light.
+
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
+
+| 0 | +1 | +2 | +3 | +4 | +5 | +6 |
+|---+----+----+----+----+----+----|
+|   |    |    |    |    |    |    |
+

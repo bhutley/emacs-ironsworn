@@ -1,0 +1,9 @@
+*** Ritualist
+Once you [[file:~/other/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]] (formidable or greater) in service to an elder mystic, and [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]] to train with them...
+
+- [-] When you Secure an Advantage to ready yourself for a ritual, envision how you prepare. Then, add +1 and take +1 momentum on a hit.
+
+- [ ] When you perform a ritual, you may suffer -1 supply and add +1 (decide before rolling).
+
+- [ ] When you tattoo the essence of a new ritual onto your skin, envision the mark you create. You may then purchase and upgrade that ritual asset for 1 fewer experience.
+

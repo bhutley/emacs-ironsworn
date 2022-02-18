@@ -1,0 +1,8 @@
+*** Sway
+
+- [-] When you speak a person's name three times to the wind, roll +wits. On a strong hit, the wind whispers of this person's need. Envision what you hear ([[file:~/other/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure). If you use this information or fulfill this need when you [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] them, you may reroll any dice (one time only). On a weak hit, as above, but this person's need creates a troubling dilemma or complication; [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (1 stress).
+
+- [ ] As above, and if you score a strong hit when you [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]], you may also reroll any dice (one time only) when you [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] from this person.
+
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
+

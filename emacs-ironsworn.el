@@ -1,3 +1,6 @@
+(add-to-list 'load-path "~/other/emacs-rpgdm")
+(add-to-list 'load-path "~/other/emacs-ironsworn")
+
 (require 'rpgdm)
 
 (defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
@@ -37,37 +40,113 @@ roll (added to MODIFIER) vs. two d10 challenge dice."
     (rpgdm-message (rpgdm-ironsworn--results action-roll modifier
                                              one-challenge two-challenge))))
 
-(defun rpgdm-ironsworn-new-character ()
-  "Interactively query the user for a new character's attribute.
-This function _appends_ this information to the current buffer,
-which should be using the `org-mode' major mode."
-  (interactive)
-  (let ((name (read-string "What is the new character's name? "))
-        (frmt (seq-random-elt '("* The Adventures of %s"
+(defun rpgdm-ironsworn--new-character-template (name)
+  "Insert a basic Ironsworn template at the end of the current buffer."
+  (when (s-blank? name)
+    (setq name (rpgdm-tables-choose "names-ironlander")))
+
+  (let ((frmt (seq-random-elt '("* The Adventures of %s"
                                 "* The Journeys of %s"
                                 "* %s, an Epic Saga"
                                 "* The Epic of %s"
                                 "* Travels of %s"))))
-    (when (s-blank? name)
-      (setq name (rpgdm-tables-choose "names-ironlander")))
     (goto-char (point-max))
     (insert "# Local Variables:
-# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load (concat rpgdm-ironsworn-project \"tables\")))
+# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode))
 # End:
 ")
-    (insert (format frmt name))
+    (insert (format frmt name))))
 
-    (dolist (stat '(edge heart iron shadow wits))
-      (rpgdm-ironsworn-store-character-state stat
-                                             (read-string (format "What is %s's %s stat: " name stat))))
+(defun rpgdm-ironsworn--good-character-assets (asset-files)
+  "Return ASSET-FILES if all given are _good enough_.
+That is, all are unique, only one companion, etc."
+  (when (and
+         (equal asset-files (seq-uniq asset-files))
+         (<= (seq-length
+              (seq-filter (lambda (file) (string-match (rx "companions") file))
+                          asset-files))
+             1))
+    asset-files))
 
-    (dolist (stat '(health spirit supply))
-      (rpgdm-ironsworn-store-character-state stat 5))
-    (rpgdm-ironsworn-store-character-state 'momentum 2)
+(defun rpgdm-ironsworn--some-character-assets (asset-filenames &optional number)
+  "Return a list of NUMBER elements from ASSET-FILENAMES... randomly.
+If NUMBER is nil, then return 3."
+  (unless number
+    (setq number 3))
+  (loop for x from 1 to number
+        collect (seq-random-elt asset-filenames)))
 
-    (rpgdm-ironsworn-progress-create "Bonds" 1)
-    (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
-    (message "Alright, the template for %s is complete. Edit away!" name)))
+(defun rpgdm-ironsworn--new-character-asset-files ()
+  "Return the file names of three assets from the `assets' directory.
+The chosen assets are _good_ in that they won't have duplicates, etc."
+  (let ((asset-files (thread-first rpgdm-ironsworn-project
+                       (f-join "assets")
+                       (directory-files-recursively (rx (one-or-more any) ".org") nil))))
+
+    (defun good-enough-list (assets)
+      (let ((answer (thread-first assets
+                      rpgdm-ironsworn--some-character-assets
+                      rpgdm-ironsworn--good-character-assets)))
+        (if answer
+            answer
+          (good-enough-list assets))))
+
+    (good-enough-list asset-files)))
+
+(defun rpgdm-ironsworn--new-character-assets ()
+  "Insert the contents of three character assets from the assets directory."
+  (let ((asset-files (rpgdm-ironsworn--new-character-asset-files)))
+    (goto-char (point-max))
+    (insert "\n** Assets\n")
+    (dolist (file asset-files)
+      (insert-file-contents file nil)
+      (insert "\n\n"))))
+
+(defun rpgdm-ironsworn--new-character-stats ()
+  "Query the user for a new character's stats, and add them as
+properties using the `rpgdm-ironsworn-store-character-state' and
+the `rpgdm-ironsworn-progress-create' functions."
+  (dolist (stat '(edge heart iron shadow wits))
+    (rpgdm-ironsworn-store-character-state stat
+        (read-string (format "What '%s' stat: " stat))))
+
+  (dolist (stat '(health spirit supply))
+    (rpgdm-ironsworn-store-character-state stat 5))
+  (rpgdm-ironsworn-store-character-state 'momentum 2)
+
+  (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
+  (rpgdm-ironsworn-progress-create "Bonds" 1)
+  (search-forward ":END:")
+  (end-of-line)
+  (insert "\n** Bonds\n")
+  (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement-names"))))
+
+(defun rpgdm-ironsworn--new-character-stats-first (&optional name)
+  "Insert a new character template, query for the stats, then insert assets."
+  (rpgdm-ironsworn--new-character-template name)
+  (rpgdm-ironsworn--new-character-stats)
+  (rpgdm-ironsworn--new-character-assets))
+
+(defun rpgdm-ironsworn--new-character-assets-first (&optional name)
+  "Insert a new character template, insert assets then query for the stats."
+  (rpgdm-ironsworn--new-character-template name)
+  ;; Saving and restoring point, means the properties should be in the
+  ;; correct, top-level position.
+  (save-excursion
+    (rpgdm-ironsworn--new-character-assets))
+  (rpgdm-ironsworn--new-character-stats))
+
+(defun rpgdm-ironsworn-new-character (name order)
+  "Interactively query the user for a new character's attribute.
+        This function _appends_ this information to the current buffer,
+        which should be using the `org-mode' major mode."
+  (interactive (list
+                (read-string "What is the new character's name? ")
+                (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+  (if (equal order "Assets first")
+      (rpgdm-ironsworn--new-character-assets-first)
+    (rpgdm-ironsworn--new-character-stats-first))
+  (message "Alright, the template is complete. Edit away!" name))
 
 (defun rpgdm-ironsworn--display-stat (stat character)
   (let* ((value (gethash stat character))
@@ -341,12 +420,18 @@ to rolling two d10 challenge dice."
     (ignore-errors
       (remhash name tracks))))
 
+(rpgdm-tables-load (concat rpgdm-ironsworn-project "tables"))
+
 (defun rpgdm-ironsworn-oracle-action-theme ()
   "Rolls on two tables at one time."
   (interactive)
   (let ((action (rpgdm-tables-choose "actions"))
         (theme  (rpgdm-tables-choose "themes")))
     (rpgdm-message "%s / %s" action theme)))
+
+(puthash "action-and-theme :: Roll on both tables"
+         'rpgdm-ironsworn-oracle-action-theme
+         rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-npc ()
   "Roll on all the character-related tables and show them together.
@@ -361,6 +446,9 @@ You'll need to pick and choose what works and discard what doesn't."
     (rpgdm-message "%s, %s %s (Activity: %s  Disposition: %s  Goal: %s)"
                    name description role activity disposition goal)))
 
+(puthash "npc :: Roll on all character tables"
+         'rpgdm-ironsworn-oracle-npc rpgdm-tables)
+
 (defun rpgdm-ironsworn-oracle-combat ()
   (interactive)
   (let ((action (rpgdm-tables-choose "combat-action"))
@@ -368,12 +456,18 @@ You'll need to pick and choose what works and discard what doesn't."
         (target (rpgdm-tables-choose "combat-event-target")))
     (rpgdm-message "%s %s or %s" method target action)))
 
+(puthash "combat-action-events :: Roll on all combat tables"
+         'rpgdm-ironsworn-oracle-combat rpgdm-tables)
+
 (defun rpgdm-ironsworn-oracle-feature ()
   "Rolls on two tables at one time for a Site's feature."
   (interactive)
   (let ((aspect (rpgdm-tables-choose "feature-aspect"))
         (focus  (rpgdm-tables-choose "feature-focus")))
     (rpgdm-message "%s / %s" aspect focus)))
+
+(puthash "feature-aspect-and-focus :: Roll on both feature tables"
+         'rpgdm-ironsworn-oracle-feature rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-site-nature ()
   "Rolls on two tables at one time for a random Site."
@@ -383,6 +477,9 @@ You'll need to pick and choose what works and discard what doesn't."
          (place  (downcase domain))
          (name   (rpgdm-ironsworn-oracle-site-name place)))
     (rpgdm-message "%s %s :: %s" theme domain name)))
+
+(puthash "site-nature :: Roll on both site theme and domain tables"
+         'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
   "Rolling on multiple tables to return a random site name."
@@ -407,6 +504,9 @@ You'll need to pick and choose what works and discard what doesn't."
       ((<= roll 95) (format "%s %s of %s" description place namesake))
       (t            (format "%s of %s" place namesake))))))
 
+(puthash "site-name :: Generate a name for a dangerous site"
+         'rpgdm-ironsworn-oracle-site-name rpgdm-tables)
+
 (defvar rpgdm-ironsworn-oracle-threats '("Burgeoning Conflict" "Ravaging Horde"
                                          "Cursed Site" "Malignant Plague"
                                          "Scheming Leader" "Zealous Cult"
@@ -421,6 +521,9 @@ You'll need to pick and choose what works and discard what doesn't."
     (setq category (seq-random-elt rpgdm-ironsworn-oracle-threats)))
   (let ((table-name (format "threat-%s" (downcase (string-replace " " "-" category)))))
     (rpgdm-message "%s: %s" category (rpgdm-tables-choose table-name))))
+
+(puthash "threat-goal :: Generate a goal for a particular threat"
+         'rpgdm-ironsworn-oracle-threat-goal rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle ()
   "Given a LIKLIHOOD as a single character, return weighted coin flip."
@@ -463,6 +566,7 @@ You'll need to pick and choose what works and discard what doesn't."
 
 (defun rpgdm-ironsworn-paste-last-move ()
   "Insert the contents of the `m' register, which should have last move."
+  (interactive)
   (insert "\n" (get-register ?m)))
 
 (defhydra hydra-rpgdm-oracles (:color blue)

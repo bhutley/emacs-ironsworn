@@ -1,0 +1,16 @@
+*** Kindred
+Name:
+
+Your friend stands by you.
+
+- [ ] *Skilled:* When you make a move outside of combat aided by your companion's expertise, add +1.
+
+  Expertise:
+
+- [ ] *Shield-Kin:* When you [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] or [[file:~/other/ironsworn/moves/combat/battle.org][Battle]] alongside your companion, or when you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] against an attack by standing together, add +1.
+
+- [ ] *Bonded:* Once you mark a bond with your companion, add +1 when you [[file:~/other/ironsworn/moves/suffer/face-desolation.org][Face Desolation]] in their presence.
+
+| 0 | +1 | +2 | +3 | +4 | +5 |
+|---+----+----+----+----+----|
+|   |    |    |    |    |    |

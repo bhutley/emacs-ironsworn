@@ -1,0 +1,8 @@
+*** Tether
+
+- [-] When you commune with the spirits of a place, roll +heart. If you share a bond with someone there, add +1. On a strong hit, you are tethered. When you [[file:~/other/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]] to return, you may roll +spirit or +heart (instead of +wits), and take +1 momentum on a hit. When you [[file:~/other/ironsworn/moves/adventure/reach-your-destination.org][Reach Your Destination]], take +2 momentum on a strong hit. The tether is lost if you perform this ritual elsewhere, or when you [[file:~/other/ironsworn/moves/suffer/face-desolation.org][Face Desolation]]. On a weak hit, as above, but the spirits reveal a disturbing aspect of the place; [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (2 stress).
+
+- [ ] As above, and you may also reroll any dice when you [[file:~/other/ironsworn/moves/relationship/sojourn.org][Sojourn]] in the tethered place.
+
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
+

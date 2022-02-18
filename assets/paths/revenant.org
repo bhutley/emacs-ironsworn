@@ -1,0 +1,9 @@
+*** Revenant
+Once you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]] and return to the world of the living...
+
+- [-] When you are at 0 health, and [[file:~/other/ironsworn/moves/suffer/endure-harm.org][Endure Harm]] or [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]], add +1. If you then burn momentum to improve your result, envision what bond or vow binds you to this world, and take +2 momentum after you reset.
+
+- [ ] When you make a move to investigate, oppose, or interact with a horror, spirit, or other undead being, add +1.
+
+- [ ] When you bring death to your foe to [[file:~/other/ironsworn/moves/combat/end-the-fight.org][End the Fight]], you may burn momentum to cancel one (not both) of the challenge dice if your momentum is greater than the value of that die. If you do, [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (2 stress).
+

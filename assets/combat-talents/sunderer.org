@@ -1,0 +1,9 @@
+*** Sunderer
+If you wield an axe...
+
+- [-] When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] in close quarters, you may suffer -1 momentum and inflict +1 harm on a hit (decide before rolling).
+
+- [ ] When you have your axe in hand, and use the promise of violence to [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] or [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], add +1 and take +1 momentum on a hit.
+
+- [ ] When you make a tribute to a fallen foe (formidable or greater) by carving a rune in the haft of your axe, roll +heart. On a strong hit, inflict +1d6 harm (one time only) when you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]]. On a weak hit, as above, but this death weighs on you; [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (2 stress).
+

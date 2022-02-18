@@ -1,0 +1,14 @@
+*** Raven
+Name:
+
+Your raven heeds your call.
+
+- [ ] *Sly:* When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] or [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +shadow using your raven to perform trickery (such as creating a distraction or stealing a small object) add +1 and take +1 momentum on a hit.
+
+- [ ] *Knowing:* When you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]], add +2 and take +1 momentum on a hit.
+
+- [ ] *Diligent:* When your raven carries messages for you, you may [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]], or [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] from a distance.
+
+| 0 | +1 | +2 |
+|---+----+----|
+|   |    |    |

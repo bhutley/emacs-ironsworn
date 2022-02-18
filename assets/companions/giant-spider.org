@@ -1,0 +1,14 @@
+*** Giant Spider
+Name:
+
+Your spider uncovers secrets.
+
+- [ ] *Discreet:* When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] by sending your spider to scout a place, add +1 and take +1 momentum on a hit.
+
+- [ ] *Soul-Piercing:* You may [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +shadow by sending your spider to secretly study someone. On a hit, the spider returns to reveal the target's deepest fears through a reflection in its glassy eyes. Use this to [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] and reroll any dice.
+
+- [ ] *Ensnaring:* When your spider sets a trap, add +1 as you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] +shadow. On a strong hit, also inflict 2 harm.
+
+| 0 | +1 | +2 | +3 | +4 |
+|---+----+----+----+----|
+|   |    |    |    |    |

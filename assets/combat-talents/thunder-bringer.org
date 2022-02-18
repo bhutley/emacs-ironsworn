@@ -1,0 +1,9 @@
+*** Thunder-Bringer
+If you wield a mighty hammer...
+
+- [-] When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]], [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], or [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] by hitting or breaking an inanimate object, add +1 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] a foe to knock them back, stun them, or put them off balance, inflict 1 harm (instead of 2) and take +2 momentum on a hit. On a strong hit, you also create an opening and add +1 on your next move.
+
+- [ ] When you [[file:~/other/ironsworn/moves/combat/turn-the-tide.org][Turn the Tide]], you may [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] with all the fury and power you can muster. If you do (decide before rolling), you may reroll any dice and inflict +2 harm on a strong hit, but count a weak hit as a miss.
+

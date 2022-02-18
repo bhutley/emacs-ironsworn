@@ -1,0 +1,8 @@
+*** Wright
+Specialty:
+
+- [-] When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] by crafting a useful item using your specialty, or when you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] to create or repair an item in a perilous situation, add +1 and take +1 momentum on a hit.
+
+- [ ] As above, and you may suffer -1 supply (after rolling) to add an additional +1.
+
+- [ ] When you give the item you create as a gift to commemorate an important event or relationship, you may (one time only) reroll any dice when you [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]], [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]], or [[file:~/other/ironsworn/moves/relationship/test-your-bond.org][Test Your Bond]].

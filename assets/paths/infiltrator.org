@@ -1,0 +1,8 @@
+*** Infiltrator
+
+- [-] When you make a move to breach, traverse, or hide within an area held by an enemy, add +1 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] within an enemy area to discover their positions, plans, or methods, or when you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] within that area through observation, you may roll +shadow (instead of +wits). If you do, take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]] within an enemy area by scavenging or looting, you may roll +shadow (instead of +wits). If you do, take +1 momentum or +1 supply on a hit.
+

@@ -1,0 +1,7 @@
+*** Fated
+
+- [-] When you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]] or [[file:~/other/ironsworn/moves/suffer/face-desolation.org][Face Desolation]] while your epic background vow is unfulfilled, it is not yet your time. Instead of rolling, you may take an automatic strong hit. If you do, this asset counts as a debility (and you no longer have this protection) until you next [[file:~/other/ironsworn/moves/quest/reach-a-milestone.org][Reach a Milestone]] on the background vow.
+
+- [ ] When you [[file:~/other/ironsworn/moves/quest/reach-a-milestone.org][Reach a Milestone]] on your background vow, take +2 momentum or +1 spirit.
+
+- [ ] For every two boxes filled on your background vow progress track, take 1 experience. When you [[file:~/other/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]], your fate is at hand. Envision your final sacrifice and reroll any dice.

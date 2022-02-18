@@ -1,0 +1,11 @@
+*** Trickster
+
+- [-] When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]], [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], or [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] by lying, bluffing, stealing, or cheating, add +1.
+
+
+- [ ] When you [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] by investigating a devious scheme, you may roll +shadow (instead of +wits). If you do, take +2 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]] for a relationship founded on a lie, choose one.
+    - Keep your secret: Roll +shadow (instead of +heart).
+    - Reveal the truth: Roll +heart. On a strong hit, mark a bond twice and take 1 experience. A weak hit counts as a miss.
+

@@ -1,0 +1,11 @@
+*** Ironclad
+If you wear armor...
+
+- [-] When you equip or adjust your armor, choose one.
+    - [ ] *Lightly armored:* When you [[file:~/other/ironsworn/moves/suffer/endure-harm.org][Endure Harm]] in a fight, add +1 and take +1 momentum on a hit.
+    - [ ] *Geared for war:* Mark encumbered. When you [[file:~/other/ironsworn/moves/suffer/endure-harm.org][Endure Harm]] in a fight, add +2 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] while you are geared for war, add +1.
+
+- [ ] When you [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] in a situation where strength of arms is a factor, add +2.
+

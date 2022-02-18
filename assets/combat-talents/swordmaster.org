@@ -1,0 +1,9 @@
+*** Swordmaster
+If you wield a sword...
+
+- [-] When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] and burn momentum to improve your result, inflict +2 harm. If the fight continues, add +1 on your next move.
+
+- [ ] When you [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] and score a strong hit, add +1 if you immediately follow with a [[file:~/other/ironsworn/moves/combat/strike.org][Strike]].
+
+- [ ] When you [[file:~/other/ironsworn/moves/quest/swear-an-iron-vow.org][Swear an Iron Vow]] by kneeling and grasping your sword's blade, add +1 and take +1 momentum on a hit. If you let the edge draw blood from your hands, [[file:~/other/ironsworn/moves/suffer/endure-harm.org][Endure Harm]] (1 harm) in exchange for an additional +1 momentum on a hit.
+

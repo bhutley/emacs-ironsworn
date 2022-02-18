@@ -1,0 +1,8 @@
+*** Lorekeeper
+
+- [-] You are the bearer of a mystical archive. When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] or [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] using lore recalled from your studies, add +1. If you have a few hours to search the archive, add +2. On a hit, envision the obscure but helpful knowledge you put to use ([[file:~/other/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure), and take +1 momentum.
+
+- [ ] When you learn of a site or object holding lost knowledge, and [[file:~/other/ironsworn/moves/quest/swear-an-iron-vow.org][Swear an Iron Vow]] to recover it for the archive, reroll any dice. When you [[file:~/other/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]] and mark experience, take +1 experience.
+
+- [ ] One time only, you may browse the archive's forbidden depths. If you do, raise your wits by 1 and roll an action die. On 1-3, you must also mark corrupted or [[file:~/other/ironsworn/moves/suffer/face-desolation.org][Face Desolation]] (ignoring momentum).
+

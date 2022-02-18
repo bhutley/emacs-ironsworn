@@ -1,0 +1,8 @@
+*** Shadow-Walk
+
+- [-] When you cloak yourself with the gossamer veil of the shadow realms, roll +shadow. On a strong hit, take +1 momentum. Then, reroll any dice (one time only) when you make a move by ambushing, hiding, or sneaking. On a weak hit, as above, but the shadows try to lead you astray. You must first [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] to find your way.
+
+- [ ] As above, and you may also travel along the hidden paths of the shadow realms to [[file:~/other/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]] using +shadow (instead of +wits). If you do, [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (1 stress) and mark progress twice on a strong hit.
+
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
+

@@ -1,0 +1,15 @@
+*** Owl
+Name:
+
+Your owl soars through the darkness.
+
+- [ ] *Nocturnal:* If you [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]] at night by sending your owl to hunt, take +2 momentum on a hit. When you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] +wits against an ambush in darkness, add +1 and take +1 momentum on a hit.
+
+- [ ] *Sage:* When you leverage your owl's secret knowledge to perform a ritual, add +1 or take +1 momentum on a hit (decide before rolling).
+
+- [ ] *Embodying:* When you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]], take your owl's health as +momentum before you roll.
+
+| 0 | +1 | +2 | +3 |
+|---+----+----+----|
+|   |    |    |    |
+

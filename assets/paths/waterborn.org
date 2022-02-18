@@ -1,0 +1,9 @@
+*** Waterborn
+
+- [-] When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]], [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]], or [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] related to your knowledge of watercraft, water travel, or aquatic environments or creatures, add +1 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]] by boat or ship, add +1. On a strong hit, also choose one.
+    - The wind is at your back: Mark progress twice.
+    - Find safe anchor: [[file:~/other/ironsworn/moves/adventure/make-camp.org][Make Camp]] now and reroll any dice.
+    - Reap the bounty: [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]] now and reroll any dice.
+    - When you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] aboard a boat or ship, reroll any dice.

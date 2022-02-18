@@ -1,0 +1,8 @@
+*** Divination
+
+- [-] When you take a drop of blood from a willing subject (not yourself) and cast the rune-carved stones, roll +heart. On a strong hit, you may read the runes to gain insight about the subject and people close to them, including information you and the subject have no knowledge of. If you use the reading to [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]], [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]], or [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]], add +1. On a weak hit, as above, but the runes reveal their secrets only with extra time and focus; suffer -2 momentum.
+
+- [ ] As above, and your divination can also reveal information about the subject's future.
+
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
+

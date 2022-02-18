@@ -1,0 +1,15 @@
+*** Mammoth
+Name:
+
+Your mammoth walks a resolute path.
+
+- [ ] *Lumbering:* When your mammoth travels with you as you [[file:~/other/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]], you may add +2 but suffer -1 momentum (decide before rolling).
+
+- [ ] *Beast of burden:* When you make a move which requires you to roll +supply, you may instead roll +your mammoth's health.
+
+- [ ] *Overpowering:* When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] by riding your mammoth against a pack of foes, add +1 and inflict +1 harm on a hit.
+
+| 0 | +1 | +2 | +3 | +4 | +5 |
+|---+----+----+----+----+----|
+|   |    |    |    |    |    |
+

@@ -1,0 +1,9 @@
+*** Oathbreaker
+Once you [[file:~/other/ironsworn/moves/quest/forsake-your-vow.org][Forsake Your Vow]]...
+
+- [-] *This asset counts as a debility.* One time only, when you [[file:~/other/ironsworn/moves/quest/swear-an-iron-vow.org][Swear an Iron Vow]] to redeem yourself (extreme or greater), give that vow a special mark. When you [[file:~/other/ironsworn/moves/quest/reach-a-milestone.org][Reach a Milestone]] on the marked vow, take +2 momentum.
+
+- [ ] When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] or [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] by reaffirming your commitment to your marked vow, add +1 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]] on your marked quest and score a hit, you find redemption and automatically activate this ability at no cost. You may then improve one of your stats by +1 and *discard this asset.*
+

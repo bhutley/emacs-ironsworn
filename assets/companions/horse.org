@@ -1,0 +1,15 @@
+*** Horse
+Name:
+
+You and your horse ride as one.
+
+- [ ] *Swift:* When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +edge using your horse's speed and grace, or when you [[file:~/other/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]], add +1.
+
+- [ ] *Fearless:* When you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] or [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] +heart by charging into combat, add +1 and take +1 momentum on a hit.
+
+- [ ] *Mighty:* When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] at close range while mounted, add +1 and inflict +1 harm on a hit.
+
+| 0 | +1 | +2 | +3 | +4 | +5 |
+|---+----+----+----+----+----|
+|   |    |    |    |    |    |
+

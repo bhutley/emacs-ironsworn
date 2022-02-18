@@ -1,0 +1,14 @@
+*** Cave Lion
+Name:
+
+Your cat takes down its prey.
+
+- [ ] *Eager:* When your cat chases down big game, you may [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]] with +edge (instead of +wits). If you do, take +1 supply or +1 momentum on a strong hit.
+
+- [ ] *Inescapable:* When you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] or [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] by sending your cat to attack, roll +edge. On a hit, take +2 momentum.
+
+- [ ] *Protective:* When you [[file:~/other/ironsworn/moves/adventure/make-camp.org][Make Camp]], your cat is alert to trouble. If you or an ally choose to relax, take +1 spirit. If you focus, take +1 momentum.
+
+| 0 | +1 | +2 | +3 | +4 |
+|---+----+----+----+----+
+|   |    |    |    |    |

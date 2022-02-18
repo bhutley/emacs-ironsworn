@@ -1,0 +1,15 @@
+*** Hound
+Name:
+
+Your hound is your steadfast companion.
+
+- [ ] *Sharp:* When you [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] using your hound's keen senses to track your quarry or investigate a scene, add +1 and take +1 momentum on a hit.
+
+- [ ] *Ferocious:* When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] alongside your hound and score a hit, inflict +1 harm or take +1 momentum.
+
+- [ ] *Loyal:* When you [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] in the company of your hound, add +1.
+
+| 0 | +1 | +2 | +3 | +4 |
+|---+----+----+----+----|
+|   |    |    |    |    |
+

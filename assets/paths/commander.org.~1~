@@ -1,0 +1,11 @@
+*** Commander
+
+- [-] You lead a warband with +4 strength. Roll +strength when you command your warband to [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]], [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]], or [[file:~/other/ironsworn/moves/combat/battle.org][Battle]]. When you face the negative outcome of any move, you may suffer -1 strength as the cost. When you [[file:~/other/ironsworn/moves/adventure/make-camp.org][Make Camp]] or [[file:~/other/ironsworn/moves/relationship/sojourn.org][Sojourn]] and score a hit, take +1 strength. While at 0 strength, this asset counts as a debility.
+
+- [ ] You may dispatch scouts from your warband to [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]] or [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]]; if you do, roll +strength.
+
+- [ ] Once you [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]] with your warband, take +1 momentum on a hit when you leverage a warband ability.
+
+| 0 | +1 | +2 | +3 | +4 |
+|---+----+----+----+----|
+

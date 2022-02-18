@@ -1,0 +1,15 @@
+*** Hawk
+Name:
+
+Your hawk can aid you while it is aloft.
+
+- [ ] *Far-seeing:* When you [[file:~/other/ironsworn/moves/adventure/undertake-a-journey.org][Undertake a Journey]], or when you [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]] by hunting for small game, add +1.
+
+- [ ] *Fierce:* When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] +edge using your hawk to harass and distract your foes, add +1 and take +1 momentum on a hit.
+
+- [ ] *Vigilant:* When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +wits to detect an approaching threat, or when you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] +wits against an ambush, add +2.
+
+| 0 | +1 | +2 | +3 |
+|---+----+----+----|
+|   |    |    |    |
+

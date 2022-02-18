@@ -145,8 +145,8 @@ To begin, we'll need the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm pr
 We also need the name of the directory for this project, so that we can load tables and other documentation.
 
 #+BEGIN_SRC emacs-lisp
-(defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
-  "The root directory to the emacs-ironsworn project")
+    (defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
+      "The root directory to the emacs-ironsworn project")
 #+END_SRC
 ** Dice Roller
 In *Ironsworn*, all dice rolls follow a pattern where you set the challenge level for a check by rolling /challenge dice/ (two d10s) and compare that against rolling an /action die/ (a single d6 ... adding all modifiers to that six-sided die). You always three possible values:
@@ -212,40 +212,164 @@ The basic interface will query for a modifer, roll all three dice, and then disp
 But what might be nice is to have a character sheet that has the default modifiers, and then we wouldn't have to /give/ the modifiers, at least, not the basic ones. You will store these stats and other numbers in your org file, and we'll work [[*Org Interface][the details of that later]].
 *** Creating a Character
 Assuming we have a new character, let's query the user for all of these stats, and call =rpgdm-ironsworn-store-character-state= for each. This function /attempts/ to only put the bare minimum into the Org File, as I would expect, gentle reader, to have some firm opinions on how this file should be formatted.
+**** Character Template
+We assume you have created an org-file, and the /template/ will just append some basic text at the end of the buffer. Note that if you don't give this function a name, it will randomly choose one.
 
 #+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn-new-character ()
-    "Interactively query the user for a new character's attribute.
-  This function _appends_ this information to the current buffer,
-  which should be using the `org-mode' major mode."
-    (interactive)
-    (let ((name (read-string "What is the new character's name? "))
-          (frmt (seq-random-elt '("* The Adventures of %s"
+  (defun rpgdm-ironsworn--new-character-template (name)
+    "Insert a basic Ironsworn template at the end of the current buffer."
+    (when (s-blank? name)
+      (setq name (rpgdm-tables-choose "names-ironlander")))
+
+    (let ((frmt (seq-random-elt '("* The Adventures of %s"
                                   "* The Journeys of %s"
                                   "* %s, an Epic Saga"
                                   "* The Epic of %s"
                                   "* Travels of %s"))))
-      (when (s-blank? name)
-        (setq name (rpgdm-tables-choose "names-ironlander")))
       (goto-char (point-max))
       (insert "# Local Variables:
   # eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode))
   # End:
   ")
-      (insert (format frmt name))
-
-      (dolist (stat '(edge heart iron shadow wits))
-        (rpgdm-ironsworn-store-character-state stat
-                                               (read-string (format "What is %s's %s stat: " name stat))))
-
-      (dolist (stat '(health spirit supply))
-        (rpgdm-ironsworn-store-character-state stat 5))
-      (rpgdm-ironsworn-store-character-state 'momentum 2)
-
-      (rpgdm-ironsworn-progress-create "Bonds" 1)
-      (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
-      (message "Alright, the template for %s is complete. Edit away!" name)))
+      (insert (format frmt name))))
 #+END_SRC
+**** Character Assets
+We need a way to insert three assets, however, I don't want duplicates, or two companions, or ... well, I may come up with more rules, but I codify those rules into a function that returns a list, if it is good, or =nil= otherwise:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--good-character-assets (asset-files)
+    "Return ASSET-FILES if all given are _good enough_.
+  That is, all are unique, only one companion, etc."
+    (when (and
+           (equal asset-files (seq-uniq asset-files))
+           (<= (seq-length
+                (seq-filter (lambda (file) (string-match (rx "companions") file))
+                            asset-files))
+               1))
+      asset-files))
+#+END_SRC
+
+And I can write a little unit test to verify my test cases:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (ert-deftest rpgdm-ironsworn--good-character-assets-test ()
+    (should (rpgdm-ironsworn--good-character-assets     '("foo" "bar" "baz")))
+    (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "foo")))
+    (should-not (rpgdm-ironsworn--good-character-assets '("assets/companions/dog.org"
+                                                          "assets/paths/good-guy.org"
+                                                          "assets/companions/monkey.org"))))
+#+END_SRC
+
+The rules say to start off with three assets, so let's have a function that can give us three random assets:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--some-character-assets (asset-filenames &optional number)
+    "Return a list of NUMBER elements from ASSET-FILENAMES... randomly.
+  If NUMBER is nil, then return 3."
+    (unless number
+      (setq number 3))
+    (loop for x from 1 to number
+          collect (seq-random-elt asset-filenames)))
+#+END_SRC
+
+And again, a little unit test would be nice:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (ert-deftest rpgdm-ironsworn--some-character-assets-test ()
+    (should (= 4 (seq-length (rpgdm-ironsworn--some-character-assets '(1 2 3 4 5 6) 4))))
+    (should (= 3 (seq-length (rpgdm-ironsworn--some-character-assets '(1 2 3 4 5 6))))))
+#+END_SRC
+
+And a function that will read the =assets= directory (recursively) and return a list of three filenames randomly chosen.
+Once we get the list of filenames, we use a inner helper function, =good-enough-list=, that picks three filenames, and if they are not good enough, will call itself until it picks three good ones. Shouldn't take too many iterations.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--new-character-asset-files ()
+    "Return the file names of three assets from the `assets' directory.
+  The chosen assets are _good_ in that they won't have duplicates, etc."
+    (let ((asset-files (thread-first rpgdm-ironsworn-project
+                         (f-join "assets")
+                         (directory-files-recursively (rx (one-or-more any) ".org") nil))))
+
+      (defun good-enough-list (assets)
+        (let ((answer (thread-first assets
+                        rpgdm-ironsworn--some-character-assets
+                        rpgdm-ironsworn--good-character-assets)))
+          (if answer
+              answer
+            (good-enough-list assets))))
+
+      (good-enough-list asset-files)))
+#+END_SRC
+
+Finally, we have a function that inserts the contents of three randomly chosen assets:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--new-character-assets ()
+    "Insert the contents of three character assets from the assets directory."
+    (let ((asset-files (rpgdm-ironsworn--new-character-asset-files)))
+      (goto-char (point-max))
+      (insert "\n** Assets\n")
+      (dolist (file asset-files)
+        (insert-file-contents file nil)
+        (insert "\n\n"))))
+#+END_SRC
+**** Character Stats
+This function will query the user for all of the stats and other properties that we will need to store before we can play the game.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--new-character-stats ()
+    "Query the user for a new character's stats, and add them as
+  properties using the `rpgdm-ironsworn-store-character-state' and
+  the `rpgdm-ironsworn-progress-create' functions."
+    (dolist (stat '(edge heart iron shadow wits))
+      (rpgdm-ironsworn-store-character-state stat
+          (read-string (format "What '%s' stat: " stat))))
+
+    (dolist (stat '(health spirit supply))
+      (rpgdm-ironsworn-store-character-state stat 5))
+    (rpgdm-ironsworn-store-character-state 'momentum 2)
+
+    (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
+    (rpgdm-ironsworn-progress-create "Bonds" 1)
+    (search-forward ":END:")
+    (end-of-line)
+    (insert "\n** Bonds\n")
+    (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement-names"))))
+#+END_SRC
+**** New Character Interface
+Do we choose the stats first, or the assets? Do we ask, or have two separate functions?
+Perhaps the clearest approach is to do both, create two process functions, and then query the user which they would prefer.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--new-character-stats-first (&optional name)
+    "Insert a new character template, query for the stats, then insert assets."
+    (rpgdm-ironsworn--new-character-template name)
+    (rpgdm-ironsworn--new-character-stats)
+    (rpgdm-ironsworn--new-character-assets))
+
+  (defun rpgdm-ironsworn--new-character-assets-first (&optional name)
+    "Insert a new character template, insert assets then query for the stats."
+    (rpgdm-ironsworn--new-character-template name)
+    ;; Saving and restoring point, means the properties should be in the
+    ;; correct, top-level position.
+    (save-excursion
+      (rpgdm-ironsworn--new-character-assets))
+    (rpgdm-ironsworn--new-character-stats))
+
+  (defun rpgdm-ironsworn-new-character (name order)
+    "Interactively query the user for a new character's attribute.
+          This function _appends_ this information to the current buffer,
+          which should be using the `org-mode' major mode."
+    (interactive (list
+                  (read-string "What is the new character's name? ")
+                  (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+    (if (equal order "Assets first")
+        (rpgdm-ironsworn--new-character-assets-first)
+      (rpgdm-ironsworn--new-character-stats-first))
+    (message "Alright, the template is complete. Edit away!" name))
+#+END_SRC
+
 *** Showing a Character Stats
 Sure, you could open up the appropriate drawer to see a character's stats, but  we could do better? An updated org table? A separate buffer? For the moment, I am just going to display it in the mini-buffer whenever I want to see it:
 

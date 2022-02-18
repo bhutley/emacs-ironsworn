@@ -1,0 +1,9 @@
+*** Shield-Bearer
+If you wield a shield...
+
+- [-] When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] using your shield as cover, add +1. When you [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] in close quarters, take +1 momentum on a strong hit.
+
+- [ ] When you paint your shield with a meaningful symbol, envision what you create. Then, if you [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] as you face off against a fearsome foe, add +1 and take +1 momentum on a hit.
+
+- [ ] When forced to [[file:~/other/ironsworn/moves/suffer/endure-harm.org][Endure Harm]] in a fight, you may instead sacrifice your shield and ignore all harm. If you do, the shield is destroyed. Once per fight, you also take initiative when you sacrifice your shield to avoid harm.
+

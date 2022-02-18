@@ -1,0 +1,9 @@
+*** Battle-Scarred
+Once you become maimed...
+
+- [ ] You focus your energies: Reduce your edge or iron by 1 and add +2 to wits or heart, or +1 to each (to a maximum of +4).
+
+- [ ] You overcome your limitations: Reduce your maximum health by 1. Maimed no longer counts as a debility, and does not reduce your maximum momentum or reset value. When you [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] +heart, take +1 momentum on a strong hit.
+
+- [ ] You have stared down death before: When you are at 0 health and [[file:~/other/ironsworn/moves/suffer/endure-harm.org][Endure Harm]], you may roll +wits or +heart (instead of +health or +iron). If you do, take +1 momentum on a hit.
+

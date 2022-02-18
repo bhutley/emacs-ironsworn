@@ -1,0 +1,11 @@
+*** Banner-Sworn
+Name:
+
+Once you mark a bond with a leader or faction...
+
+- [-] When you [[file:~/other/ironsworn/moves/quest/swear-an-iron-vow.org][Swear an Iron Vow]] to serve your leader or faction on a mission, you may reroll any dice. When you [[file:~/other/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]] and mark experience, take +1 experience.
+
+- [ ] When you [[file:~/other/ironsworn/moves/relationship/sojourn.org][Sojourn]] or [[file:~/other/ironsworn/moves/adventure/make-camp.org][Make Camp]] in the company of your banner-kin, add +1 and take +1 momentum on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] bearing your banner, add +1 and take +1 momentum on a hit. When you burn momentum while carrying your banner in combat, take +1 momentum after you reset.
+

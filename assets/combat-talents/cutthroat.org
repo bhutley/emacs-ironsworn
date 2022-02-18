@@ -1,0 +1,11 @@
+*** Cutthroat
+If you wield a dagger or knife...
+
+- [-] When you are in position to [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] at an unsuspecting foe, choose one (before rolling).
+    - Add +2 and take +1 momentum on a hit.
+    - Inflict +2 harm on a hit.
+
+- [ ] When you [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] someone at the point of your blade, or when you rely on your blade to [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]], add +1.
+
+- [ ] Once per fight, when you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] +shadow by performing a feint or misdirection, reroll any dice and take +1 momentum on a hit.
+

@@ -1,0 +1,9 @@
+*** Spirit-Bound
+
+- [-] You are haunted by someone whose death you caused through your actions or failures. When you consult with their spirit to [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] or [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]], add +1 and take +2 momentum on a hit. On a weak hit, also [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (1 stress).
+
+- [ ] When you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]] guided by the spirit, add +1. On a strong hit, envision what you learn and take 1 experience.
+
+- [ ] One time only, when you successfully [[file:~/other/ironsworn/moves/quest/fulfill-your-vow.org][Fulfill Your Vow]] (formidable or greater) in service to the spirit, choose one.
+    - Let them go: Take 2 experience for each marked ability and discard this asset.
+    - Deepen your connection: Add +1 more when you leverage this asset.
