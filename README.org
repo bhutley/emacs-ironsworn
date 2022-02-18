@@ -59,15 +59,15 @@ While the interface may change (and I may not update that screenshot too often),
   - ~d~ rolls the /Ironsworn/ dice, two d10s and a d6 allowing you to add all the modifiers you want. Better.
   - ~e~, ~h~, ~i~, ~s~, and ~w~ roll against your character's /edge/, /heart/, /iron/, /shadow/ and /wits/ respectively.
   - ~p~ allows you to create a new progress track, or mark progress against it. It has its own submenu:
-    #+ATTR_HTML: :width 800px
+    #+ATTR_HTML: :width 1100px
     [[file:images/ui-progress.png]]
   - ~m~ lets you choose a move, display the details, and lets you roll against it.
-    #+ATTR_HTML: :width 400px
+    #+ATTR_HTML: :width 1100px
     [[file:images/list-of-moves.png]]
   - ~H~, ~S~, ~G~, and ~M~ let you change those stats about your character
   - ~z~ let's you ask a yes/no question, choosing how likely it is. Good for both solo play as well as turning it back on your players, "How likely do you think moor is haunted?"
   - ~c~ displays a list of random tables to roll against:
-    #+ATTR_HTML: :width 400px
+    #+ATTR_HTML: :width 1100px
     [[file:images/list-of-tables.png]]
   - Ironsworn expects you to roll many of the tables /in tandem/, so the ~O~ shows a list of these, for instance:
     #+ATTR_HTML: :width 1200px
