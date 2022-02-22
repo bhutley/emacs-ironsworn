@@ -5,7 +5,7 @@
 #+TAGS:   rpg ironsworn
 
 # Local Variables:
-# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load (concat rpgdm-ironsworn-project "tables")))
+# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode) (rpgdm-tables-load (concat rpgdm-ironsworn-project "tables"))
 # End:
 * Travels of Kannan
 :PROPERTIES:

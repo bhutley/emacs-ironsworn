@@ -4,7 +4,7 @@
 (require 'rpgdm)
 
 (defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
-  "The root directory to the emacs-ironsworn project")
+  "The root directory to the rpgdm-ironsworn project")
 
 (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge
                                  &optional momentum)
@@ -528,8 +528,8 @@ to rolling two d10 challenge dice."
 (defun rpgdm-ironsworn-oracle-action-theme ()
   "Rolls on two tables at one time."
   (interactive)
-  (let ((action (rpgdm-tables-choose "actions"))
-        (theme  (rpgdm-tables-choose "themes")))
+  (let ((action (rpgdm-tables-choose "action"))
+        (theme  (rpgdm-tables-choose "theme")))
     (rpgdm-message "%s / %s" action theme)))
 
 (puthash "action-and-theme :: Roll on both tables"
@@ -540,12 +540,12 @@ to rolling two d10 challenge dice."
   "Roll on all the character-related tables and show them together.
 You'll need to pick and choose what works and discard what doesn't."
   (interactive)
-  (let ((name        (rpgdm-tables-choose "names-ironlander"))
-        (goal        (rpgdm-tables-choose "character-goal"))
-        (role        (rpgdm-tables-choose "character-role"))
-        (activity    (rpgdm-tables-choose "character-activity"))
-        (description (rpgdm-tables-choose "character-descriptor"))
-        (disposition (rpgdm-tables-choose "character-disposition")))
+  (let ((name        (rpgdm-tables-choose "name/ironlander"))
+        (goal        (rpgdm-tables-choose "character/goal"))
+        (role        (rpgdm-tables-choose "character/role"))
+        (activity    (rpgdm-tables-choose "character/activity"))
+        (description (rpgdm-tables-choose "character/descriptor"))
+        (disposition (rpgdm-tables-choose "character/disposition")))
     (rpgdm-message "%s, %s %s (Activity: %s  Disposition: %s  Goal: %s)"
                    name description role activity disposition goal)))
 
@@ -565,18 +565,28 @@ You'll need to pick and choose what works and discard what doesn't."
 (defun rpgdm-ironsworn-oracle-feature ()
   "Rolls on two tables at one time for a Site's feature."
   (interactive)
-  (let ((aspect (rpgdm-tables-choose "feature-aspect"))
-        (focus  (rpgdm-tables-choose "feature-focus")))
+  (let ((aspect (rpgdm-tables-choose "feature/aspect"))
+        (focus  (rpgdm-tables-choose "feature/focus")))
     (rpgdm-message "%s / %s" aspect focus)))
 
-(puthash "feature-aspect-and-focus :: Roll on both feature tables for a waypoint"
+(puthash "feature-aspect-and-focus :: Roll on both feature tables"
          'rpgdm-ironsworn-oracle-feature rpgdm-tables)
+
+(defun rpgdm-ironsworn-oracle-waypoint ()
+  "Rolls on two tables at one time for a Site's feature."
+  (interactive)
+  (let ((location     (rpgdm-tables-choose "location"))
+        (description  (rpgdm-tables-choose "location-descriptors")))
+    (rpgdm-message "%s %s" description (downcase location))))
+
+(puthash "location-and-descriptor :: Roll on two tables for a waypoint"
+         'rpgdm-ironsworn-oracle-waypoint rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-site-nature ()
   "Rolls on two tables at one time for a random Site."
   (interactive)
-  (let* ((theme  (rpgdm-tables-choose "site-theme"))
-         (domain (rpgdm-tables-choose "site-domain"))
+  (let* ((theme  (rpgdm-tables-choose "site/theme"))
+         (domain (rpgdm-tables-choose "site/domain"))
          (place  (downcase domain))
          (name   (rpgdm-ironsworn-oracle-site-name place)))
     (rpgdm-message "%s %s :: %s" theme domain name)))
@@ -588,14 +598,14 @@ You'll need to pick and choose what works and discard what doesn't."
   "Rolling on multiple tables to return a random site name."
   (interactive (list (completing-read "Place type: "
                                       '(barrow cavern icereach mine pass ruin
-                                               sea-cave shadowfen stronghold
-                                               tanglewood underkeep))))
+                                        sea-cave shadowfen stronghold
+                                        tanglewood underkeep))))
   (unless place-type
     (setq place-type "unknown"))
-  (let ((description (rpgdm-tables-choose "site-name-description"))
-        (detail (rpgdm-tables-choose "site-name-detail"))
-        (namesake (rpgdm-tables-choose "site-name-namesake"))
-        (place  (rpgdm-tables-choose (format "site-name-place-%s" place-type)))
+  (let ((description (rpgdm-tables-choose "site/name/description"))
+        (detail (rpgdm-tables-choose "site/name/detail"))
+        (namesake (rpgdm-tables-choose "site/name/namesake"))
+        (place  (rpgdm-tables-choose (format "site/name/place/%s" place-type)))
         (roll   (rpgdm--roll-die 100)))
     (rpgdm-message
      (cond
@@ -622,7 +632,7 @@ You'll need to pick and choose what works and discard what doesn't."
   (interactive (list (completing-read "Threat: " rpgdm-ironsworn-oracle-threats)))
   (unless category
     (setq category (seq-random-elt rpgdm-ironsworn-oracle-threats)))
-  (let ((table-name (format "threat-%s" (downcase (string-replace " " "-" category)))))
+  (let ((table-name (format "threat/%s" (downcase (string-replace " " "-" category)))))
     (rpgdm-message "%s: %s" category (rpgdm-tables-choose table-name))))
 
 (puthash "threat-goal :: Generate a goal for a particular threat"
