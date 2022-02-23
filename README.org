@@ -749,7 +749,7 @@ Oh, one issue... how do I know where the data files for the moves are?
 	    (mapcar 'rpgdm-ironsworn--move-tuple
 		    (directory-files-recursively
 		     (f-join rpgdm-ironsworn-project "moves")
-		     ".*\.org$"))))
+                     (rx (1+ any) ".org" eos)))))
     rpgdm-ironsworn-moves)
 #+END_SRC
 
@@ -763,7 +763,7 @@ A frustrating lack-of-function is a [[help:completing-read][completing-read]] fu
 
 #+BEGIN_SRC emacs-lisp
   (defun completing-read-value (prompt values)
-    "Like `completing-read' but returns the value from VALUES instead of key.
+    "Like `completing-read' but return value from VALUES instead of key.
   Display PROMPT, and has a list of choices displayed for the user to select."
     (thread-first prompt
       (completing-read values)
@@ -793,14 +793,15 @@ Now, let's do the Move interface. We need to load the documentation, and retriev
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-make-move (move-file)
-    "Make an Ironsworn move by loading MOVE-FILE, and optionally querying the
-  user to make an initial roll based on the properties in the file."
+    "Make an Ironsworn move by loading MOVE-FILE.
+  Optionally query the user to make an initial roll based
+  on the properties in the file."
     (interactive (list (rpgdm-ironsworn-choose-move)))
 
     ;; Normally, we'd call `save-window-excursion', however, that buries the file
     ;; we show, and I think we should leave it up for study.
     (let (props title
-          (orig-buf (window-buffer)))
+	  (orig-buf (window-buffer)))
       (find-file-other-window move-file)
       (goto-char (point-min))
       (setq title (cdr (assoc "ITEM" (org-entry-properties))))
@@ -887,18 +888,19 @@ A helper function for allowing the user to choose which track to mark progress a
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-progress-track-choose (&optional allow-other)
-    "Query the user for a particular stored track. If ALLOW-OTHER is non-nil,
-  we append a choice, <other>, which allows the user to choose the number
-  of squares that have been marked against some progress."
+    "Query the user to choose a track stored in the org file.
+  If ALLOW-OTHER is non-nil, we append a choice, <other>, which
+  allows the user to choose the number of squares that have been
+  marked against some progress."
     (let* ((other "<other>")
-           (tracks  (rpgdm-ironsworn-character-progresses))
-           (choices (if allow-other
-                        (append tracks (list other))
-                      tracks))
-           (original (completing-read "Progress Track: " choices)))
+	   (tracks  (rpgdm-ironsworn-character-progresses))
+	   (choices (if allow-other
+			(append tracks (list other))
+		      tracks))
+	   (original (completing-read "Progress Track: " choices)))
       (if (and allow-other (equal original other))
-          (read-number "Completed Track Amount [0-10]: ")
-        original)))
+	  (read-number "Completed Track Amount [0-10]: ")
+	original)))
 #+END_SRC
 
 Adding a progress to a character amounts to an arbitrary name, and the number of ticks, that amount to a /level/. For instance, we want to mark two boxes against a /dangerous/ track, which is =8= ticks. We store this in the character's hash-table, under the key, =progress-tracks=:
@@ -906,7 +908,7 @@ Adding a progress to a character amounts to an arbitrary name, and the number of
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-progress-create (name level)
     "Add a new progress track, NAME, of a particular LEVEL.
-  Stored as a property in the org file. Keep in mind that the
+  Stored as a property in the org file.  Keep in mind that the
   NAME should be a short title, not a description."
     (interactive (list (read-string "Progress Name: ")
 		       (completing-read-value "Progress Level: "
@@ -937,8 +939,9 @@ Interactively, we can call the =-mark= function multiple times, but we might wan
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-progress-mark (name &optional times)
-    "Mark progress against a track, NAME. Instead of calling this function multiple
-  times, you can specify the number of TIMES to mark progress."
+    "Mark progress against a track, NAME, storing result.
+  Instead of calling this function multiple times, you can specify
+  the number of TIMES to mark progress."
     (interactive (list (rpgdm-ironsworn-progress-track-choose)))
     (unless times (setq times 1))
     (dotimes (idx times)
@@ -967,8 +970,8 @@ Rolling against the progress just means we need to request that value instead of
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-progress-roll (progress-value)
-    "Display a Hit/Miss message based on comparing the PROGRESS-VALUE
-  to rolling two d10 challenge dice."
+    "Display a Hit/Miss message based on the PROGRESS-VALUE.
+  This value is compared to rolling two d10 challenge dice."
     (interactive (list (rpgdm-ironsworn-progress-track-choose t)))
     (unless (numberp progress-value)
       (setq progress-value (rpgdm-ironsworn-progress-amount progress-value)))
@@ -1014,11 +1017,95 @@ Let's make sure these function work as we expect:
       (should (= (rpgdm-ironsworn-progress-amount track) 1))))
 #+END_SRC
 *** Delve Site Progress
-In the Ironsworn Delve expansion, you can venture in a /dangerous place/, and this is a slightly different progress. To begin, you choose a /theme/ and a /domain/, and then many oracles can refer to a combination of them. Let’a have a function that allows us to choose both (and store) so that we can refer to them again.
+In the Ironsworn Delve expansion, you can venture in a /dangerous place/, and this is a slightly different progress.
+
+Using the interesting random name generator from the Ironsworn: Delve source book.
+Requires a =place-type= to help limit the values that can be in /place/ and then looks up the details on various tables.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
+    "Return a randomly generated name for a dangerous site.
+  The PLACE-TYPE is something like 'shadowfen or 'sea-cave,
+  and helps to make the new name more meaningful to the place."
+    (interactive (list (completing-read "Place type: "
+					'(barrow cavern icereach mine pass ruin
+					  sea-cave shadowfen stronghold
+					  tanglewood underkeep))))
+    (unless place-type
+      (setq place-type "unknown"))
+    (let ((description (rpgdm-tables-choose "site/name/description"))
+	  (detail (rpgdm-tables-choose "site/name/detail"))
+	  (namesake (rpgdm-tables-choose "site/name/namesake"))
+	  (place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
+	  (roll   (rpgdm--roll-die 100)))
+      (rpgdm-message
+       (cond
+	((<= roll 25) (format "%s %s" description place))
+	((<= roll 50) (format "%s of %s" place detail))
+	((<= roll 70) (format "%s of %s %s" place description detail))
+	((<= roll 80) (format "%s of %s's %s" place namesake detail))
+	((<= roll 85) (format "%s's %s" namesake place))
+	((<= roll 95) (format "%s %s of %s" description place namesake))
+	(t            (format "%s of %s" place namesake))))))
+#+END_SRC
+While the following functions can take advantage of this function, we also want to place it in our normal =rpgdm-tables= hash, so that we can choose it there:
+
+#+BEGIN_SRC emacs-lisp
+  (puthash "site/name" 'rpgdm-ironsworn-oracle-site-name rpgdm-tables)
+#+END_SRC
+
+So, let's generate some random place names as examples of it working:
+#+BEGIN_SRC emacs-lisp :tangle no
+(rpgdm-ironsworn-oracle-site-name "barrow")     ; "Tomb of Storms"
+(rpgdm-ironsworn-oracle-site-name "cavern")     ; "Lair of Khulan’s Truth"
+(rpgdm-ironsworn-oracle-site-name "icereach")   ; "Barrens of Erisia’s Winter"
+(rpgdm-ironsworn-oracle-site-name "mine")       ; "Lode of Ashen Lament"
+(rpgdm-ironsworn-oracle-site-name "pass")       ; "Sunken Highlands"
+(rpgdm-ironsworn-oracle-site-name "ruin")       ; "Sanctum of Khulan’s Truth"
+(rpgdm-ironsworn-oracle-site-name "sea-cave")   ; "Silent Caves"
+(rpgdm-ironsworn-oracle-site-name "shadowfen")  ; "Floodlands of Nightmare Despair"
+(rpgdm-ironsworn-oracle-site-name "stronghold") ; "Crumbling Bastion"
+(rpgdm-ironsworn-oracle-site-name "tanglewood") ; "Bramble of Endless Strife"
+(rpgdm-ironsworn-oracle-site-name "underkeep")  ; "Underkeep of Lament"
+(rpgdm-ironsworn-oracle-site-name)              ; "Sundered Mists of Khulan"
+#+END_SRC
+
+What makes these unique is the combination a place type, called a /domain/, and an aspect, called a /theme/, and then many oracles can refer to a combination of both tables.  We could randomly choose a place, rolling randomly on both theme and domain, for instance:
+  - Ravaged Shadowfen :: Mire of Shrouded Silence
+  - Haunted Barrow :: Grave of Radek’s Shadow
+  - Infested Barrow :: Selpulcher of Wasted Bone
+Notice we also generate a name for the place.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-oracle-site-nature ()
+    "Return a name and nature of a dangerous site.
+  The nature is a combination of theme and domain."
+    (interactive)
+    (let* ((theme  (rpgdm-tables-choose "site/theme"))
+	   (domain (rpgdm-tables-choose "site/domain"))
+	   (place  (downcase domain))
+	   (name   (rpgdm-ironsworn-oracle-site-name place)))
+      (rpgdm-message "%s %s :: %s" theme domain name)))
+#+END_SRC
+
+Let’s put this function too in our =rpgdm-tables= hash table, so I can easily grab a unique random dangerous site.
+
+#+BEGIN_SRC emacs-lisp
+  (puthash "site" 'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
+#+END_SRC
+
+To begin delving into a site, you choose a /theme/ and a /domain/, and then . Let’a have a function that allows us to choose both (and store) so that we can refer to them again.
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-discover-a-site (theme domain)
-    "Store a Delve Site information in the org file."
+    "Store a Delve Site information in the org file.
+  The THEME and DOMAIN need to match org files in the `tables'
+  directory, and the choices themselves come from these files.
+  See the helper functions,
+  `rpgdm-ironsworn-site-themes' and `rpgdm-ironsworn-site-domains'.
+
+  Note, this function also queries the user for the name of the site
+  and progress level, and stores all this information in the org file."
     (interactive
      (list
       (completing-read "What is the site theme? " rpgdm-ironsworn-site-themes)
@@ -1033,11 +1120,13 @@ In the Ironsworn Delve expansion, you can venture in a /dangerous place/, and th
     (rpgdm-ironsworn-store-character-state 'site-theme (downcase theme))
     (rpgdm-ironsworn-store-character-state 'site-domain (downcase domain)))
 #+END_SRC
+
 With these properties in place, we can now do a much better job with the [[file:moves/delve/delve-the-depths.org][Delve the Depths]] move.
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-delve-the-depths-weak (stat)
-    "Return random results from weak hit table for Delve the Depths."
+    "Return random result from weak hit table for Delve the Depths.
+  The STAT should be the symbol, 'wits, 'shadow, or 'edge."
     (interactive (list (completing-read "Stat Choice: "
 					'("wits" "shadow" "edge"))))
     (let ((table-name (format "delve/weak-hit/%s" stat)))
@@ -1045,14 +1134,17 @@ With these properties in place, we can now do a much better job with the [[file:
       (rpgdm-tables-choose table-name)))
 
   (defun rpgdm-ironsworn-delve-the-depths-weak-edge ()
+    "Return random result from `edge` version of the weak hit table."
     (interactive)
     (rpgdm-ironsworn-delve-the-depths-weak "edge"))
 
   (defun rpgdm-ironsworn-delve-the-depths-weak-shadow ()
+    "Return random result from `shadow` version of the weak hit table."
     (interactive)
     (rpgdm-ironsworn-delve-the-depths-weak "shadow"))
 
   (defun rpgdm-ironsworn-delve-the-depths-weak-wits ()
+    "Return random result from `wits` version of the weak hit table."
     (interactive)
     (rpgdm-ironsworn-delve-the-depths-weak "wits"))
 #+END_SRC
@@ -1153,14 +1245,14 @@ The [[file:tables/combat-action.org][combat action]] table isn't often tactical,
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-oracle-combat ()
+    "Return combat response combined from three combat tables."
     (interactive)
-    (let ((action (rpgdm-tables-choose "combat-action"))
-          (method (rpgdm-tables-choose "combat-event-method"))
-          (target (rpgdm-tables-choose "combat-event-target")))
+    (let ((action (rpgdm-tables-choose "combat/action"))
+	  (method (rpgdm-tables-choose "combat/event-method"))
+	  (target (rpgdm-tables-choose "combat/event-target")))
       (rpgdm-message "%s %s or %s" method target action)))
 
-  (puthash "combat-action-events :: Roll on all combat tables"
-           'rpgdm-ironsworn-oracle-combat rpgdm-tables)
+  (puthash "combat" 'rpgdm-ironsworn-oracle-combat rpgdm-tables)
 #+END_SRC
 *** Feature
 This function combines the [[file:tables/feature-aspect.org][aspect]] and [[file:tables/feature-focus.org][focus]] of a /feature/, for instance:
@@ -1170,7 +1262,7 @@ This function combines the [[file:tables/feature-aspect.org][aspect]] and [[file
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-oracle-feature ()
-    "Rolls on two tables at one time for a Site's feature."
+    "Roll on two tables at one time for a Site's feature."
     (interactive)
     (let ((aspect (rpgdm-tables-choose "feature/aspect"))
           (focus  (rpgdm-tables-choose "feature/focus")))
@@ -1184,7 +1276,7 @@ And a Waypoint is similar:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-oracle-waypoint ()
-    "Rolls on two tables at one time for a Site's feature."
+    "Roll on two tables at one time for a Site's feature."
     (interactive)
     (let ((location     (rpgdm-tables-choose "location"))
           (description  (rpgdm-tables-choose "location-descriptors")))
@@ -1192,73 +1284,6 @@ And a Waypoint is similar:
 
   (puthash "location-and-descriptor :: Roll on two tables for a waypoint"
            'rpgdm-ironsworn-oracle-waypoint rpgdm-tables)
-#+END_SRC
-*** Site Nature
-In the Ironsworn Delve expansion, you can randomly choose a /dangerous place/, for instance:
-  - Ravaged Shadowfen :: Mire of Shrouded Silence
-  - Haunted Barrow :: Grave of Radek’s Shadow
-  - Infested Barrow :: Selpulcher of Wasted Bone
-Notice we also generate a name for the place.
-
-#+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn-oracle-site-nature ()
-    "Rolls on two tables at one time for a random Site."
-    (interactive)
-    (let* ((theme  (rpgdm-tables-choose "site/theme"))
-           (domain (rpgdm-tables-choose "site/domain"))
-           (place  (downcase domain))
-           (name   (rpgdm-ironsworn-oracle-site-name place)))
-      (rpgdm-message "%s %s :: %s" theme domain name)))
-
-  (puthash "site-nature :: Roll on both site theme and domain tables"
-           'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
-#+END_SRC
-*** Site Name
-Using the interesting random name generator from the Ironsworn: Delve source book.
-Requires a =place-type= to help limit the values that can be in /place/ and then looks up the details on the tables in the =ironsworn= directory.
-
-#+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
-    "Rolling on multiple tables to return a random site name."
-    (interactive (list (completing-read "Place type: "
-                                        '(barrow cavern icereach mine pass ruin
-                                          sea-cave shadowfen stronghold
-                                          tanglewood underkeep))))
-    (unless place-type
-      (setq place-type "unknown"))
-    (let ((description (rpgdm-tables-choose "site/name/description"))
-          (detail (rpgdm-tables-choose "site/name/detail"))
-          (namesake (rpgdm-tables-choose "site/name/namesake"))
-          (place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
-          (roll   (rpgdm--roll-die 100)))
-      (rpgdm-message
-       (cond
-        ((<= roll 25) (format "%s %s" description place))
-        ((<= roll 50) (format "%s of %s" place detail))
-        ((<= roll 70) (format "%s of %s %s" place description detail))
-        ((<= roll 80) (format "%s of %s's %s" place namesake detail))
-        ((<= roll 85) (format "%s's %s" namesake place))
-        ((<= roll 95) (format "%s %s of %s" description place namesake))
-        (t            (format "%s of %s" place namesake))))))
-
-  (puthash "site-name :: Generate a name for a dangerous site"
-           'rpgdm-ironsworn-oracle-site-name rpgdm-tables)
-#+END_SRC
-
-So, let's generate some random place names:
-#+BEGIN_SRC emacs-lisp :tangle no
-(rpgdm-ironsworn-oracle-site-name "barrow")     ; "Tomb of Storms"
-(rpgdm-ironsworn-oracle-site-name "cavern")     ; "Lair of Khulan’s Truth"
-(rpgdm-ironsworn-oracle-site-name "icereach")   ; "Barrens of Erisia’s Winter"
-(rpgdm-ironsworn-oracle-site-name "mine")       ; "Lode of Ashen Lament"
-(rpgdm-ironsworn-oracle-site-name "pass")       ; "Sunken Highlands"
-(rpgdm-ironsworn-oracle-site-name "ruin")       ; "Sanctum of Khulan’s Truth"
-(rpgdm-ironsworn-oracle-site-name "sea-cave")   ; "Silent Caves"
-(rpgdm-ironsworn-oracle-site-name "shadowfen")  ; "Floodlands of Nightmare Despair"
-(rpgdm-ironsworn-oracle-site-name "stronghold") ; "Crumbling Bastion"
-(rpgdm-ironsworn-oracle-site-name "tanglewood") ; "Bramble of Endless Strife"
-(rpgdm-ironsworn-oracle-site-name "underkeep")  ; "Underkeep of Lament"
-(rpgdm-ironsworn-oracle-site-name)              ; "Sundered Mists of Khulan"
 #+END_SRC
 *** Threat
 Generate a random threat and its motivations by coding the threat, but using the many [[file:tables/threat-category.org][threats]] available:
@@ -1269,7 +1294,7 @@ Generate a random threat and its motivations by coding the threat, but using the
                                            "Scheming Leader" "Zealous Cult"
                                            "Environmental Calamity" "Power-Hungry Mystic"
                                            "Rampaging Creature")
-    "A list of threats that correspond to tables")
+    "A list of threats that correspond to tables.")
 
   (defun rpgdm-ironsworn-oracle-threat-goal (&optional category)
     "Given a CATEGORY, display a threat goal."
@@ -1483,6 +1508,7 @@ Since we store both normal and progress props together, we need to distinguish b
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--short-progress-p (prop)
+    "Return non-nil if symbol, PROP, begins with progress."
     (let ((p (symbol-name prop)))
       (s-starts-with-p "progress-" p)))
 #+END_SRC
@@ -1519,11 +1545,12 @@ So the general idea is:
 Since we need to know if we are at the top-level, we could have a function, =org-heading-level= that returns =1= if we are at the top-level, and =0= if we aren't at any level:
 
 #+BEGIN_SRC emacs-lisp
-  (defun org-heading-level ()
-    "Return heading level of the element at the point. 0 otherwise."
-    (if-let ((level-str (org-element-property :level (org-element-at-point))))
-        level-str
-      0))
+    (defun org-heading-level ()
+      "Return heading level of the element at the point.
+    Return 0 if not at a heading, or above first headline."
+      (if-let ((level-str (org-element-property :level (org-element-at-point))))
+	  level-str
+	0))
 #+END_SRC
 
 Enough chit-chat, let's write this function. While we are at it, let's convert the property symbols into short symbols, e.g. =:IRONSWORN-SHADOW= should just be =shadow=, and number values should be numeric:
@@ -1531,8 +1558,8 @@ Enough chit-chat, let's write this function. While we are at it, let's convert t
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--current-character-state (results)
     "Recursive helper to insert current header properties in RESULTS.
-  Calls itself if it is not looking at the top-level header in the
-  file. If a property is already in the hash table, RESULTS, it is
+  Calls itself if it is not looking at the top level header in the
+  file.  If a property is already in the hash table, RESULTS, it is
   not overwritten, thereby having lower-level subtrees take
   precendence over similar settings in higher headers."
     (defun key-convert (ironsworn-prop)
@@ -1586,8 +1613,8 @@ Org can return the value, but breaking it up requires a regular expression:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--progress-values (value)
-    "Parse a string VALUE returning a list of parts,
-  Including the initial name, the number of ticks to mark,
+    "Parse a string VALUE returning a list of parts.
+  This includes the initial name, the number of ticks to mark,
   and the current progress of the track."
     (let ((regxp (rx "\""
                     (group (one-or-more (not "\"")))
@@ -1649,7 +1676,7 @@ And since we move the cursor, we need to [[help:save-excursion][save-excursion]]
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-mark-progress-track (label)
-    "Given a progress track's name, STR, update its progress mark."
+    "Given a progress track's name, LABEL, update its progress mark."
     (interactive (list (completing-read "Progress: " (rpgdm-ironsworn--progresses))))
     (save-excursion
       (rpgdm-ironsworn--mark-progress-track label)))

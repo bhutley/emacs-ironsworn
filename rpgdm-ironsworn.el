@@ -422,11 +422,11 @@ will return a cached copy."
 	  (mapcar 'rpgdm-ironsworn--move-tuple
 		  (directory-files-recursively
 		   (f-join rpgdm-ironsworn-project "moves")
-		   ".*\.org$"))))
+                   (rx (1+ any) ".org" eos)))))
   rpgdm-ironsworn-moves)
 
 (defun completing-read-value (prompt values)
-  "Like `completing-read' but returns the value from VALUES instead of key.
+  "Like `completing-read' but return value from VALUES instead of key.
 Display PROMPT, and has a list of choices displayed for the user to select."
   (thread-first prompt
     (completing-read values)
@@ -444,14 +444,15 @@ current file."
   (set-register ?m (format "# %s ... %s " title results)))
 
 (defun rpgdm-ironsworn-make-move (move-file)
-  "Make an Ironsworn move by loading MOVE-FILE, and optionally querying the
-user to make an initial roll based on the properties in the file."
+  "Make an Ironsworn move by loading MOVE-FILE.
+Optionally query the user to make an initial roll based
+on the properties in the file."
   (interactive (list (rpgdm-ironsworn-choose-move)))
 
   ;; Normally, we'd call `save-window-excursion', however, that buries the file
   ;; we show, and I think we should leave it up for study.
   (let (props title
-        (orig-buf (window-buffer)))
+	(orig-buf (window-buffer)))
     (find-file-other-window move-file)
     (goto-char (point-min))
     (setq title (cdr (assoc "ITEM" (org-entry-properties))))
@@ -507,22 +508,23 @@ For instance, if LABEL is `Dangerous', this returns `8'."
   (car (rassoc level rpgdm-ironsworn-progress-levels)))
 
 (defun rpgdm-ironsworn-progress-track-choose (&optional allow-other)
-  "Query the user for a particular stored track. If ALLOW-OTHER is non-nil,
-we append a choice, <other>, which allows the user to choose the number
-of squares that have been marked against some progress."
+  "Query the user to choose a track stored in the org file.
+If ALLOW-OTHER is non-nil, we append a choice, <other>, which
+allows the user to choose the number of squares that have been
+marked against some progress."
   (let* ((other "<other>")
-         (tracks  (rpgdm-ironsworn-character-progresses))
-         (choices (if allow-other
-                      (append tracks (list other))
-                    tracks))
-         (original (completing-read "Progress Track: " choices)))
+	 (tracks  (rpgdm-ironsworn-character-progresses))
+	 (choices (if allow-other
+		      (append tracks (list other))
+		    tracks))
+	 (original (completing-read "Progress Track: " choices)))
     (if (and allow-other (equal original other))
-        (read-number "Completed Track Amount [0-10]: ")
+	(read-number "Completed Track Amount [0-10]: ")
       original)))
 
 (defun rpgdm-ironsworn-progress-create (name level)
   "Add a new progress track, NAME, of a particular LEVEL.
-Stored as a property in the org file. Keep in mind that the
+Stored as a property in the org file.  Keep in mind that the
 NAME should be a short title, not a description."
   (interactive (list (read-string "Progress Name: ")
 		     (completing-read-value "Progress Level: "
@@ -549,8 +551,9 @@ NAME should be a short title, not a description."
     (org-set-property track-prop track-val)))
 
 (defun rpgdm-ironsworn-progress-mark (name &optional times)
-  "Mark progress against a track, NAME. Instead of calling this function multiple
-times, you can specify the number of TIMES to mark progress."
+  "Mark progress against a track, NAME, storing result.
+Instead of calling this function multiple times, you can specify
+the number of TIMES to mark progress."
   (interactive (list (rpgdm-ironsworn-progress-track-choose)))
   (unless times (setq times 1))
   (dotimes (idx times)
@@ -571,8 +574,8 @@ times, you can specify the number of TIMES to mark progress."
       boxes)))
 
 (defun rpgdm-ironsworn-progress-roll (progress-value)
-  "Display a Hit/Miss message based on comparing the PROGRESS-VALUE
-to rolling two d10 challenge dice."
+  "Display a Hit/Miss message based on the PROGRESS-VALUE.
+This value is compared to rolling two d10 challenge dice."
   (interactive (list (rpgdm-ironsworn-progress-track-choose t)))
   (unless (numberp progress-value)
     (setq progress-value (rpgdm-ironsworn-progress-amount progress-value)))
@@ -589,8 +592,54 @@ to rolling two d10 challenge dice."
     (ignore-errors
       (remhash name tracks))))
 
+(defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
+  "Return a randomly generated name for a dangerous site.
+The PLACE-TYPE is something like 'shadowfen or 'sea-cave,
+and helps to make the new name more meaningful to the place."
+  (interactive (list (completing-read "Place type: "
+				      '(barrow cavern icereach mine pass ruin
+					sea-cave shadowfen stronghold
+					tanglewood underkeep))))
+  (unless place-type
+    (setq place-type "unknown"))
+  (let ((description (rpgdm-tables-choose "site/name/description"))
+	(detail (rpgdm-tables-choose "site/name/detail"))
+	(namesake (rpgdm-tables-choose "site/name/namesake"))
+	(place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
+	(roll   (rpgdm--roll-die 100)))
+    (rpgdm-message
+     (cond
+      ((<= roll 25) (format "%s %s" description place))
+      ((<= roll 50) (format "%s of %s" place detail))
+      ((<= roll 70) (format "%s of %s %s" place description detail))
+      ((<= roll 80) (format "%s of %s's %s" place namesake detail))
+      ((<= roll 85) (format "%s's %s" namesake place))
+      ((<= roll 95) (format "%s %s of %s" description place namesake))
+      (t            (format "%s of %s" place namesake))))))
+
+(puthash "site/name" 'rpgdm-ironsworn-oracle-site-name rpgdm-tables)
+
+(defun rpgdm-ironsworn-oracle-site-nature ()
+  "Return a name and nature of a dangerous site.
+The nature is a combination of theme and domain."
+  (interactive)
+  (let* ((theme  (rpgdm-tables-choose "site/theme"))
+	 (domain (rpgdm-tables-choose "site/domain"))
+	 (place  (downcase domain))
+	 (name   (rpgdm-ironsworn-oracle-site-name place)))
+    (rpgdm-message "%s %s :: %s" theme domain name)))
+
+(puthash "site" 'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
+
 (defun rpgdm-ironsworn-discover-a-site (theme domain)
-  "Store a Delve Site information in the org file."
+  "Store a Delve Site information in the org file.
+The THEME and DOMAIN need to match org files in the `tables'
+directory, and the choices themselves come from these files.
+See the helper functions,
+`rpgdm-ironsworn-site-themes' and `rpgdm-ironsworn-site-domains'.
+
+Note, this function also queries the user for the name of the site
+and progress level, and stores all this information in the org file."
   (interactive
    (list
     (completing-read "What is the site theme? " rpgdm-ironsworn-site-themes)
@@ -606,7 +655,8 @@ to rolling two d10 challenge dice."
   (rpgdm-ironsworn-store-character-state 'site-domain (downcase domain)))
 
 (defun rpgdm-ironsworn-delve-the-depths-weak (stat)
-  "Return random results from weak hit table for Delve the Depths."
+  "Return random result from weak hit table for Delve the Depths.
+The STAT should be the symbol, 'wits, 'shadow, or 'edge."
   (interactive (list (completing-read "Stat Choice: "
 				      '("wits" "shadow" "edge"))))
   (let ((table-name (format "delve/weak-hit/%s" stat)))
@@ -614,14 +664,17 @@ to rolling two d10 challenge dice."
     (rpgdm-tables-choose table-name)))
 
 (defun rpgdm-ironsworn-delve-the-depths-weak-edge ()
+  "Return random result from `edge` version of the weak hit table."
   (interactive)
   (rpgdm-ironsworn-delve-the-depths-weak "edge"))
 
 (defun rpgdm-ironsworn-delve-the-depths-weak-shadow ()
+  "Return random result from `shadow` version of the weak hit table."
   (interactive)
   (rpgdm-ironsworn-delve-the-depths-weak "shadow"))
 
 (defun rpgdm-ironsworn-delve-the-depths-weak-wits ()
+  "Return random result from `wits` version of the weak hit table."
   (interactive)
   (rpgdm-ironsworn-delve-the-depths-weak "wits"))
 
@@ -692,17 +745,17 @@ You'll need to pick and choose what works and discard what doesn't."
          'rpgdm-ironsworn-oracle-npc rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-combat ()
+  "Return combat response combined from three combat tables."
   (interactive)
-  (let ((action (rpgdm-tables-choose "combat-action"))
-        (method (rpgdm-tables-choose "combat-event-method"))
-        (target (rpgdm-tables-choose "combat-event-target")))
+  (let ((action (rpgdm-tables-choose "combat/action"))
+	(method (rpgdm-tables-choose "combat/event-method"))
+	(target (rpgdm-tables-choose "combat/event-target")))
     (rpgdm-message "%s %s or %s" method target action)))
 
-(puthash "combat-action-events :: Roll on all combat tables"
-         'rpgdm-ironsworn-oracle-combat rpgdm-tables)
+(puthash "combat" 'rpgdm-ironsworn-oracle-combat rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-feature ()
-  "Rolls on two tables at one time for a Site's feature."
+  "Roll on two tables at one time for a Site's feature."
   (interactive)
   (let ((aspect (rpgdm-tables-choose "feature/aspect"))
         (focus  (rpgdm-tables-choose "feature/focus")))
@@ -712,7 +765,7 @@ You'll need to pick and choose what works and discard what doesn't."
          'rpgdm-ironsworn-oracle-feature rpgdm-tables)
 
 (defun rpgdm-ironsworn-oracle-waypoint ()
-  "Rolls on two tables at one time for a Site's feature."
+  "Roll on two tables at one time for a Site's feature."
   (interactive)
   (let ((location     (rpgdm-tables-choose "location"))
         (description  (rpgdm-tables-choose "location-descriptors")))
@@ -721,50 +774,12 @@ You'll need to pick and choose what works and discard what doesn't."
 (puthash "location-and-descriptor :: Roll on two tables for a waypoint"
          'rpgdm-ironsworn-oracle-waypoint rpgdm-tables)
 
-(defun rpgdm-ironsworn-oracle-site-nature ()
-  "Rolls on two tables at one time for a random Site."
-  (interactive)
-  (let* ((theme  (rpgdm-tables-choose "site/theme"))
-         (domain (rpgdm-tables-choose "site/domain"))
-         (place  (downcase domain))
-         (name   (rpgdm-ironsworn-oracle-site-name place)))
-    (rpgdm-message "%s %s :: %s" theme domain name)))
-
-(puthash "site-nature :: Roll on both site theme and domain tables"
-         'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
-
-(defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
-  "Rolling on multiple tables to return a random site name."
-  (interactive (list (completing-read "Place type: "
-                                      '(barrow cavern icereach mine pass ruin
-                                        sea-cave shadowfen stronghold
-                                        tanglewood underkeep))))
-  (unless place-type
-    (setq place-type "unknown"))
-  (let ((description (rpgdm-tables-choose "site/name/description"))
-        (detail (rpgdm-tables-choose "site/name/detail"))
-        (namesake (rpgdm-tables-choose "site/name/namesake"))
-        (place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
-        (roll   (rpgdm--roll-die 100)))
-    (rpgdm-message
-     (cond
-      ((<= roll 25) (format "%s %s" description place))
-      ((<= roll 50) (format "%s of %s" place detail))
-      ((<= roll 70) (format "%s of %s %s" place description detail))
-      ((<= roll 80) (format "%s of %s's %s" place namesake detail))
-      ((<= roll 85) (format "%s's %s" namesake place))
-      ((<= roll 95) (format "%s %s of %s" description place namesake))
-      (t            (format "%s of %s" place namesake))))))
-
-(puthash "site-name :: Generate a name for a dangerous site"
-         'rpgdm-ironsworn-oracle-site-name rpgdm-tables)
-
 (defvar rpgdm-ironsworn-oracle-threats '("Burgeoning Conflict" "Ravaging Horde"
                                          "Cursed Site" "Malignant Plague"
                                          "Scheming Leader" "Zealous Cult"
                                          "Environmental Calamity" "Power-Hungry Mystic"
                                          "Rampaging Creature")
-  "A list of threats that correspond to tables")
+  "A list of threats that correspond to tables.")
 
 (defun rpgdm-ironsworn-oracle-threat-goal (&optional category)
   "Given a CATEGORY, display a threat goal."
@@ -918,6 +933,7 @@ Specifically, does it begin with `:IRONSWORN-PROGRESS'"
     (string-match (rx bos ":IRONSWORN-PROGRESS-") p)))
 
 (defun rpgdm-ironsworn--short-progress-p (prop)
+  "Return non-nil if symbol, PROP, begins with progress."
   (let ((p (symbol-name prop)))
     (s-starts-with-p "progress-" p)))
 
@@ -926,7 +942,8 @@ Specifically, does it begin with `:IRONSWORN-PROGRESS'"
   (downcase (substring (symbol-name prop) 1)))
 
 (defun org-heading-level ()
-  "Return heading level of the element at the point. 0 otherwise."
+  "Return heading level of the element at the point.
+Return 0 if not at a heading, or above first headline."
   (if-let ((level-str (org-element-property :level (org-element-at-point))))
       level-str
     0))
@@ -977,8 +994,8 @@ lower levels of the tree headings take precedence."
       results)))
 
 (defun rpgdm-ironsworn--progress-values (value)
-  "Parse a string VALUE returning a list of parts,
-Including the initial name, the number of ticks to mark,
+  "Parse a string VALUE returning a list of parts.
+This includes the initial name, the number of ticks to mark,
 and the current progress of the track."
   (let ((regxp (rx "\""
                   (group (one-or-more (not "\"")))
@@ -1020,7 +1037,7 @@ and the current progress of the track."
     (rpgdm-ironsworn--mark-progress-track str)))
 
 (defun rpgdm-ironsworn-mark-progress-track (label)
-  "Given a progress track's name, STR, update its progress mark."
+  "Given a progress track's name, LABEL, update its progress mark."
   (interactive (list (completing-read "Progress: " (rpgdm-ironsworn--progresses))))
   (save-excursion
     (rpgdm-ironsworn--mark-progress-track label)))
