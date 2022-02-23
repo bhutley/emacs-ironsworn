@@ -1,0 +1,8 @@
+#+TITLE: Weak Hit Table for Shadow
+
+Roll on Table: d100
+|  1-30 | Mark progress and Reveal a Danger.                |
+| 31-65 | Mark progress.                                    |
+| 66-90 | Choose one: Mark progress or Find an Opportunity. |
+| 91-99 | Take both: Mark progress and Find an Opportunity. |
+|    00 | Mark progress twice and Reveal a Danger.          |

@@ -1,0 +1,8 @@
+#+TITLE: Weak Hit Table for Wits
+
+Roll on Table: d100
+|  1-40 | Mark progress and Reveal a Danger.                |
+| 41-55 | Mark progress.                                    |
+| 56-80 | Choose one: Mark progress or Find an Opportunity. |
+| 81-99 | Take both: Mark progress and Find an Opportunity. |
+|    00 | Mark progress twice and Reveal a Danger.          |

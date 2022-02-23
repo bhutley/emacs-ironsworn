@@ -2,17 +2,17 @@
 
 When you traverse an area within a perilous site, envision your surroundings ([[file:/Volumes/Personal/personal/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure). Then, consider your approach. If you navigate this area...
 
-  - With haste: Roll +edge.
-  - With stealth or trickery: Roll +shadow.
-  - With observation, intuition, or expertise: Roll +wits.
+  - With haste: Roll ~+edge~.
+  - With stealth or trickery: Roll ~+shadow~.
+  - With observation, intuition, or expertise: Roll ~+wits~.
 
 On a *strong hit*, you delve deeper. Mark progress and [[file:find-an-opportunity.org][Find an Opportunity]].
 
-On a *weak hit*, roll on the following table according to your stat.
+On a *weak hit*, [[elisp:rpgdm-ironsworn-delve-the-depths-weak][roll on the following table]] according to your stat.
 
 On a *miss*, [[file:reveal-a-danger.org][Reveal a Danger]].
 
-|  Edge | Shadow |  Wits | Weak Hit Result                                   |
+|  [[elisp:rpgdm-ironsworn-delve-the-depths-weak-edge][Edge]] | [[elisp:rpgdm-ironsworn-delve-the-depths-weak-shadow][Shadow]] |  [[elisp:rpgdm-ironsworn-delve-the-depths-weak-wits][Wits]] | Weak Hit Result                                   |
 |-------+--------+-------+---------------------------------------------------|
 |  1-45 |   1-30 |  1-40 | Mark progress and Reveal a Danger.                |
 | 46-65 |  31-65 | 41-55 | Mark progress.                                    |

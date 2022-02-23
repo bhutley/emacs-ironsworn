@@ -1,7 +1,7 @@
 ** Reveal a Danger
 
 When you *encounter a risky situation within a site*, envision the danger
-or [[elisp:(rpgdm-tables-choose "dangers")][roll on the following table]]:
+or [[elisp:(rpgdm-tables-choose "dangers")][roll on the following table]], or better yet, call the function.
 
 |  Roll | Result                                                      |
 |-------+-------------------------------------------------------------|

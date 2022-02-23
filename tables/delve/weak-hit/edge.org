@@ -1,0 +1,8 @@
+#+TITLE: Weak Hit Table for Edge
+
+Roll on Table: d100
+|  1-45 | Mark progress and Reveal a Danger.                |
+| 46-65 | Mark progress.                                    |
+| 66-75 | Choose one: Mark progress or Find an Opportunity. |
+| 76-80 | Take both: Mark progress and Find an Opportunity. |
+| 81-00 | Mark progress twice and Reveal a Danger.          |

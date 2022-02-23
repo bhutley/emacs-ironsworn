@@ -1,78 +1,105 @@
-(add-to-list 'load-path (expand-file-name "~/other/rpgdm"))
-(add-to-list 'load-path (expand-file-name "~/other/rpgdm-ironsworn"))
+;;; rpgdm-ironsworn -- Functions for integrating Ironsworn with Org
+;;
+;; Copyright (C) 2020 Howard X. Abrams
+;;
+;; Author: Howard X. Abrams <http://gitlab.com/howardabrams>
+;; Maintainer: Howard X. Abrams
+;; Created: September 18, 2020
+;;
+;; This file is not part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;    This file is conspicuously absent from commentary or even
+;;    comments.  This is because this file is created from tangling
+;;    the README.org file in this directory.
+;;
+;;; Code:
 
 (require 'rpgdm)
 
 (defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
-  "The root directory to the rpgdm-ironsworn project")
+  "The root directory to the rpgdm-ironsworn project.")
 
 (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge
-                                 &optional momentum)
+				 &optional momentum)
+  "Return formatted string for an Ironsworn dice roll results.
+The ACTION is the d6 which is added to the MODIFIER (which can
+have character attribute values as well as any bonuses.  The sum
+is compared to the two d10, ONE-CHALLENGE and TWO-CHALLENGE.
+
+The optional MOMENTUM can be specified to add a message that the
+use could burn that in order to improve the roll."
   (unless momentum
     (setq momentum 0))
 
   (cl-flet ((strong-p (value dice1 dice2) (and (> value dice1) (> value dice2)))
-            (weak-p   (value dice1 dice2)  (or (> value dice1) (> value dice2)))
-            (miss-p   (value dice1 dice2) (and (<= value dice1) (<= value dice2)))
-            (faded    (str) (propertize str 'face '(:foreground "#888")))
-            (noted    (str) (propertize str 'face '(:foreground "light blue")))
-            (strong   (str) (propertize str 'face '(:foreground "green")))
-            (weak     (str) (propertize str 'face '(:foreground "yellow")))
-            (interest (str) (propertize str 'face '(:foreground "orange")))
-            (miss     (str) (propertize str 'face '(:foreground "red"))))
+	    (weak-p   (value dice1 dice2)  (or (> value dice1) (> value dice2)))
+	    (miss-p   (value dice1 dice2) (and (<= value dice1) (<= value dice2)))
+	    (faded    (str) (propertize str 'face '(:foreground "#888")))
+	    (noted    (str) (propertize str 'face '(:foreground "light blue")))
+	    (strong   (str) (propertize str 'face '(:foreground "green")))
+	    (weak     (str) (propertize str 'face '(:foreground "yellow")))
+	    (interest (str) (propertize str 'face '(:foreground "orange")))
+	    (miss     (str) (propertize str 'face '(:foreground "red"))))
 
     (let* ((action-results (+ action modifier))
-           (str-results (cond
-                         ((strong-p action-results one-challenge two-challenge)
-                          (strong "Strong hit"))
-                         ((weak-p action-results one-challenge two-challenge)
-                          (weak "Weak hit"))
-                         (t (miss "Miss"))))
-           (burn-msg     (if (> momentum action-results)
-                             (cond
-                              ((and (strong-p momentum one-challenge two-challenge)
-                                    (not (strong-p action-results one-challenge two-challenge)))
-                               (concat " -- Burn momentum for a " (strong "Strong hit")))
-                              ((and (weak-p momentum one-challenge two-challenge)
-                                    (miss-p action-results one-challenge two-challenge))
-                               (concat " -- Burn momentum for a " (weak "Weak hit")))
-                              (t ""))
-                           ""))
-           (matched-msg  (if (= one-challenge two-challenge)
-                             (concat " ← " (interest "Create a Twist"))
-                           "")))
+	   (str-results (cond
+			 ((strong-p action-results one-challenge two-challenge)
+			  (strong "Strong hit"))
+			 ((weak-p action-results one-challenge two-challenge)
+			  (weak "Weak hit"))
+			 (t (miss "Miss"))))
+	   (burn-msg     (if (> momentum action-results)
+			     (cond
+			      ((and (strong-p momentum one-challenge two-challenge)
+				    (not (strong-p action-results one-challenge two-challenge)))
+			       (concat " -- Burn momentum for a " (strong "Strong hit")))
+			      ((and (weak-p momentum one-challenge two-challenge)
+				    (miss-p action-results one-challenge two-challenge))
+			       (concat " -- Burn momentum for a " (weak "Weak hit")))
+			      (t ""))
+			   ""))
+	   (matched-msg  (if (= one-challenge two-challenge)
+			     (concat " ← " (interest "Create a Twist"))
+			   "")))
 
       (format "%s %s %d %s%d %s %d%s %s %d %s %d%s%s"
-              str-results         (faded "::")
-              (+ action modifier) (faded "(")
-              action              (faded "+")
-              modifier            (faded ")")
-              (noted "→")
-              one-challenge       (faded "/")
-              two-challenge
-              matched-msg burn-msg))))
+	      str-results         (faded "::")
+	      (+ action modifier) (faded "(")
+	      action              (faded "+")
+	      modifier            (faded ")")
+	      (noted "→")
+	      one-challenge       (faded "/")
+	      two-challenge
+	      matched-msg burn-msg))))
 
 (defun rpgdm-ironsworn-roll (modifier &optional momentum)
-  "Display a Hit/Miss message based on comparing a d6 action
-roll (added to MODIFIER) vs. two d10 challenge dice."
+  "Display a Hit/Miss message based on an Ironsworn roll.
+Done by rolling and comparing a d6 action roll (summed with
+MODIFIER) vs two d10 challenge dice.  If given, the MOMENTUM may
+trigger a message to the user that they can burn that for better
+results."
   (interactive "nModifier: ")
   (let ((one-challenge (rpgdm--roll-die 10))
-        (two-challenge (rpgdm--roll-die 10))
-        (action-roll   (rpgdm--roll-die 6)))
+	(two-challenge (rpgdm--roll-die 10))
+	(action-roll   (rpgdm--roll-die 6)))
     (rpgdm-message (rpgdm-ironsworn--results action-roll modifier
-                                             one-challenge two-challenge
-                                             momentum))))
+					     one-challenge two-challenge
+					     momentum))))
 
 (defun rpgdm-ironsworn--new-character-template (name)
-  "Insert a basic Ironsworn template at the end of the current buffer."
+  "Insert basic Ironsworn template at the end of the current buffer.
+A header is created with NAME, but if this is an empty string,
+a random name is generated for the purposes of the template."
   (when (s-blank? name)
     (setq name (rpgdm-tables-choose "names-ironlander")))
 
   (let ((frmt (seq-random-elt '("* The Adventures of %s"
-                                "* The Journeys of %s"
-                                "* %s, an Epic Saga"
-                                "* The Epic of %s"
-                                "* Travels of %s"))))
+				"* The Journeys of %s"
+				"* %s, an Epic Saga"
+				"* The Epic of %s"
+				"* Travels of %s"))))
     (goto-char (point-max))
     (insert "# Local Variables:
 # eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode))
@@ -101,7 +128,7 @@ roll (added to MODIFIER) vs. two d10 challenge dice."
 (defun rpgdm-ironsworn-character-assets ()
   "Return an association list of all available assets.
 The `car' is a label for the asset, and the `cdr' is the filename
-that contains the text. The first time we call this, we read from
+that contains the text.  The first time we call this, we read from
 the `assets' directory, otherwise, we return a cached version."
   (unless rpgdm-ironsworn-character-assets
     (let ((asset-files (thread-first rpgdm-ironsworn-project
@@ -122,7 +149,7 @@ the `assets' directory, otherwise, we return a cached version."
       (cdr))))
 
 (defun rpgdm-ironsworn-insert-character-asset (asset)
-  "Choose and insert the contents of an asset in the current buffer."
+  "Choose and insert the contents of an ASSET in the current buffer."
   (interactive (list (rpgdm-ironsworn--pick-character-asset)))
   (let ((file (if (consp asset) (cdr asset) asset)))
     (insert-file-contents file nil)
@@ -133,7 +160,7 @@ the `assets' directory, otherwise, we return a cached version."
 
 (defun rpgdm-ironsworn--good-character-assets (asset-files)
   "Return ASSET-FILES if all given are _good enough_.
-  That is, all are unique, only one companion, etc."
+That is, all are unique, only one companion, etc."
   (cl-flet ((companion-p (entry)
                          (when (consp entry)
                            (setq entry (cdr entry)))
@@ -167,6 +194,8 @@ The chosen assets are _good_ in that they won't have duplicates, etc."
     (good-enough-list (rpgdm-ironsworn-character-assets)))
 
 (defun rpgdm-ironsworn-random-character-assets (&optional number-of-assets)
+  "Return the file names of NUMBER-OF-ASSETS from the `assets' directory.
+The chosen assets are _good_ in that they won't have duplicates, etc."
   (interactive "nHow many random assets should we insert? ")
   (dolist (file (rpgdm-ironsworn--random-character-assets number-of-assets))
     (rpgdm-ironsworn-insert-character-asset file)))
@@ -181,12 +210,13 @@ The chosen assets are _good_ in that they won't have duplicates, etc."
         (call-interactively 'rpgdm-ironsworn-insert-character-asset))))
 
 (defun rpgdm-ironsworn--new-character-stats ()
-  "Query the user for a new character's stats, and add them as
-properties using the `rpgdm-ironsworn-store-character-state' and
-the `rpgdm-ironsworn-progress-create' functions."
+  "Insert character stats after querying user for them.
+Note: The stats are added as properties using the
+`rpgdm-ironsworn-store-character-state' and the
+`rpgdm-ironsworn-progress-create' functions."
   (dolist (stat '(edge heart iron shadow wits))
     (rpgdm-ironsworn-store-character-state stat
-        (read-string (format "What '%s' stat: " stat))))
+	(read-string (format "What '%s' stat: " stat))))
 
   (dolist (stat '(health spirit supply))
     (rpgdm-ironsworn-store-character-state stat 5))
@@ -200,13 +230,15 @@ the `rpgdm-ironsworn-progress-create' functions."
   (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement-names"))))
 
 (defun rpgdm-ironsworn--new-character-stats-first (&optional name)
-  "Insert a new character template, query for the stats, then insert assets."
+  "Insert a new character template for character, NAME.
+The character stats are first queried, and then assets inserted."
   (rpgdm-ironsworn--new-character-template name)
   (rpgdm-ironsworn--new-character-stats)
   (rpgdm-ironsworn--new-character-assets))
 
 (defun rpgdm-ironsworn--new-character-assets-first (&optional name)
-  "Insert a new character template, insert assets then query for the stats."
+  "Insert a new character template for character, NAME.
+The assets are inserted first, and then character stats are queried."
   (rpgdm-ironsworn--new-character-template name)
   ;; Saving and restoring point, means the properties should be in the
   ;; correct, top-level position.
@@ -216,24 +248,28 @@ the `rpgdm-ironsworn-progress-create' functions."
 
 (defun rpgdm-ironsworn-new-character (name order)
   "Interactively query the user for a new character's attribute.
-        This function _appends_ this information to the current buffer,
-        which should be using the `org-mode' major mode."
+The NAME is the character's name, and ORDER determines how the
+template will generate and query the user for the rest of the data.
+This function _appends_ this information to the current buffer,
+which should be using the `org-mode' major mode."
   (interactive (list
-                (read-string "What is the new character's name? ")
-                (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+		(read-string "What is the new character's name? ")
+		(completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
   (if (equal order "Assets first")
       (rpgdm-ironsworn--new-character-assets-first)
     (rpgdm-ironsworn--new-character-stats-first))
   (message "Alright, the template is complete. Edit away!" name))
 
 (defun rpgdm-ironsworn--display-stat (stat character)
+  "Colorized the STAT from a CHARACTER hash containing it.
+See `rpgdm-ironsworn-character-display'."
   (let* ((value (gethash stat character))
-         (s-val (number-to-string value))
-         (color (cond
-                 ((< value 1) "red")
-                 ((< value 3) "orange")
-                 ((< value 4) "yellow")
-                 (t "green"))))
+	 (s-val (number-to-string value))
+	 (color (cond
+		 ((< value 1) "red")
+		 ((< value 3) "orange")
+		 ((< value 4) "yellow")
+		 (t "green"))))
     (propertize s-val 'face `(:foreground ,color))))
 
 (defun rpgdm-ironsworn-character-display ()
@@ -242,20 +278,20 @@ the `rpgdm-ironsworn-progress-create' functions."
   (let ((character (rpgdm-ironsworn-current-character-state)))
     (rpgdm-message "Edge: %d  Heart: %d  Iron: %d  Shadow: %d  Wits: %d
 Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
-                   (rpgdm-ironsworn-character-stat 'edge character)
-                   (rpgdm-ironsworn-character-stat 'heart character)
-                   (rpgdm-ironsworn-character-stat 'iron character)
-                   (rpgdm-ironsworn-character-stat 'shadow character)
-                   (rpgdm-ironsworn-character-stat 'wits character)
+		   (rpgdm-ironsworn-character-stat 'edge character)
+		   (rpgdm-ironsworn-character-stat 'heart character)
+		   (rpgdm-ironsworn-character-stat 'iron character)
+		   (rpgdm-ironsworn-character-stat 'shadow character)
+		   (rpgdm-ironsworn-character-stat 'wits character)
 
-                   (rpgdm-ironsworn--display-stat 'health character)
-                   (rpgdm-ironsworn--display-stat 'spirit character)
-                   (rpgdm-ironsworn--display-stat 'supply character)
+		   (rpgdm-ironsworn--display-stat 'health character)
+		   (rpgdm-ironsworn--display-stat 'spirit character)
+		   (rpgdm-ironsworn--display-stat 'supply character)
 
-                   (gethash 'momentum character 5))))
+		   (gethash 'momentum character 5))))
 
 (defun rpgdm-ironsworn-to-string (a)
-  "Return a lowercase string from either a string, keyword or symbol."
+  "Return a lowercase string from either A, a string, keyword or symbol."
   (downcase
    (cond
     ((keywordp a) (substring (symbol-name a) 1))
@@ -269,15 +305,18 @@ Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
   (lambda (s) (sxhash-equal (rpgdm-ironsworn-to-string s))))
 
 (defun rpgdm-ironsworn-character-stat (stat &optional character)
-  "Return integer value associated with a character's STAT."
+  "Return integer value associated with a character's STAT.
+If CHARACTER doesn't refer to a character hash, then this calls
+the `rpgdm-ironsworn-current-character-state' function."
   (when (null character)
     (setq character (rpgdm-ironsworn-current-character-state)))
   (gethash stat character 1))
 
 (defun rpgdm-ironsworn-adjust-stat (stat adj &optional default)
-  "Increase or decrease the current character's STAT by ADJ."
+  "Increase or decrease the current character's STAT by ADJ.
+If the STAT isn't found, returns DEFAULT."
   (let* ((curr (rpgdm-ironsworn-character-stat stat))
-         (new  (+ curr adj)))
+	 (new  (+ curr adj)))
     (rpgdm-ironsworn-store-character-state stat new)))
 
 (defun rpgdm-ironsworn-adjust-health (health-adj)
@@ -353,42 +392,55 @@ Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
    (rpgdm-ironsworn-character-stat :supply)))
 
 (defun rpgdm-ironsworn--move-tuple (file)
+  "Return a list of a string representation of FILE, and FILE.
+The string representation is created by looking at the parent
+directory and file name."
   (let* ((regx (rx "moves/"
-                   (group (one-or-more (not "/")))
-                   "/"
-                   (group (one-or-more (not ".")))
-                   ".org" eol))
-         (mtch (string-match regx file))
-         (type (thread-last file
-                 (match-string 1)
-                 (s-titleize)))
-         (name (thread-last file
-                 (match-string 2)
-                 (s-replace-regexp "-" " "))))
+		   (group (one-or-more (not "/")))
+		   "/"
+		   (group (one-or-more (not ".")))
+		   ".org" eol))
+	 (mtch (string-match regx file))
+	 (type (thread-last file
+		 (match-string 1)
+		 (s-titleize)))
+	 (name (thread-last file
+		 (match-string 2)
+		 (s-replace-regexp "-" " "))))
     (list (format "%s :: %s" type name) file)))
 
-(defvar rpgdm-ironsworn-moves () "A list of tuples of the move and the file containing its goodness.")
+(defvar rpgdm-ironsworn-moves ()
+  "A list of tuples of the move and the file containing its goodness.")
 
 (defun rpgdm-ironsworn-moves ()
-  "Return a list containing available moves, and the filename containing
-  the moves instructions, and other properties. Note that this function is
-  memoized, in that re-calling this function will return a cached copy."
+  "Return a list containing available moves and its filename.
+The file contains the move's instructions and other properties.  Note
+that this function is memoized, in that re-calling this function
+will return a cached copy."
   (unless rpgdm-ironsworn-moves
     (setq rpgdm-ironsworn-moves
-          (mapcar 'rpgdm-ironsworn--move-tuple
-                  (directory-files-recursively
-                   (f-join rpgdm-ironsworn-project "moves")
-                   ".*\.org$"))))
+	  (mapcar 'rpgdm-ironsworn--move-tuple
+		  (directory-files-recursively
+		   (f-join rpgdm-ironsworn-project "moves")
+		   ".*\.org$"))))
   rpgdm-ironsworn-moves)
 
+(defun completing-read-value (prompt values)
+  "Like `completing-read' but returns the value from VALUES instead of key.
+Display PROMPT, and has a list of choices displayed for the user to select."
+  (thread-first prompt
+    (completing-read values)
+    (assoc values)
+    (second)))
+
 (defun rpgdm-ironsworn-choose-move ()
-  (let* ((move (completing-read "Move: " (rpgdm-ironsworn-moves)))
-         (tuple (assoc move (rpgdm-ironsworn-moves))))
-    (cadr tuple)))
+  "A `completing-read' for moves, but returns the move filename."
+  (completing-read-value "Move: " (rpgdm-ironsworn-moves)))
 
 (defun rpgdm-ironsworn--store-move (title results)
-  "Store the results in a `m' register. It should also include
-the name of the move, based on the current file."
+  "Store RESULTS in `m' register for later pasting.
+The register also has TITLE, the name of the move, based on the
+current file."
   (set-register ?m (format "# %s ... %s " title results)))
 
 (defun rpgdm-ironsworn-make-move (move-file)
@@ -438,11 +490,11 @@ See `rpgdm-ironsworn-roll-stat' for details."
 (cl-flet* ((faded (str) (propertize str 'face '(:foreground "#888")))
            (msg   (a b) (format "%s %s %s" a (faded "--") (faded b))))
   (defvar
-    rpgdm-ironsworn-progress-levels `((,(msg "troublesome" "quick") . 12)
-                                      (,(msg "dangerous" "short") . 8)
-                                      (,(msg "formidable" "long") . 4)
-                                      (,(msg "extreme" "very long") . 2)
-                                      (,(msg "epic" "never-ending") . 1))
+    rpgdm-ironsworn-progress-levels `((,(msg "troublesome" "quick") 12)
+                                      (,(msg "dangerous" "short") 8)
+                                      (,(msg "formidable" "long") 4)
+                                      (,(msg "extreme" "very long") 2)
+                                      (,(msg "epic" "never-ending") 1))
     "The five levels of progression for an Ironsworn progress track."))
 
 (defun rpgdm-ironsworn-progress-level (label)
@@ -473,13 +525,27 @@ of squares that have been marked against some progress."
 Stored as a property in the org file. Keep in mind that the
 NAME should be a short title, not a description."
   (interactive (list (read-string "Progress Name: ")
-                     (completing-read "Progress Level: "
-                                      rpgdm-ironsworn-progress-levels)))
+		     (completing-read-value "Progress Level: "
+				      rpgdm-ironsworn-progress-levels)))
 
-  (let* ((level-value (rpgdm-ironsworn-progress-level level))
-         (track-id    (substring (secure-hash 'md5 name) 0 8))
-         (track-prop  (format "ironsworn-progress-%s" track-id))
-         (track-val   (format "\"%s\" %d %d" name level-value 0)))
+  (let* ((track-id    (substring (secure-hash 'md5 name) 0 8))
+	 (track-prop  (format "ironsworn-progress-%s" track-id))
+	 (track-val   (format "\"%s\" %d %d" name level 0))
+
+	 (title       (org-get-heading))
+	 (option      '(("At the same level as a sibling?" same-level)
+			("As a subheading to this?" subheading)
+			("No new heading. Re-use this." no))))
+
+    (cl-case (completing-read-value "Create a new heading? " option)
+      ('same-level (progn
+			(org-insert-heading-respect-content)
+			(insert name)))
+      ('subheading (progn
+			 (org-insert-heading-respect-content)
+			 (org-shiftmetaright)
+			 (insert name))))
+
     (org-set-property track-prop track-val)))
 
 (defun rpgdm-ironsworn-progress-mark (name &optional times)
@@ -523,7 +589,80 @@ to rolling two d10 challenge dice."
     (ignore-errors
       (remhash name tracks))))
 
+(defun rpgdm-ironsworn-discover-a-site (theme domain)
+  "Store a Delve Site information in the org file."
+  (interactive
+   (list
+    (completing-read "What is the site theme? " rpgdm-ironsworn-site-themes)
+    (completing-read "What is the domain? " rpgdm-ironsworn-site-domains)))
+
+  (rpgdm-ironsworn-progress-create
+   (read-string "Site Name: "
+		(rpgdm-ironsworn-oracle-site-name domain))
+   (completing-read-value "Progress Level: "
+			  rpgdm-ironsworn-progress-levels))
+  (next-line 2)
+  (rpgdm-ironsworn-store-character-state 'site-theme (downcase theme))
+  (rpgdm-ironsworn-store-character-state 'site-domain (downcase domain)))
+
+(defun rpgdm-ironsworn-delve-the-depths-weak (stat)
+  "Return random results from weak hit table for Delve the Depths."
+  (interactive (list (completing-read "Stat Choice: "
+				      '("wits" "shadow" "edge"))))
+  (let ((table-name (format "delve/weak-hit/%s" stat)))
+    (message "Rolling on %s" table-name)
+    (rpgdm-tables-choose table-name)))
+
+(defun rpgdm-ironsworn-delve-the-depths-weak-edge ()
+  (interactive)
+  (rpgdm-ironsworn-delve-the-depths-weak "edge"))
+
+(defun rpgdm-ironsworn-delve-the-depths-weak-shadow ()
+  (interactive)
+  (rpgdm-ironsworn-delve-the-depths-weak "shadow"))
+
+(defun rpgdm-ironsworn-delve-the-depths-weak-wits ()
+  (interactive)
+  (rpgdm-ironsworn-delve-the-depths-weak "wits"))
+
+(defun rpgdm-ironsworn--reveal-a-danger ()
+  "Return a random danger appropriate for Delve sites.
+For instance, if the `danger' table states to consult the theme
+or domain tables, this reads the `site-theme' and `site-domain'
+properties in the current org file, and rolls on the appropriate
+chart."
+  (let* ((theme (rpgdm-ironsworn-character-stat 'site-theme))
+	 (domain (rpgdm-ironsworn-character-stat 'site-domain))
+	 (danger (rpgdm-tables-choose "danger")))
+    (cond
+     ((equal danger "Check the theme card.")
+      (rpgdm-tables-choose (format "danger/theme/%s" theme)))
+
+     ((equal danger "Check the domain card.")
+      (rpgdm-tables-choose (format "danger/domain/%s" theme)))
+
+     (t   danger))))
+
+(defun rpgdm-ironsworn-reveal-a-danger ()
+  "Display a random danger appropriate for Delve sites.
+For instance, if the `danger' table states to consult the theme
+or domain tables, this reads the `site-theme' and `site-domain'
+properties in the current org file, and rolls on the appropriate
+chart."
+  (interactive)
+  (rpgdm-message "Revealed Danger: %s" (rpgdm-ironsworn--reveal-a-danger)))
+
 (rpgdm-tables-load (f-join rpgdm-ironsworn-project "tables"))
+
+(defvar rpgdm-ironsworn-site-themes
+  (progn (rpgdm-tables-choose "site/theme")
+	 (gethash "site/theme" rpgdm-tables))
+"A list of the Delve site themes.")
+
+(defvar rpgdm-ironsworn-site-domains
+  (progn (rpgdm-tables-choose "site/domain")
+	 (gethash "site/domain" rpgdm-tables))
+"A list of the Delve site domains.")
 
 (defun rpgdm-ironsworn-oracle-action-theme ()
   "Rolls on two tables at one time."
@@ -605,7 +744,7 @@ You'll need to pick and choose what works and discard what doesn't."
   (let ((description (rpgdm-tables-choose "site/name/description"))
         (detail (rpgdm-tables-choose "site/name/detail"))
         (namesake (rpgdm-tables-choose "site/name/namesake"))
-        (place  (rpgdm-tables-choose (format "site/name/place/%s" place-type)))
+        (place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
         (roll   (rpgdm--roll-die 100)))
     (rpgdm-message
      (cond
@@ -692,23 +831,33 @@ You'll need to pick and choose what works and discard what doesn't."
   ("s" rpgdm-ironsworn-oracle-site-nature  "Site Nature")
   ("t" rpgdm-ironsworn-oracle-threat-goal  "Threat's Goal"))
 
+(defhydra hydra-rpgdm-delve (:color blue)
+  "Delve site actions"
+  ("n" rpgdm-ironsworn-discover-a-site "discover a site")
+  ("w" rpgdm-ironsworn-delve-the-depths-weak "weak hit table")
+  ("d" rpgdm-ironsworn-reveal-a-danger "reveal a danger")
+  ("m" rpgdm-ironsworn-progress-mark   "mark progress")
+  ("p" rpgdm-ironsworn-progress-amount "show progress")
+  ("x" rpgdm-ironsworn-progress-delete "delete")
+  ("r" rpgdm-ironsworn-progress-roll   "escape the depths"))
+
 (defhydra hydra-rpgdm-progress (:color blue)
   "Progress Tracks"
   ("n" rpgdm-ironsworn-progress-create "new")
   ("m" rpgdm-ironsworn-progress-mark   "mark")
   ("p" rpgdm-ironsworn-progress-amount "show")
-  ("d" rpgdm-ironsworn-progress-delete "delete")
+  ("x" rpgdm-ironsworn-progress-delete "delete")
   ("r" rpgdm-ironsworn-progress-roll   "roll"))
 
 (defhydra hydra-rpgdm (:color blue :hint nil)
   "
     ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
  ----------------------------------------------------------------------------------------------------------------------------------------------------
-    _d_: Roll Dice  _p_: Progress      _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
+    _D_: Roll Dice  _p_: Progress      _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
     _e_: Roll Edge  _h_: Roll Shadow   _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
     _r_: Roll Heart _w_: Roll Wits     _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
-    _i_: Roll Iron  _m_: Make Move       _M_: Momentum                      _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
-  ("d" rpgdm-ironsworn-roll)    ("D" rpgdm-ironsworn-progress-roll)
+    _i_: Roll Iron  _m_: Make Move       _M_: Momentum   _d_: Delve Actions   _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
+  ("D" rpgdm-ironsworn-roll)
   ("z" rpgdm-ironsworn-oracle)  ("Z" rpgdm-yes-and-50/50)
 
   ("e" rpgdm-ironsworn-roll-edge)
@@ -727,6 +876,8 @@ You'll need to pick and choose what works and discard what doesn't."
   ("M" rpgdm-ironsworn-adjust-momentum :color pink)
 
   ("O" rpgdm-tables-load)       ("c" rpgdm-tables-choose)     ("C" rpgdm-tables-choose :color pink)
+
+  ("d" hydra-rpgdm-delve/body)
   ("p" hydra-rpgdm-progress/body)
 
   ("o" ace-link)                 ("N" org-narrow-to-subtree)   ("W" widen)
@@ -791,17 +942,17 @@ precendence over similar settings in higher headers."
 
   (defun value-convert (value)
     (if (string-match (rx bos (one-or-more digit) eos) value)
-        (string-to-number value)
+	(string-to-number value)
       value))
 
   (let ((props (org-element--get-node-properties)))
     (loop for (k v) on props by (function cddr) do
-          ;; If key is ironsworn property, but isn't in the table...
-          (when (rpgdm-ironsworn--property-p k)
-            (let ((key (key-convert k))
-                  (val (value-convert v)))
-              (unless (gethash key results)
-                (puthash key val results)))))
+	  ;; If key is ironsworn property, but isn't in the table...
+	  (when (rpgdm-ironsworn--property-p k)
+	    (let ((key (key-convert k))
+		  (val (value-convert v)))
+	      (unless (gethash key results)
+		(puthash key val results)))))
 
     (unless (= (org-heading-level) 1)
       (org-up-element)
@@ -813,9 +964,15 @@ Note that values in sibling trees are ignored, and settings in
 lower levels of the tree headings take precedence."
   (save-excursion
     (let ((results (make-hash-table :test 'str-or-keys)))
-      (unless (eq 'headline (org-element-type (org-element-at-point)))
-        (org-up-element))
+      (unless (org-at-heading-p)
+	(org-up-element))
 
+      ;; Put the lowest heading title in the results hashtable:
+      (puthash 'title (thread-first
+			 (org-element-at-point)
+			 (second)
+			 (plist-get :raw-value))
+	       results)
       (rpgdm-ironsworn--current-character-state results)
       results)))
 
