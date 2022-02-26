@@ -1025,7 +1025,7 @@ Make a progress to visual table of boxes. Not sure if this is very helpful or no
 
 Some tests may make it clear how that function will look:
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--progress-box-test ()
     (should (equal (rpgdm-ironsworn--progress-box 0 0)  "|   |   |   |   |   |   |   |   |   |   |"))
     (should (equal (rpgdm-ironsworn--progress-box 0 1)  "| - |   |   |   |   |   |   |   |   |   |"))
@@ -1034,7 +1034,7 @@ Some tests may make it clear how that function will look:
     (should (equal (rpgdm-ironsworn--progress-box 1 0)  "| ■ |   |   |   |   |   |   |   |   |   |"))
     (should (equal (rpgdm-ironsworn--progress-box 2 0)  "| ■ | ■ |   |   |   |   |   |   |   |   |"))
     (should (equal (rpgdm-ironsworn--progress-box 3 0)  "| ■ | ■ | ■ |   |   |   |   |   |   |   |"))
-    (should (equal (rpgdm-ironsworn--progress-box 4 0)  "| ■ | ■ | ■ | ■ |   |   |   |   |   |   |"
+    (should (equal (rpgdm-ironsworn--progress-box 4 0)  "| ■ | ■ | ■ | ■ |   |   |   |   |   |   |"))
     (should (equal (rpgdm-ironsworn--progress-box 4 1)  "| ■ | ■ | ■ | ■ | - |   |   |   |   |   |"))
     (should (equal (rpgdm-ironsworn--progress-box 4 2)  "| ■ | ■ | ■ | ■ | x |   |   |   |   |   |"))
     (should (equal (rpgdm-ironsworn--progress-box 4 3)  "| ■ | ■ | ■ | ■ | * |   |   |   |   |   |"))

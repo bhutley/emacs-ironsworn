@@ -612,26 +612,6 @@ For instance, with 4 boxes and 2 leftover tick marks, this will return:
 
   (concat "|" (make-box boxes leftover blanks)))
 
-(ert-deftest rpgdm-ironsworn--progress-box-test ()
-  (should (equal (rpgdm-ironsworn--progress-box 0 0)  "|   |   |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 0 1)  "| - |   |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 0 2)  "| x |   |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 0 3)  "| * |   |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 1 0)  "| ■ |   |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 2 0)  "| ■ | ■ |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 3 0)  "| ■ | ■ | ■ |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 4 0)  "| ■ | ■ | ■ | ■ |   |   |   |   |   |   |"
-  (should (equal (rpgdm-ironsworn--progress-box 4 1)  "| ■ | ■ | ■ | ■ | - |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 4 2)  "| ■ | ■ | ■ | ■ | x |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 4 3)  "| ■ | ■ | ■ | ■ | * |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 5 0)  "| ■ | ■ | ■ | ■ | ■ |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 10 0) "| ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |"))
-  ;; Negative test cases
-  (should (equal (rpgdm-ironsworn--progress-box 11 0) "| ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |"))
-  (should (equal (rpgdm-ironsworn--progress-box -1 0) "|   |   |   |   |   |   |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 4 8)  "| ■ | ■ | ■ | ■ | ■ | ■ |   |   |   |   |"))
-  (should (equal (rpgdm-ironsworn--progress-box 4 6)  "| ■ | ■ | ■ | ■ | ■ | x |   |   |   |   |")))
-
 (defun rpgdm-ironsworn-progress-amount (name)
   "Display the progress made against a track, NAME."
   (interactive (list (rpgdm-ironsworn-progress-track-choose)))
@@ -661,6 +641,26 @@ This value is compared to rolling two d10 challenge dice."
   (let ((tracks      (gethash 'progress-tracks rpgdm-ironsworn-character)))
     (ignore-errors
       (remhash name tracks))))
+
+(ert-deftest rpgdm-ironsworn-progress-test ()
+  (let ((track "Battling a Grue"))
+    (rpgdm-ironsworn-progress-delete track)
+    (rpgdm-ironsworn-progress-create track "Dangerous")
+    (should (= (rpgdm-ironsworn-progress-amount track) 0))
+    (rpgdm-ironsworn-progress-mark track)
+    (should (= (rpgdm-ironsworn-progress-amount track) 2))
+    (rpgdm-ironsworn-progress-mark track 2)
+    (should (= (rpgdm-ironsworn-progress-amount track) 6))))
+
+(ert-deftest rpgdm-ironsworn-progress-test ()
+  (let ((track "Battling an Extreme Grue"))
+    (rpgdm-ironsworn-progress-delete track)
+    (rpgdm-ironsworn-progress-create track "Extreme")
+    (should (= (rpgdm-ironsworn-progress-amount track) 0))
+    (rpgdm-ironsworn-progress-mark track)
+    (should (= (rpgdm-ironsworn-progress-amount track) 0))
+    (rpgdm-ironsworn-progress-mark track 2)
+    (should (= (rpgdm-ironsworn-progress-amount track) 1))))
 
 (defun rpgdm-ironsworn-oracle-site-name (&optional place-type)
   "Return a randomly generated name for a dangerous site.
