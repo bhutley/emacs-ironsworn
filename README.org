@@ -169,7 +169,12 @@ We also need the name of the directory for this project, so that we can load tab
       "The root directory to the rpgdm-ironsworn project.")
 #+END_SRC
 ** Dice Roller
-In *Ironsworn*, all dice rolls follow a pattern where you set the challenge level for a check by rolling /challenge dice/ (two d10s) and compare that against rolling an /action die/ (a single d6 ... adding all modifiers to that six-sided die). You always three possible values:
+In *Ironsworn*, all dice rolls follow a pattern where you set the challenge level for a check by rolling /challenge dice/ (two d10s) and compare that against rolling an /action die/ (a single d6 ... adding all modifiers to that six-sided die).
+
+#+ATTR_HTML: :width 800px
+[[file:images/dice-roll-all.png]]
+
+You always three possible values:
 
   - A *strong hit* where your action die + modifiers is larger than both d10 challenge dice.
   - A *weak hit* is where your action die + modifiers is larger than /only one/ of the d10 challenge dice.
@@ -236,7 +241,7 @@ When we roll, I want one of those three results printed, but in different colors
 
 So the following messages, given various /rolls/ should cover those possibilities with text properties:
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--results-test ()
     (should (equal (rpgdm-ironsworn--results 3 2 4 1)
                    "Strong hit :: 5 (3 + 2) → 4 / 1"))
@@ -250,7 +255,7 @@ So the following messages, given various /rolls/ should cover those possibilitie
     (should (equal (rpgdm-ironsworn--results 3 2 8 6 7)
                    "Miss :: 5 (3 + 2) → 8 / 6 -- Burn momentum for a Weak hit"))
     (should (equal (rpgdm-ironsworn--results 3 2 8 6 9)
-                   "Miss :: 5 (3 + 2) → 8 / 6 -- Burn momentum for a Strong hit")))))
+                   "Miss :: 5 (3 + 2) → 8 / 6 -- Burn momentum for a Strong hit")))
 #+END_SRC
 
 The basic interface will query for a modifer, roll all three dice, and then display the results using the [[https://gitlab.com/howardabrams/emacs-rpgdm/-/blob/main/rpgdm.el#L76][rpgdm-message]] function:
@@ -279,12 +284,12 @@ Assuming we have a new character, let's query the user for all of these stats, a
 We assume you have created an org-file, and the /template/ will just append some basic text at the end of the buffer. Note that if you don't give this function a name, it will randomly choose one.
 
 #+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn--new-character-template (name)
+  (defun rpgdm-ironsworn--new-character-template (&optional name)
     "Insert basic Ironsworn template at the end of the current buffer.
   A header is created with NAME, but if this is an empty string,
   a random name is generated for the purposes of the template."
-    (when (s-blank? name)
-      (setq name (rpgdm-tables-choose "names-ironlander")))
+    (when (or (null name) (s-blank? name))
+      (setq name (rpgdm-tables-choose "name/ironlander")))
 
     (let ((frmt (seq-random-elt '("* The Adventures of %s"
 				  "* The Journeys of %s"
@@ -335,8 +340,8 @@ Let's fill in those asset values /lazily/. The first time we call this function,
   the `assets' directory, otherwise, we return a cached version."
     (unless rpgdm-ironsworn-character-assets
       (let ((asset-files (thread-first rpgdm-ironsworn-project
-                           (f-join "assets")
-                           (directory-files-recursively (rx (one-or-more any) ".org") nil))))
+                                       (f-join "assets")
+                                       (directory-files-recursively (rx (one-or-more any) ".org") nil))))
 
         (setq rpgdm-ironsworn-character-assets
               (seq-map (lambda (file) (cons (rpgdm-ironsworn--character-asset-label file) file))
@@ -390,7 +395,7 @@ When you start a character, you choose three assets, but what if we choose them 
 
 And I can write a little unit test to verify my test cases:
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--good-character-assets-test ()
     (should (rpgdm-ironsworn--good-character-assets     '("foo" "bar" "baz")))
     (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "foo")))
@@ -399,7 +404,7 @@ And I can write a little unit test to verify my test cases:
                                                           "assets/companions/monkey.org")))
     (should-not (rpgdm-ironsworn--good-character-assets '(("Companions :: Dog" . "assets/companions/dog.org")
                                                           ("Paths :: Good Guy" . "assets/paths/good-guy.org")
-                                                          ("Companions :: Monkey" . "assets/companions/monkey.org"))))))
+                                                          ("Companions :: Monkey" . "assets/companions/monkey.org")))))
 #+END_SRC
 
 The rules say to start off with three assets, so let's have a function that can give us three random assets:
@@ -416,7 +421,7 @@ The rules say to start off with three assets, so let's have a function that can 
 
 And again, a little unit test would be nice:
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--some-character-assets-test ()
     (should (= 4 (seq-length (rpgdm-ironsworn--some-character-assets '(1 2 3 4 5 6) 4))))
     (should (= 3 (seq-length (rpgdm-ironsworn--some-character-assets '(1 2 3 4 5 6))))))
@@ -459,7 +464,7 @@ Whew. We finally can have a function that queries the user about a new character
       (goto-char (point-max))
       (insert "\n** Assets\n")
       (if (y-or-n-p "Would you like three random assets? ")
-          (rpgdm-ironsworn-random-character-assets asset-files)
+          (rpgdm-ironsworn-random-character-assets 3)
         (if (y-or-n-p "Would you like to choose your assets? ")
           (call-interactively 'rpgdm-ironsworn-insert-character-asset))))
 #+END_SRC
@@ -474,7 +479,7 @@ This function will query the user for all of the stats and other properties that
   `rpgdm-ironsworn-progress-create' functions."
     (dolist (stat '(edge heart iron shadow wits))
       (rpgdm-ironsworn-store-character-state stat
-	  (read-string (format "What '%s' stat: " stat))))
+          (read-string (format "What '%s' stat: " stat))))
 
     (dolist (stat '(health spirit supply))
       (rpgdm-ironsworn-store-character-state stat 5))
@@ -482,10 +487,11 @@ This function will query the user for all of the stats and other properties that
 
     (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
     (rpgdm-ironsworn-progress-create "Bonds" 1)
+    (rpgdm-ironsworn-progress-mark "Bonds")
     (search-forward ":END:")
     (end-of-line)
     (insert "\n** Bonds\n")
-    (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement-names"))))
+    (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement/name"))))
 #+END_SRC
 **** New Character Interface
 Do we choose the stats first, or the assets? Do we ask, or have two separate functions?
@@ -495,14 +501,12 @@ Perhaps the clearest approach is to do both, create two process functions, and t
   (defun rpgdm-ironsworn--new-character-stats-first (&optional name)
     "Insert a new character template for character, NAME.
   The character stats are first queried, and then assets inserted."
-    (rpgdm-ironsworn--new-character-template name)
     (rpgdm-ironsworn--new-character-stats)
     (rpgdm-ironsworn--new-character-assets))
 
   (defun rpgdm-ironsworn--new-character-assets-first (&optional name)
     "Insert a new character template for character, NAME.
   The assets are inserted first, and then character stats are queried."
-    (rpgdm-ironsworn--new-character-template name)
     ;; Saving and restoring point, means the properties should be in the
     ;; correct, top-level position.
     (save-excursion
@@ -516,16 +520,18 @@ Perhaps the clearest approach is to do both, create two process functions, and t
   This function _appends_ this information to the current buffer,
   which should be using the `org-mode' major mode."
     (interactive (list
-		  (read-string "What is the new character's name? ")
-		  (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+                  (read-string "What is the new character's name? ")
+                  (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+
+    (rpgdm-ironsworn--new-character-template name)
     (if (equal order "Assets first")
-	(rpgdm-ironsworn--new-character-assets-first)
+        (rpgdm-ironsworn--new-character-assets-first)
       (rpgdm-ironsworn--new-character-stats-first))
     (message "Alright, the template is complete. Edit away!" name))
 #+END_SRC
 
 *** Showing a Character Stats
-Sure, you could open up the appropriate drawer to see a character's stats, but  we could do better? An updated org table? A separate buffer? For the moment, I am just going to display it in the mini-buffer whenever I want to see it:
+Sure, you could open up the appropriate drawer to see a character's stats, but we could do better? An updated org table? A separate buffer? For the moment, I am just going to display it in the mini-buffer whenever I want to see it.
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--display-stat (stat character)
@@ -719,13 +725,13 @@ The [[file:moves][moves]] directory contains one org file for each move. These f
 
 And let's verify the format:
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--move-tuple-test ()
     (let ((file "moves/fate/ask-the-oracle.org")
           (full "~/other/over/here/moves/fate/ask-the-oracle.org"))
-      (should (equal (list "Fate :: Ask The Oracle" file)
+      (should (equal (list "Fate :: ask the oracle" file)
                      (rpgdm-ironsworn--move-tuple file)))
-      (should (equal (list "Fate :: Ask The Oracle" full)
+      (should (equal (list "Fate :: ask the oracle" full)
                      (rpgdm-ironsworn--move-tuple full)))))
 #+END_SRC
 
@@ -876,12 +882,26 @@ Given a label, can we get the level as a value:
     (alist-get label rpgdm-ironsworn-progress-levels 8 nil 'equal))
 #+END_SRC
 
-Since we'll store only the numbers, we might want to get back the label:
+Since we'll store only the numbers, we might want to get back the label. Originally, I used an =rassoc=, but since I =propertized= the labels, my new function is a bit more complicated:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-progress-level-label (level)
     "Return the label associated with the progress LEVEL, e.g. dangerous."
-    (car (rassoc level rpgdm-ironsworn-progress-levels)))
+    (thread-last rpgdm-ironsworn-progress-levels
+                 (--filter (= (second it) level))
+                 (first)    ; Assume we only get one match
+                 (first)    ; Get the textual label
+                 (s-split " ")
+                 (first)))  ; Word before the space
+#+END_SRC
+
+Basic tests for sanity:
+
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
+  (ert-deftest rpgdm-ironsworn-progress-level-label-test ()
+    (should (equal (rpgdm-ironsworn-progress-level-label 1) "epic"))
+    (should (equal (rpgdm-ironsworn-progress-level-label 12) "troublesome"))
+    (should (equal (rpgdm-ironsworn-progress-level-label 4) "formidable")))
 #+END_SRC
 
 A helper function for allowing the user to choose which track to mark progress against:
@@ -911,26 +931,27 @@ Adding a progress to a character amounts to an arbitrary name, and the number of
   Stored as a property in the org file.  Keep in mind that the
   NAME should be a short title, not a description."
     (interactive (list (read-string "Progress Name: ")
-		       (completing-read-value "Progress Level: "
-					rpgdm-ironsworn-progress-levels)))
+                       (completing-read-value "Progress Level: "
+                                              rpgdm-ironsworn-progress-levels)))
 
     (let* ((track-id    (substring (secure-hash 'md5 name) 0 8))
-	   (track-prop  (format "ironsworn-progress-%s" track-id))
-	   (track-val   (format "\"%s\" %d %d" name level 0))
+           (track-prop  (format "ironsworn-progress-%s" track-id))
+           (track-val   (format "\"%s\" %d %d" name level 0))
 
-	   (title       (org-get-heading))
-	   (option      '(("At the same level as a sibling?" same-level)
-			  ("As a subheading to this?" subheading)
-			  ("No new heading. Re-use this." no))))
+           (title       (org-get-heading))
+           (option      '(("At the same level as a sibling?" same-level)
+                          ("As a subheading to this?" subheading)
+                          ("No new heading. Re-use this." no))))
 
-      (cl-case (completing-read-value "Create a new heading? " option)
-	('same-level (progn
-			  (org-insert-heading-respect-content)
-			  (insert name)))
-	('subheading (progn
-			   (org-insert-heading-respect-content)
-			   (org-shiftmetaright)
-			   (insert name))))
+      (when (called-interactively-p)
+        (cl-case (completing-read-value "Create a new heading? " option)
+          ('same-level (progn
+                         (org-insert-heading-respect-content)
+                         (insert name)))
+          ('subheading (progn
+                         (org-insert-heading-respect-content)
+                         (org-shiftmetaright)
+                         (insert name)))))
 
       (org-set-property track-prop track-val)))
 #+END_SRC
@@ -948,22 +969,97 @@ Interactively, we can call the =-mark= function multiple times, but we might wan
       (rpgdm-ironsworn-mark-progress-track name)))
 #+END_SRC
 
+The =rpgdm-ironsworn--progress-amount= function returns the information about a progress, by name. It returns a list of all aspects, allowing us to decide how to display it:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--progress-amount (name)
+    "Return list of aspects of progress by NAME.
+  Including:
+    - track  :: The name of the track (same as `name')
+    - value  :: The number complexity level, e.g. how many ticks per marked progress
+    - level  :: The string label of a progress, e.g. Epic or Troublesome
+    - ticks  :: The amount of ticks marked, shnould be <= 40
+    - boxes  :: The number of completed boxes (ticks / 4, rounded down)
+    - remain :: The number of remaining ticks marked towards the next box."
+    (let* ((tracks  (rpgdm-ironsworn-character-progresses))
+           (matched (assoc name tracks))
+           (track   (first matched))
+           (value   (second matched))
+           (level   (rpgdm-ironsworn-progress-level-label value))
+           (ticks   (third matched))
+           (boxes   (/ ticks 4))
+           (remain  (% ticks 4)))
+      (list track value level ticks boxes remain)))
+#+END_SRC
+
+Make a progress to visual table of boxes. Not sure if this is very helpful or not, but it sure will look cool:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--progress-box (boxes leftover)
+    "Return a org-like table of current completion of an Ironsworn progress.
+  For instance, with 4 boxes and 2 leftover tick marks, this will return:
+  | ■ | ■ | ■ | ■ | x |   |   |   |   |   | "
+    (defun make-box (boxes leftover-ticks blanks)
+      (cond
+       ((> boxes 0) (concat " ■ |" (make-box (1- boxes) leftover-ticks blanks)))
+
+       ((> leftover-ticks 2) (concat " * |" (make-box 0 0 blanks)))
+       ((> leftover-ticks 1) (concat " x |" (make-box 0 0 blanks)))
+       ((> leftover-ticks 0) (concat " - |" (make-box 0 0 blanks)))
+
+       ((> blanks 0) (concat "   |" (make-box 0 0 (1- blanks))))))
+
+    (when (> leftover 3)
+      (setq boxes    (+ boxes (/ leftover 4)))
+      (setq leftover          (% leftover 4)))
+    (when (< boxes 0)
+      (setq boxes 0))
+    (when (> boxes 10)
+      (setq boxes 10))
+    (setq blanks (if (> leftover 0)
+                     (- 9 boxes)
+                   (- 10 boxes)))
+
+    (concat "|" (make-box boxes leftover blanks)))
+#+END_SRC
+
+Some tests may make it clear how that function will look:
+
+#+BEGIN_SRC emacs-lisp
+  (ert-deftest rpgdm-ironsworn--progress-box-test ()
+    (should (equal (rpgdm-ironsworn--progress-box 0 0)  "|   |   |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 0 1)  "| - |   |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 0 2)  "| x |   |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 0 3)  "| * |   |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 1 0)  "| ■ |   |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 2 0)  "| ■ | ■ |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 3 0)  "| ■ | ■ | ■ |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 4 0)  "| ■ | ■ | ■ | ■ |   |   |   |   |   |   |"
+    (should (equal (rpgdm-ironsworn--progress-box 4 1)  "| ■ | ■ | ■ | ■ | - |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 4 2)  "| ■ | ■ | ■ | ■ | x |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 4 3)  "| ■ | ■ | ■ | ■ | * |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 5 0)  "| ■ | ■ | ■ | ■ | ■ |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 10 0) "| ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |"))
+    ;; Negative test cases
+    (should (equal (rpgdm-ironsworn--progress-box 11 0) "| ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |"))
+    (should (equal (rpgdm-ironsworn--progress-box -1 0) "|   |   |   |   |   |   |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 4 8)  "| ■ | ■ | ■ | ■ | ■ | ■ |   |   |   |   |"))
+    (should (equal (rpgdm-ironsworn--progress-box 4 6)  "| ■ | ■ | ■ | ■ | ■ | x |   |   |   |   |")))
+#+END_SRC
+
 If we call the =-amount= function /interactively/, we should get the current results displayed, otherwise, we really just want the number of full boxes marked:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-progress-amount (name)
     "Display the progress made against a track, NAME."
     (interactive (list (rpgdm-ironsworn-progress-track-choose)))
-    (let* ((tracks  (rpgdm-ironsworn-character-progresses))
-           (matched (--filter (equal name (first it)) tracks))
-           (track   (first matched))
-           (value   (second track))
-           (level   (rpgdm-ironsworn-progress-level-label value))
-           (ticks   (third track))
-           (boxes   (/ ticks 4)))
-      (if (called-interactively-p 'any)
-          (rpgdm-message "[%d] Progress on %s: %d  (Ticks: %d)" level name boxes ticks)
-        boxes)))
+    (cl-destructuring-bind
+            (track value level ticks boxes leftover)
+            (rpgdm-ironsworn--progress-amount name)
+          (if (not (called-interactively-p 'any))
+                  boxes
+            (rpgdm-message "[%s] Progress on '%s': %d    %s" level name boxes
+                           (rpgdm-ironsworn--progress-box boxes leftover)))))
 #+END_SRC
 
 Rolling against the progress just means we need to request that value instead of rolling the d6, but in this case, we should either take a currently registered progress track, or simply specify a completed amount:
@@ -993,9 +1089,9 @@ When we've finished a track, we can remove it from the hash to not clutter the i
         (remhash name tracks))))
 #+END_SRC
 
-Let's make sure these function work as we expect:
+Let's make sure these function work as we expect (keep in mind, these can only be run in an Org file):
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (ert-deftest rpgdm-ironsworn-progress-test ()
     (let ((track "Battling a Grue"))
       (rpgdm-ironsworn-progress-delete track)
@@ -1523,7 +1619,7 @@ We also need a property-symbol to string conversion. I don't know if the string 
 
 A test is always explanatory for how this function should behave:
 
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--progress-to-str-test ()
     (should (equal (rpgdm-ironsworn--progress-to-str :IRONSWORN-PROGRESS-EPIC)
                    "ironsworn-progress-epic")))

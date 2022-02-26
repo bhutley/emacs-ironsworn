@@ -88,12 +88,12 @@ results."
 					     one-challenge two-challenge
 					     momentum))))
 
-(defun rpgdm-ironsworn--new-character-template (name)
+(defun rpgdm-ironsworn--new-character-template (&optional name)
   "Insert basic Ironsworn template at the end of the current buffer.
 A header is created with NAME, but if this is an empty string,
 a random name is generated for the purposes of the template."
-  (when (s-blank? name)
-    (setq name (rpgdm-tables-choose "names-ironlander")))
+  (when (or (null name) (s-blank? name))
+    (setq name (rpgdm-tables-choose "name/ironlander")))
 
   (let ((frmt (seq-random-elt '("* The Adventures of %s"
 				"* The Journeys of %s"
@@ -132,8 +132,8 @@ that contains the text.  The first time we call this, we read from
 the `assets' directory, otherwise, we return a cached version."
   (unless rpgdm-ironsworn-character-assets
     (let ((asset-files (thread-first rpgdm-ironsworn-project
-                         (f-join "assets")
-                         (directory-files-recursively (rx (one-or-more any) ".org") nil))))
+                                     (f-join "assets")
+                                     (directory-files-recursively (rx (one-or-more any) ".org") nil))))
 
       (setq rpgdm-ironsworn-character-assets
             (seq-map (lambda (file) (cons (rpgdm-ironsworn--character-asset-label file) file))
@@ -205,7 +205,7 @@ The chosen assets are _good_ in that they won't have duplicates, etc."
     (goto-char (point-max))
     (insert "\n** Assets\n")
     (if (y-or-n-p "Would you like three random assets? ")
-        (rpgdm-ironsworn-random-character-assets asset-files)
+        (rpgdm-ironsworn-random-character-assets 3)
       (if (y-or-n-p "Would you like to choose your assets? ")
         (call-interactively 'rpgdm-ironsworn-insert-character-asset))))
 
@@ -216,7 +216,7 @@ Note: The stats are added as properties using the
 `rpgdm-ironsworn-progress-create' functions."
   (dolist (stat '(edge heart iron shadow wits))
     (rpgdm-ironsworn-store-character-state stat
-	(read-string (format "What '%s' stat: " stat))))
+        (read-string (format "What '%s' stat: " stat))))
 
   (dolist (stat '(health spirit supply))
     (rpgdm-ironsworn-store-character-state stat 5))
@@ -224,22 +224,21 @@ Note: The stats are added as properties using the
 
   (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
   (rpgdm-ironsworn-progress-create "Bonds" 1)
+  (rpgdm-ironsworn-progress-mark "Bonds")
   (search-forward ":END:")
   (end-of-line)
   (insert "\n** Bonds\n")
-  (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement-names"))))
+  (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement/name"))))
 
 (defun rpgdm-ironsworn--new-character-stats-first (&optional name)
   "Insert a new character template for character, NAME.
 The character stats are first queried, and then assets inserted."
-  (rpgdm-ironsworn--new-character-template name)
   (rpgdm-ironsworn--new-character-stats)
   (rpgdm-ironsworn--new-character-assets))
 
 (defun rpgdm-ironsworn--new-character-assets-first (&optional name)
   "Insert a new character template for character, NAME.
 The assets are inserted first, and then character stats are queried."
-  (rpgdm-ironsworn--new-character-template name)
   ;; Saving and restoring point, means the properties should be in the
   ;; correct, top-level position.
   (save-excursion
@@ -253,8 +252,10 @@ template will generate and query the user for the rest of the data.
 This function _appends_ this information to the current buffer,
 which should be using the `org-mode' major mode."
   (interactive (list
-		(read-string "What is the new character's name? ")
-		(completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+                (read-string "What is the new character's name? ")
+                (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
+
+  (rpgdm-ironsworn--new-character-template name)
   (if (equal order "Assets first")
       (rpgdm-ironsworn--new-character-assets-first)
     (rpgdm-ironsworn--new-character-stats-first))
@@ -505,7 +506,12 @@ For instance, if LABEL is `Dangerous', this returns `8'."
 
 (defun rpgdm-ironsworn-progress-level-label (level)
   "Return the label associated with the progress LEVEL, e.g. dangerous."
-  (car (rassoc level rpgdm-ironsworn-progress-levels)))
+  (thread-last rpgdm-ironsworn-progress-levels
+               (--filter (= (second it) level))
+               (first)    ; Assume we only get one match
+               (first)    ; Get the textual label
+               (s-split " ")
+               (first)))  ; Word before the space
 
 (defun rpgdm-ironsworn-progress-track-choose (&optional allow-other)
   "Query the user to choose a track stored in the org file.
@@ -527,26 +533,27 @@ marked against some progress."
 Stored as a property in the org file.  Keep in mind that the
 NAME should be a short title, not a description."
   (interactive (list (read-string "Progress Name: ")
-		     (completing-read-value "Progress Level: "
-				      rpgdm-ironsworn-progress-levels)))
+                     (completing-read-value "Progress Level: "
+                                            rpgdm-ironsworn-progress-levels)))
 
   (let* ((track-id    (substring (secure-hash 'md5 name) 0 8))
-	 (track-prop  (format "ironsworn-progress-%s" track-id))
-	 (track-val   (format "\"%s\" %d %d" name level 0))
+         (track-prop  (format "ironsworn-progress-%s" track-id))
+         (track-val   (format "\"%s\" %d %d" name level 0))
 
-	 (title       (org-get-heading))
-	 (option      '(("At the same level as a sibling?" same-level)
-			("As a subheading to this?" subheading)
-			("No new heading. Re-use this." no))))
+         (title       (org-get-heading))
+         (option      '(("At the same level as a sibling?" same-level)
+                        ("As a subheading to this?" subheading)
+                        ("No new heading. Re-use this." no))))
 
-    (cl-case (completing-read-value "Create a new heading? " option)
-      ('same-level (progn
-			(org-insert-heading-respect-content)
-			(insert name)))
-      ('subheading (progn
-			 (org-insert-heading-respect-content)
-			 (org-shiftmetaright)
-			 (insert name))))
+    (when (called-interactively-p)
+      (cl-case (completing-read-value "Create a new heading? " option)
+        ('same-level (progn
+                       (org-insert-heading-respect-content)
+                       (insert name)))
+        ('subheading (progn
+                       (org-insert-heading-respect-content)
+                       (org-shiftmetaright)
+                       (insert name)))))
 
     (org-set-property track-prop track-val)))
 
@@ -559,19 +566,82 @@ the number of TIMES to mark progress."
   (dotimes (idx times)
     (rpgdm-ironsworn-mark-progress-track name)))
 
+(defun rpgdm-ironsworn--progress-amount (name)
+  "Return list of aspects of progress by NAME.
+Including:
+  - track  :: The name of the track (same as `name')
+  - value  :: The number complexity level, e.g. how many ticks per marked progress
+  - level  :: The string label of a progress, e.g. Epic or Troublesome
+  - ticks  :: The amount of ticks marked, shnould be <= 40
+  - boxes  :: The number of completed boxes (ticks / 4, rounded down)
+  - remain :: The number of remaining ticks marked towards the next box."
+  (let* ((tracks  (rpgdm-ironsworn-character-progresses))
+         (matched (assoc name tracks))
+         (track   (first matched))
+         (value   (second matched))
+         (level   (rpgdm-ironsworn-progress-level-label value))
+         (ticks   (third matched))
+         (boxes   (/ ticks 4))
+         (remain  (% ticks 4)))
+    (list track value level ticks boxes remain)))
+
+(defun rpgdm-ironsworn--progress-box (boxes leftover)
+  "Return a org-like table of current completion of an Ironsworn progress.
+For instance, with 4 boxes and 2 leftover tick marks, this will return:
+| ■ | ■ | ■ | ■ | x |   |   |   |   |   | "
+  (defun make-box (boxes leftover-ticks blanks)
+    (cond
+     ((> boxes 0) (concat " ■ |" (make-box (1- boxes) leftover-ticks blanks)))
+
+     ((> leftover-ticks 2) (concat " * |" (make-box 0 0 blanks)))
+     ((> leftover-ticks 1) (concat " x |" (make-box 0 0 blanks)))
+     ((> leftover-ticks 0) (concat " - |" (make-box 0 0 blanks)))
+
+     ((> blanks 0) (concat "   |" (make-box 0 0 (1- blanks))))))
+
+  (when (> leftover 3)
+    (setq boxes    (+ boxes (/ leftover 4)))
+    (setq leftover          (% leftover 4)))
+  (when (< boxes 0)
+    (setq boxes 0))
+  (when (> boxes 10)
+    (setq boxes 10))
+  (setq blanks (if (> leftover 0)
+                   (- 9 boxes)
+                 (- 10 boxes)))
+
+  (concat "|" (make-box boxes leftover blanks)))
+
+(ert-deftest rpgdm-ironsworn--progress-box-test ()
+  (should (equal (rpgdm-ironsworn--progress-box 0 0)  "|   |   |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 0 1)  "| - |   |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 0 2)  "| x |   |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 0 3)  "| * |   |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 1 0)  "| ■ |   |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 2 0)  "| ■ | ■ |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 3 0)  "| ■ | ■ | ■ |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 4 0)  "| ■ | ■ | ■ | ■ |   |   |   |   |   |   |"
+  (should (equal (rpgdm-ironsworn--progress-box 4 1)  "| ■ | ■ | ■ | ■ | - |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 4 2)  "| ■ | ■ | ■ | ■ | x |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 4 3)  "| ■ | ■ | ■ | ■ | * |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 5 0)  "| ■ | ■ | ■ | ■ | ■ |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 10 0) "| ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |"))
+  ;; Negative test cases
+  (should (equal (rpgdm-ironsworn--progress-box 11 0) "| ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ |"))
+  (should (equal (rpgdm-ironsworn--progress-box -1 0) "|   |   |   |   |   |   |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 4 8)  "| ■ | ■ | ■ | ■ | ■ | ■ |   |   |   |   |"))
+  (should (equal (rpgdm-ironsworn--progress-box 4 6)  "| ■ | ■ | ■ | ■ | ■ | x |   |   |   |   |")))
+
 (defun rpgdm-ironsworn-progress-amount (name)
   "Display the progress made against a track, NAME."
   (interactive (list (rpgdm-ironsworn-progress-track-choose)))
-  (let* ((tracks  (rpgdm-ironsworn-character-progresses))
-         (matched (--filter (equal name (first it)) tracks))
-         (track   (first matched))
-         (value   (second track))
-         (level   (rpgdm-ironsworn-progress-level-label value))
-         (ticks   (third track))
-         (boxes   (/ ticks 4)))
-    (if (called-interactively-p 'any)
-        (rpgdm-message "[%d] Progress on %s: %d  (Ticks: %d)" level name boxes ticks)
-      boxes)))
+  (cl-destructuring-bind
+          (track value level ticks boxes leftover)
+          (rpgdm-ironsworn--progress-amount name)
+        (if (not (called-interactively-p 'any))
+                boxes
+          (rpgdm-message "[%s] Progress on '%s': %d    %s" level name boxes
+                         (rpgdm-ironsworn--progress-box boxes leftover)))))
 
 (defun rpgdm-ironsworn-progress-roll (progress-value)
   "Display a Hit/Miss message based on the PROGRESS-VALUE.
@@ -950,8 +1020,8 @@ Return 0 if not at a heading, or above first headline."
 
 (defun rpgdm-ironsworn--current-character-state (results)
   "Recursive helper to insert current header properties in RESULTS.
-Calls itself if it is not looking at the top-level header in the
-file. If a property is already in the hash table, RESULTS, it is
+Calls itself if it is not looking at the top level header in the
+file.  If a property is already in the hash table, RESULTS, it is
 not overwritten, thereby having lower-level subtrees take
 precendence over similar settings in higher headers."
   (defun key-convert (ironsworn-prop)
