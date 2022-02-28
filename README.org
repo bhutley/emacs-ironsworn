@@ -21,7 +21,7 @@ Neither this, nor the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm proje
 
 #+BEGIN_SRC emacs-lisp :tangle no
 (add-to-list 'load-path (expand-file-name "~/other/rpgdm"))
-(add-to-list 'load-path (expand-file-name "~/other/rpgdm-ironsworn"))
+(add-to-list 'load-path (expand-file-name "~/other/emacs-ironsworn"))
 #+END_SRC
 
 Or better yet, use something like [[https://github.com/raxod502/straight.el][straight]]:
@@ -32,6 +32,16 @@ Or better yet, use something like [[https://github.com/raxod502/straight.el][str
 
   (straight-use-package
    '(el-patch :type git :host gitlab :repo "howardabrams/emacs-ironsworn"))
+#+END_SRC
+
+Hrm. If you do use =straight=, you need to set the =rpgdm-ironsworn-project= variable to the directory where you clone it, as the code needs to load data files from it. This is what I’m using (and yeah, I need to clean this):
+
+#+BEGIN_SRC emacs-lisp :tangle no
+        (use-package rpgdm-ironsworn
+          :straight (:local-repo "~/other/emacs-ironsworn")
+          :init
+          (setq rpgdm-ironsworn-project (expand-file-name "~/other/emacs-ironsworn"))))))
+
 #+END_SRC
 
 Next, create an org file, and either turn on the =rpgdm-mode= (minor mode), or simply define a globally accessible shortcut:
