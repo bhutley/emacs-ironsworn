@@ -27,6 +27,46 @@
   (should (= 4 (seq-length (rpgdm-ironsworn--some-character-assets '(1 2 3 4 5 6) 4))))
   (should (= 3 (seq-length (rpgdm-ironsworn--some-character-assets '(1 2 3 4 5 6))))))
 
+(ert-deftest rpgdm-ironsworn--read-stat-test ()
+  ;; Numbers with a minus sign always should indicate a decrease to the current value:
+  (cl-letf (((symbol-function 'read-string) (lambda (s) "-2")))
+    (should (equal (rpgdm-ironsworn--read-stat 'health) '(:decrease 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'spirit) '(:decrease 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'supply) '(:decrease 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:decrease 2))))
+
+  ;; Numbers with a minus sign always should indicate a increase to the current value:
+  (cl-letf (((symbol-function 'read-string) (lambda (s) "+2")))
+    (should (equal (rpgdm-ironsworn--read-stat 'health) '(:increase 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'spirit) '(:increase 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'supply) '(:increase 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:increase 2))))
+
+  ;; Numbers with a minus sign always should indicate a new setting:
+  (cl-letf (((symbol-function 'read-string) (lambda (s) "=2")))
+    (should (equal (rpgdm-ironsworn--read-stat 'health) '(:absolute 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'spirit) '(:absolute 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'supply) '(:absolute 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:absolute 2))))
+
+  ;; Just a number should change based on the type so stat, most go down, momentum goes up:
+  (cl-letf (((symbol-function 'read-string) (lambda (s) "2")))
+    (should (equal (rpgdm-ironsworn--read-stat 'health) '(:decrease 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'spirit) '(:decrease 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'supply) '(:decrease 2)))
+    (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:increase 2))))
+
+  ;; No numeric value, most stats go down by one, but momentum goes up by one:
+  (cl-letf (((symbol-function 'read-string) (lambda (s) "")))
+    (should (equal (rpgdm-ironsworn--read-stat 'health) '(:decrease 1)))
+    (should (equal (rpgdm-ironsworn--read-stat 'spirit) '(:decrease 1)))
+    (should (equal (rpgdm-ironsworn--read-stat 'supply) '(:decrease 1)))
+    (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:increase 1))))
+
+  ;; Anything else should return a :reset, as it will take the default value:
+  (cl-letf (((symbol-function 'read-string) (lambda (s) "go back")))
+    (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:reset 0)))))
+
 (ert-deftest rpgdm-ironsworn--move-tuple-test ()
   (let ((file "moves/fate/ask-the-oracle.org")
         (full "~/other/over/here/moves/fate/ask-the-oracle.org"))

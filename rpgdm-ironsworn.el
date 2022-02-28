@@ -313,32 +313,64 @@ the `rpgdm-ironsworn-current-character-state' function."
     (setq character (rpgdm-ironsworn-current-character-state)))
   (gethash stat character 1))
 
-(defun rpgdm-ironsworn-adjust-stat (stat adj &optional default)
+(defun rpgdm-ironsworn--read-stat (label)
+  "A `read-string', but for the changeable value associated with LABEL.
+A `+1' means increasing the stat by 1, while a `-1' decreased that stat.
+A `=3' sets the stat to the number (in this case, `3').
+
+Hitting return (entering a blank value) increments the 'momentum stat,
+but decrements any other stats by `1'.  Any other value means to take
+the default for that stat."
+  (let ((value (read-string (format "Adjustment to %s (+/-/= for absolute value): " label)))
+	(rxnum (rx (group (optional (or "+" "-" "="))) (* space) (group (+ digit)) (* space))))
+
+    (if (string-match rxnum value)
+	(let ((sign                   (match-string 1 value))
+	      (numb (string-to-number (match-string 2 value))))
+	  (cond
+	   ((equal sign "-") `(:decrease ,numb))
+	   ((equal sign "+") `(:increase ,numb))
+	   ((equal sign "=") `(:absolute ,numb))
+	   (t                (if (eq label `momentum) `(:increase ,numb) `(:decrease ,numb)))))
+
+      (if (string-blank-p value)
+	  (if (eq label 'momentum) '(:increase 1) '(:decrease 1))
+	'(:reset 0)))))
+
+(defun rpgdm-ironsworn-adjust-stat (stat &optional default)
   "Increase or decrease the current character's STAT by ADJ.
-If the STAT isn't found, returns DEFAULT."
-  (let* ((curr (rpgdm-ironsworn-character-stat stat))
-	 (new  (+ curr adj)))
+  If the STAT isn't found, returns DEFAULT."
+  (let* ((tuple (rpgdm-ironsworn--read-stat stat))
+	 (curr  (rpgdm-ironsworn-character-stat stat))
+	 (oper  (first tuple))
+	 (numb  (second tuple))
+	 (new   (cl-case oper
+		  (:increase (+ curr numb))
+		  (:decrease (- curr numb))
+		  (:absolute numb)
+		  (t         default))))
+    (message "Combining curr %d with %d with %s operator" curr numb oper)
     (rpgdm-ironsworn-store-character-state stat new)))
 
-(defun rpgdm-ironsworn-adjust-health (health-adj)
-  "Increase or decrease the current character's health by HEALTH-ADJ."
-  (interactive "nHealth Adjustment: ")
-  (rpgdm-ironsworn-adjust-stat 'health health-adj 5))
+(defun rpgdm-ironsworn-adjust-health ()
+  "Increase or decrease the current character's health interactively."
+  (interactive)
+  (rpgdm-ironsworn-adjust-stat 'health 5))
 
-(defun rpgdm-ironsworn-adjust-spirit (spirit-adj)
-  "Increase or decrease the current character's spirit by SPIRIT-ADJ."
-  (interactive "nSpirit Adjustment: ")
-  (rpgdm-ironsworn-adjust-stat 'spirit spirit-adj 5))
+(defun rpgdm-ironsworn-adjust-spirit ()
+  "Increase or decrease the current character's spirit interactively."
+  (interactive)
+  (rpgdm-ironsworn-adjust-stat 'spirit 5))
 
-(defun rpgdm-ironsworn-adjust-supply (supply-adj)
-  "Increase or decrease the current character's supply by SUPPLY-ADJ."
-  (interactive "nSupply Adjustment: ")
-  (rpgdm-ironsworn-adjust-stat 'supply supply-adj 5))
+(defun rpgdm-ironsworn-adjust-supply ()
+  "Increase or decrease the current character's supply interactively."
+  (interactive)
+  (rpgdm-ironsworn-adjust-stat 'supply 5))
 
-(defun rpgdm-ironsworn-adjust-momentum (momentum-adj)
-  "Increase or decrease the current character's momentum by MOMENTUM-ADJ."
-  (interactive "nMomentum Adjustment: ")
-  (rpgdm-ironsworn-adjust-stat 'momentum momentum-adj 2))
+(defun rpgdm-ironsworn-adjust-momentum ()
+  "Increase or decrease the current character's momentum interactively."
+  (interactive)
+  (rpgdm-ironsworn-adjust-stat 'momentum 2))
 
 (defun rpgdm-ironsworn-roll-stat (stat modifier)
   "Roll an action based on a loaded character's STAT with a MODIFIER."
@@ -701,7 +733,7 @@ The nature is a combination of theme and domain."
 
 (puthash "site" 'rpgdm-ironsworn-oracle-site-nature rpgdm-tables)
 
-(defun rpgdm-ironsworn-discover-a-site (theme domain)
+(defun rpgdm-ironsworn-discover-a-site (theme domain &optional name level)
   "Store a Delve Site information in the org file.
 The THEME and DOMAIN need to match org files in the `tables'
 directory, and the choices themselves come from these files.
@@ -715,12 +747,16 @@ and progress level, and stores all this information in the org file."
     (completing-read "What is the site theme? " rpgdm-ironsworn-site-themes)
     (completing-read "What is the domain? " rpgdm-ironsworn-site-domains)))
 
-  (rpgdm-ironsworn-progress-create
-   (read-string "Site Name: "
-		(rpgdm-ironsworn-oracle-site-name domain))
-   (completing-read-value "Progress Level: "
-			  rpgdm-ironsworn-progress-levels))
-  (next-line 2)
+  (when (called-interactively-p)
+    (setq name (read-string "Site Name: " (rpgdm-ironsworn-oracle-site-name domain)))
+    (setq level (completing-read-value "Progress Level: " rpgdm-ironsworn-progress-levels)))
+
+  (org-insert-heading-respect-content)
+  (org-shiftmetaright)
+  (insert name)
+  (rpgdm-ironsworn-progress-create name level)
+  (ignore-errors
+    (next-line 2))
   (rpgdm-ironsworn-store-character-state 'site-theme (downcase theme))
   (rpgdm-ironsworn-store-character-state 'site-domain (downcase domain)))
 
@@ -937,7 +973,7 @@ You'll need to pick and choose what works and discard what doesn't."
 (defhydra hydra-rpgdm (:color blue :hint nil)
   "
     ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
- ----------------------------------------------------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------------------------------
     _D_: Roll Dice  _p_: Progress      _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
     _e_: Roll Edge  _h_: Roll Shadow   _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
     _r_: Roll Heart _w_: Roll Wits     _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
