@@ -31,7 +31,7 @@ Or better yet, use something like [[https://github.com/raxod502/straight.el][str
    '(el-patch :type git :host gitlab :repo "howardabrams/emacs-rpgdm"))
 
   (straight-use-package
-   '(el-patch :type git :host gitlab :repo "howardabrams/rpgdm-ironsworn"))
+   '(el-patch :type git :host gitlab :repo "howardabrams/emacs-ironsworn"))
 #+END_SRC
 
 Next, create an org file, and either turn on the =rpgdm-mode= (minor mode), or simply define a globally accessible shortcut:
