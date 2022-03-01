@@ -20,7 +20,7 @@ After listening to the author, [[https://twitter.com/ShawnTomkin][Shawn Tomkin]]
 Neither this, nor the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] are currently in MELPA, so if you wish to follow along at home, you'll need to clone both repos, and add them to your =load-path= variable with =add-to-list=:
 
 #+BEGIN_SRC emacs-lisp :tangle no
-(add-to-list 'load-path (expand-file-name "~/other/rpgdm"))
+(add-to-list 'load-path (expand-file-name "~/other/emacs-rpgdm"))
 (add-to-list 'load-path (expand-file-name "~/other/emacs-ironsworn"))
 #+END_SRC
 
@@ -37,11 +37,10 @@ Or better yet, use something like [[https://github.com/raxod502/straight.el][str
 Hrm. If you do use =straight=, you need to set the =rpgdm-ironsworn-project= variable to the directory where you clone it, as the code needs to load data files from it. This is what I’m using (and yeah, I need to clean this):
 
 #+BEGIN_SRC emacs-lisp :tangle no
-        (use-package rpgdm-ironsworn
-          :straight (:local-repo "~/other/emacs-ironsworn")
-          :init
-          (setq rpgdm-ironsworn-project (expand-file-name "~/other/emacs-ironsworn"))))))
-
+  (use-package rpgdm-ironsworn
+    :straight (:local-repo "~/other/emacs-ironsworn")
+    :init
+    (setq rpgdm-ironsworn-project (expand-file-name "~/other/emacs-ironsworn"))))))
 #+END_SRC
 
 Next, create an org file, and either turn on the =rpgdm-mode= (minor mode), or simply define a globally accessible shortcut:
@@ -164,8 +163,8 @@ Details? Did someone say details? Let's talk about the code ... all the code tha
   ;;
   ;;; Commentary:
   ;;
-  ;;    This file is conspicuously absent from commentary or even
-  ;;    comments.  This is because this file is created from tangling
+  ;;    This file is conspicuously absent of commentary or even
+  ;;    comments.  This is because we create this file by tangling
   ;;    the README.org file in this directory.
   ;;
   ;;; Code:
@@ -197,7 +196,12 @@ You always three possible values:
 
 I describe the =rpgdm-ironsworn-roll= that implements this below, but I need a helper function.
 
-When we roll, I want one of those three results printed, but in different colors, to easily distinguish. I also want to see the numbers, so we can display those too. Oh, and if the same number shows on both d10s, you should introduce a significant plot twist, so this function, given all the numbers, returns a nicely formatted string:
+When we roll, I want one of those three results printed, but in different colors, to easily distinguish. I also want to see the individual umbers, so we can display those too.  For instance:
+
+#+ATTR_ORG: :width 392px
+[[file:images/dice-results.png]]
+
+Oh, and if the same number shows on both d10s, you should introduce a significant plot twist, so this function, given all the numbers, returns a nicely formatted string:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge
