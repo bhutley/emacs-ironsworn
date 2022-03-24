@@ -6,6 +6,4 @@
 
 - [ ] When you [[file:~/other/ironsworn/moves/adventure/resupply.org][Resupply]] by scavenging or looting, and score a strong hit with a match, you may envision finding an object of value. If you do, take +1 supply (instead of +2) and +1 wealth.
 
-| 0 | +1 | +2 | +3 | +4 | +5 |
-|---+----+----+----+----+----|
-
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Wealth Track" 0)][Add Wealth Track to Character Sheet]]

@@ -11,6 +11,4 @@ Your friend stands by you.
 
 - [ ] *Bonded:* Once you mark a bond with your companion, add +1 when you [[file:~/other/ironsworn/moves/suffer/face-desolation.org][Face Desolation]] in their presence.
 
-| 0 | +1 | +2 | +3 | +4 | +5 |
-|---+----+----+----+----+----|
-|   |    |    |    |    |    |
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Kindred Companion Health" 5)][Add Kindred Companion Health to Character Sheet]]

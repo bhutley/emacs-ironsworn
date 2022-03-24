@@ -9,6 +9,4 @@ Your cat takes down its prey.
 
 - [ ] *Protective:* When you [[file:~/other/ironsworn/moves/adventure/make-camp.org][Make Camp]], your cat is alert to trouble. If you or an ally choose to relax, take +1 spirit. If you focus, take +1 momentum.
 
-| 0 | +1 | +2 | +3 | +4 |
-|---+----+----+----+----+
-|   |    |    |    |    |
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Cave Lion Health" 4)][Add Cave Lion Health to Character Sheet]]

@@ -9,7 +9,4 @@ Your mammoth walks a resolute path.
 
 - [ ] *Overpowering:* When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] or [[file:~/other/ironsworn/moves/combat/clash.org][Clash]] by riding your mammoth against a pack of foes, add +1 and inflict +1 harm on a hit.
 
-| 0 | +1 | +2 | +3 | +4 | +5 |
-|---+----+----+----+----+----|
-|   |    |    |    |    |    |
-
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Mammoth Health" 5)][Add Mammoth Health to Character Sheet]]

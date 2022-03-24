@@ -6,6 +6,4 @@
 
 - [ ] Once you [[file:~/other/ironsworn/moves/relationship/forge-a-bond.org][Forge a Bond]] with your warband, take +1 momentum on a hit when you leverage a warband ability.
 
-| 0 | +1 | +2 | +3 | +4 |
-|---+----+----+----+----|
-|   |    |    |    |    |
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Warband Strength" 4)][Insert Warband Strength Stat]]

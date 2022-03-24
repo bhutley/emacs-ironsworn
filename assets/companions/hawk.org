@@ -9,7 +9,4 @@ Your hawk can aid you while it is aloft.
 
 - [ ] *Vigilant:* When you [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +wits to detect an approaching threat, or when you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] +wits against an ambush, add +2.
 
-| 0 | +1 | +2 | +3 |
-|---+----+----+----|
-|   |    |    |    |
-
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Hawk Health" 4)][Add Hawk Health to Character Sheet]]

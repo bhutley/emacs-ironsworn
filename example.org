@@ -20,6 +20,8 @@
 :ironsworn-momentum: 2
 :ironsworn-progress-bonds: "Bonds" 1 2
 :ironsworn-progress-story: "Learn the Magic of the Runes" 1 0
+:ironsworn-asset-illusionary-essence: 0
+:ironsworn-asset-raven-health: 2
 :END:
 
 My name is Kannan from a small circle called Elkfield near the great Primeval woods. This is my story.
@@ -30,18 +32,39 @@ My name is Kannan from a small circle called Elkfield near the great Primeval wo
 
 Before my mother died, she told me the hunter who died when I was 10, was not my father. She gave me an iron disk on a leather thong, and made me swear a vow that I would leave Elkfield and journey to Cinderhome to meet my father and face my destiny.
 
-*Assets*
+** Assets
+*** Communion
 
-  - Companion: Raven
-    *Sly:* When you Secure an Advantage or Face Danger +shadow using your raven to perform trickery (such as creating a distraction or stealing a small object) add +1 and take +1 momentum on a hit.
+- [-] When you surround the remains of a recently deceased intelligent creature with lit candles, and summon its spirit, roll +heart. Add +1 if you share a bond. On a strong hit, the spirit appears and you may converse for a few minutes. Make moves as appropriate (add +1). On a weak hit, as above, but the spirit also delivers troubling news unrelated to your purpose. Envision what it tells you ([[file:~/other/ironsworn/moves/fate/ask-the-oracle.org][Ask the Oracle]] if unsure) and [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (1 stress).
 
-  - Ritual: *Invoke* (Illusions) +wits
-    When you consume the mystical essence of your surroundings, roll +wits. On a strong hit, add the value of your action die to your essence track (max 6). You may then Secure an Advantage or Face Danger +essence to create minor mystical effects or illusions. If you do, suffer -1 essence and take +1 momentum on a hit. On a weak hit, as above, but capturing these energies is harrowing; Endure Stress (2 stress).
+- [ ] As above, and you may also commune with the long-dead.
 
-  - Ritual: *Communion* (Talk to the Dead) +heart
-    When you surround the remains of a recently deceased intelligent creature with lit candles, and summon its spirit, roll +heart. Add +1 if you share a bond. On a strong hit, the spirit appears and you may converse for a few minutes. Make moves as appropriate (add +1). On a weak hit, as above, but the spirit also delivers troubling news unrelated to your purpose. Envision what it tells you (Ask the Oracle if unsure) and Endure Stress (1 stress).
+- [ ] When you perform this ritual, add +1 and take +1 momentum on a hit.
 
-*** Bonds
+*** Invoke
+
+- [-] When you consume the mystical essence of your surroundings, roll +wits. On a strong hit, add the value of your action die to your essence track (max 6). You may then [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] or [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +essence to create minor mystical effects or illusions. If you do, suffer -1 essence and take +1 momentum on a hit. On a weak hit, as above, but capturing these energies is harrowing; [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] (2 stress).
+
+- [ ] You may [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] +essence (and suffer -1 essence) through a show of power.
+
+- [ ] When you perform this ritual, add +1 and take +1 essence on a hit.
+
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Illusionary Essence" 0)][Add Illusionary Essence to Character Sheet]]
+
+*** Raven
+Name: *Curio*
+
+Your raven heeds your call.
+
+- [ ] *Sly:* When you [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]] or [[file:~/other/ironsworn/moves/adventure/face-danger.org][Face Danger]] +shadow using your raven to perform trickery (such as creating a distraction or stealing a small object) add +1 and take +1 momentum on a hit.
+
+- [ ] *Knowing:* When you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]], add +2 and take +1 momentum on a hit.
+
+- [ ] *Diligent:* When your raven carries messages for you, you may [[file:~/other/ironsworn/moves/adventure/secure-advantage.org][Secure an Advantage]], [[file:~/other/ironsworn/moves/adventure/gather-information.org][Gather Information]], or [[file:~/other/ironsworn/moves/relationship/compel.org][Compel]] from a distance.
+
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Raven Health" 2)][Add Raven Health to Character Sheet]]
+
+** Bonds
 People and communities where I share a bond:
 
   - Sibila :: My mother
@@ -96,12 +119,16 @@ That night, I slept outdoors, wracked with dreams. In the morning, one word stoo
 
 Kori told me that Redcrest is a village perched on an island in the Barrier Islands, and that perhaps my father was there.
 
-*** COMMENT Journey to the Coast
+*** Journey to the Coast
 :PROPERTIES:
 :ironsworn-progress-28fd9563: "Journey to the Coast" 8 24
 :ironsworn-supply: 2
+:ironsworn-asset-illusionary-essence: 4
 :END:
-# Create a progress tracker, granted, F12 p n works too:
+Before undertaking my journey, I cast the runes to attune my mind to magical shadows of the surrounding forest.
+
+# Strong hit :: 7 (4 + 3) → 2 / 2 ← Create a Twist
+# Set Essence to 4 ... Twist? A vision of where to go?
 
 # Undertake a Journey ... Weak hit :: 6 (2 + 4) → 6 / 1 - Ruined Moor
 
@@ -122,11 +149,13 @@ But no one answered my knock. I swear I could hear voices within. I called out t
 # Make Camp ... Miss :: 6 (3 + 3) → 9 / 6
 
 I tucked myself in a corner behind some growth, and placed /Curio/ on a branch of a shrub near me. Attempted to take solace, however, I could barely rest wondering what the denizens of this dilapidated village feared. I soon found out.
+
 **** Conflict with a Horror
 :PROPERTIES:
 :ironsworn-progress-b5f243e0: "Battle with Monstrosity" 8 16
 :ironsworn-health: 3
-:ironsworn-momentum: 3
+:ironsworn-momentum: 5
+:ironsworn-asset-illusionary-essence: 3
 :END:
 # Danger: Tiny / Crustecean with Claws, Mandibles and stinger (Scorpion?) ...  Move between realities / Poisonous
 
@@ -155,4 +184,9 @@ The stinging bugs are appear out of no where, and their barbs hurt. The venom is
 
 # Secure an Advantage ... Strong hit :: 4 (2 + 2) → 3 / 2
 
-I manage to get to the clearing among the shut houses. Do I dare cry for help, or flee back down the path?
+I manage to get to the clearing among the shut houses. Do I dare cry for help, or flee back down the path? The creatures seem to be /phasing/ and closing the gap. I /wish/ they thought I went another way ...
+
+# Secure an Advantage (+essence) ... Weak hit :: 5 (1 + 4) → 8 / 3
+# Lower essence and increase momentum.
+
+And just as I wished, a shadowy figure leads them away, long enough for me to get away... albeit briefly.

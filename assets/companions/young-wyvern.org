@@ -9,6 +9,4 @@ Your wyvern won't devour you. For now.
 
 - [ ] *Savage:* When you [[file:~/other/ironsworn/moves/combat/strike.org][Strike]] by commanding your wyvern to attack, roll +heart. Your wyvern inflicts 3 harm on a hit.
 
-| 0 | +1 | +2 | +3 | +4 | +5 |
-|---+----+----+----+----+----|
-
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Wyvern Health" 4)][Add Wyvern Health to Character Sheet]]

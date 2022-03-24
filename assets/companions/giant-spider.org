@@ -9,6 +9,4 @@ Your spider uncovers secrets.
 
 - [ ] *Ensnaring:* When your spider sets a trap, add +1 as you [[file:~/other/ironsworn/moves/combat/enter-the-fray.org][Enter the Fray]] +shadow. On a strong hit, also inflict 2 harm.
 
-| 0 | +1 | +2 | +3 | +4 |
-|---+----+----+----+----|
-|   |    |    |    |    |
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Giant Spider Health" 4)][Add Giant Spider Health to Character Sheet]]

@@ -9,7 +9,4 @@ Your owl soars through the darkness.
 
 - [ ] *Embodying:* When you [[file:~/other/ironsworn/moves/suffer/face-death.org][Face Death]], take your owl's health as +momentum before you roll.
 
-| 0 | +1 | +2 | +3 |
-|---+----+----+----|
-|   |    |    |    |
-
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Owl Health" 3)][Add Owl Health to Character Sheet]]

@@ -9,7 +9,4 @@ Your hound is your steadfast companion.
 
 - [ ] *Loyal:* When you [[file:~/other/ironsworn/moves/suffer/endure-stress.org][Endure Stress]] in the company of your hound, add +1.
 
-| 0 | +1 | +2 | +3 | +4 |
-|---+----+----+----+----|
-|   |    |    |    |    |
-
+[[elisp:(rpgdm-ironsworn-asset-stat-create "Hound Health" 4)][Add Hound Health to Character Sheet]]

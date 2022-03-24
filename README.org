@@ -570,18 +570,19 @@ Sure, you could open up the appropriate drawer to see a character's stats, but w
     (interactive)
     (let ((character (rpgdm-ironsworn-current-character-state)))
       (rpgdm-message "Edge: %d  Heart: %d  Iron: %d  Shadow: %d  Wits: %d
-  Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
-		     (rpgdm-ironsworn-character-stat 'edge character)
-		     (rpgdm-ironsworn-character-stat 'heart character)
-		     (rpgdm-ironsworn-character-stat 'iron character)
-		     (rpgdm-ironsworn-character-stat 'shadow character)
-		     (rpgdm-ironsworn-character-stat 'wits character)
+  Health: %s  Spirit: %s  Supply: %s  Momentum: %d  %s"
+                     (rpgdm-ironsworn-character-stat 'edge character)
+                     (rpgdm-ironsworn-character-stat 'heart character)
+                     (rpgdm-ironsworn-character-stat 'iron character)
+                     (rpgdm-ironsworn-character-stat 'shadow character)
+                     (rpgdm-ironsworn-character-stat 'wits character)
 
-		     (rpgdm-ironsworn--display-stat 'health character)
-		     (rpgdm-ironsworn--display-stat 'spirit character)
-		     (rpgdm-ironsworn--display-stat 'supply character)
+                     (rpgdm-ironsworn--display-stat 'health character)
+                     (rpgdm-ironsworn--display-stat 'spirit character)
+                     (rpgdm-ironsworn--display-stat 'supply character)
 
-		     (gethash 'momentum character 5))))
+                     (gethash 'momentum character 5)
+                     (rpgdm-ironsworn--asset-stat-show-all character))))
 #+END_SRC
 *** Retrieving Character Stats
 We need an /internal representation/ of a character using a hash table of the attributes and other stats. One key feature is that I want to be able to look up a stat by either symbol or string, e.g. ='edge= or ="edge"= or even =:edge=. For this, I define a /comparator/, er, a Lisp test that uses a function to convert to a common format, a string:
@@ -809,6 +810,181 @@ Rolling death saves against your health, is similar to a /progress roll/ (which 
     (interactive)
     (rpgdm-ironsworn-progress-roll
      (rpgdm-ironsworn-character-stat :supply)))
+#+END_SRC
+
+** Asset-Related Stats
+
+Some assets come with additional attributes, health or other modifying values. Let’s keep track of those as well, specificially:
+
+  - We need to be able to list all of these /special/ stats, separately from /health/, /iron/, and other progress values.
+  - We should create them, but store their initial value at the very top of the org tree, like all other character stats
+  - We could roll with them as both a modifier (like /wits/) or as a progress (like /supply/).
+
+The following asset-related stat values need to be stored as =ironsworn-asset-something=, but displayed as =Something=, so we need functions to convert from a string to this symbol, and back:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--asset-stat-key (name)
+    "Convert a string, NAME, into an `asset-str' symbol."
+    (thread-last name
+      (s-replace-regexp (rx space) "-")
+      (s-replace-regexp (rx (one-or-more (not (any "-" alphanumeric)))) "")
+      (downcase)
+      (format "asset-%s")
+      (make-symbol)))
+
+  (defun rpgdm-ironsworn--asset-stat-name (stat)
+    "Convert an asset-related STAT symbol into a readable name."
+    (let ((no-asset (thread-first stat
+                      (symbol-name)
+                      (substring 6))))
+      (thread-last no-asset
+        (string-replace "-" " ")
+        (s-titleize))))
+#+END_SRC
+
+Note that adding the asset-stat, =Dobby’s Health= will be converted to the stat, =asset-dobbys-health=, which will then be displayed (again after conversion) to the user as: =Dobbys Health=. But since most of these stats will be created from the Asset files (and not directly from the user), this shouldn’t be a problem.
+
+Let’s make a few unit tests to verify this:
+
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
+  (ert-deftest rpgdm-ironsworn--asset-stat-key-test ()
+    (should (symbolp (rpgdm-ironsworn--asset-stat-key "Foo bar")))
+    (should (string= 'asset-foo-bar (rpgdm-ironsworn--asset-stat-key "Foo bar")))
+    (should (string= 'asset-foos-bar (rpgdm-ironsworn--asset-stat-key "Foo's bar"))))
+
+  (ert-deftest rpgdm-ironsworn--asset-stat-name-test ()
+    (should (string= "Foo Bar" (rpgdm-ironsworn--asset-stat-name 'asset-foo-bar))))
+#+END_SRC
+
+Use the [[help:rpgdm-ironsworn-store-default-character-state][rpgdm-ironsworn-store-default-character-state]] function to create and store an asset-related stat:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-asset-stat-create (name value)
+    "Create a special stat associated with an asset.
+  Note that this is created as an org property value at the
+  top-most heading. The NAME is a short string for the name of the
+  asset, and VALUE is the initial value, probably an integer
+  value."
+    (interactive (list (read-string "Asset stat name: ")
+                       (read-string "Initial asset stat value: ")))
+    (unless (s-blank? name)
+      (let ((stat (rpgdm-ironsworn--asset-stat-key name)))
+        (rpgdm-ironsworn-store-default-character-state stat value))))
+#+END_SRC
+
+Now with the asset-stats available, we can /filter/ them from the =hash-table= returned from the [[help:rpgdm-ironsworn-current-character-state][rpgdm-ironsworn-current-character-state]] function, to produce an =alist= where the user-formatted name is joined with the asset keys.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--asset-stat-alist (&optional stats)
+    "Return alist of all defined asset-related STATS."
+    (unless stats
+      (setq stats (rpgdm-ironsworn-current-character-state)))
+    (let* ((keys  (thread-last stats
+                    (hash-table-keys)
+                    (--filter (string-prefix-p "asset-" (symbol-name it)))))
+           (names (-map 'rpgdm-ironsworn--asset-stat-name keys)))
+      (-zip names keys)))
+#+END_SRC
+
+And we can verify this with some unit tests:
+
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
+  (ert-deftest rpgdm-ironsworn--asset-stat-alist-test ()
+    (let* ((stats #s(hash-table size 65 test str-or-keys rehash-size 1.5 rehash-threshold 0.8125 data
+                                (title "Travels of Kannan"
+                                       edge 2 heart 1 iron 1 shadow 2 wits 3
+                                       health 5 spirit 5 supply 5 momentum 2
+                                       asset-mammoth-health 5
+                                       asset-invoke-level 3)))
+           (assets (rpgdm-ironsworn--asset-stat-alist stats)))
+      (should (= (length assets) 2))
+      (should (eq (alist-get "Mammoth Health" assets 0 nil 'equal) 'asset-mammoth-health))
+      (should (eq (alist-get "Invoke Level" assets 0 nil 'equal) 'asset-invoke-level))))
+#+END_SRC
+
+With the ability to create an =alist= of all assets, we use this result to create a [[help:completing-read][completing-read]]-like function for selecting one of the stored asset-related stats.
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--asset-stat-choose ()
+    "Display all asset-related stats, allowing user to choose one.
+  Return the symbol, `asset-xyz."
+    (let* ((choices (rpgdm-ironsworn--asset-stat-alist))
+           (choice  (completing-read "Choose Asset Stat: " choices)))
+      (alist-get choice choices 0 nil 'equal)))
+#+END_SRC
+
+Most asset-related stats, like a companion’s health, need to be adjusted, so using our =-choose= function as well as the =-adjust-stat= function, the [[help:rpgdm-ironsworn-asset-stat-adjust][rpgdm-ironsworn-asset-stat-adjust]] function is trivial:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-asset-stat-adjust (stat)
+    "Adjust an asset-related STAT, after choosing that.
+  Note that the stat must have already been defined."
+    (interactive (list (rpgdm-ironsworn--asset-stat-choose)))
+    (rpgdm-ironsworn-adjust-stat stat))
+#+END_SRC
+
+Displaying the /value/ of an asset stat seems simple to write:
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-asset-stat-show (stat)
+    "Display an asset STAT after selecting it from those created."
+    (interactive (list (rpgdm-ironsworn--asset-stat-choose)))
+    (message "%d" (rpgdm-ironsworn-character-stat stat)))
+#+END_SRC
+
+While we need to know the value of an asset stat, all of those stats should also show with the standard [[help:rpgdm-ironsworn-character-display][rpgdm-ironsworn-character-display]], as that function will call a function to get a string of all the asset-related stats and values (if any).
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn--asset-stat-show-all (&optional stats)
+    "Return string showing all asset-related STATS and their values.
+  Note that if STATS is nil, the stats are acquired by calling
+  `rpgdm-ironsworn-current-character-state'."
+    (unless stats
+      (setq stats (rpgdm-ironsworn-current-character-state)))
+
+    (cl-flet ((convert (stat) (cons (car stat)
+                                    (rpgdm-ironsworn-character-stat (cdr stat)))))
+      (thread-last stats
+        (rpgdm-ironsworn--asset-stat-alist)
+        (-map #'convert)
+        (--map (format "%s: %s" (car it) (cdr it)))
+        (s-join "  "))))
+#+END_SRC
+
+How would that actually look? Let’s write a unit test to make sure.
+
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
+  (ert-deftest rpgdm-ironsworn--asset-stat-alist-test ()
+    ;; Using Lisp to `mock' the function to get an stat value:
+    (cl-letf (((symbol-function 'rpgdm-ironsworn-character-stat) (lambda (s) 3)))
+
+      (let* ((stats #s(hash-table size 65 test str-or-keys rehash-size 1.5
+                                  rehash-threshold 0.8125 data
+                                  (title "Travels of Kannan"
+                                         edge 2 heart 1 iron 1 shadow 2 wits 3
+                                         health 5 spirit 5 supply 5 momentum 2
+                                         asset-mammoth-health 3
+                                         asset-invoke-level 3))))
+        (should (string= "Mammoth Health: 3  Invoke Level: 3"
+                         (rpgdm-ironsworn--asset-stat-show-all stats))))
+
+      ;; Return an empty string if there are not asset-related stats:
+      (let* ((stats #s(hash-table size 65 test str-or-keys rehash-size 1.5
+                                  rehash-threshold 0.8125 data
+                                  (title "Travels of Kannan"
+                                         edge 2 heart 1 iron 1 shadow 2 wits 3
+                                         health 5 spirit 5 supply 5 momentum 2))))
+        (should (string= "" (rpgdm-ironsworn--asset-stat-show-all stats))))))
+#+END_SRC
+
+And now we need a few roll functions, for treating an asset-related stat as a modifier (for instance, the [[file:assets/paths/commander.org][Commander's Warband Strength]]):
+
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-asset-stat-roll (stat modifier)
+    "Use an asset-related stat as a modifier for a standard roll."
+    (interactive (list (rpgdm-ironsworn--asset-stat-choose)
+                       (read-string "Other modifier: ")))
+    (rpgdm-ironsworn-roll-stat stat modifier))
 #+END_SRC
 ** Moves
 The [[file:moves][moves]] directory contains one org file for each move. These files contains properties for how a move should behave. To make "a move" involves opening the move description file in a side-buffer, getting details about the move from the file, and then rolling some dice.
@@ -1608,6 +1784,14 @@ Can a Hydra call a hydra? Let's more all the special oracle and progress functio
     ("p" rpgdm-ironsworn-progress-amount "show")
     ("x" rpgdm-ironsworn-progress-delete "delete")
     ("r" rpgdm-ironsworn-progress-roll   "roll"))
+
+  (defhydra hydra-rpgdm-assets (:color blue)
+    "Progress Tracks"
+    ("A" rpgdm-ironsworn-insert-character-asset "insert new asset")
+    ("a" rpgdm-ironsworn-asset-stat-adjust "adjust asset stat")
+    ("n" rpgdm-ironsworn-asset-stat-create "new asset stat")
+    ("s" rpgdm-ironsworn-asset-stat-show   "show")
+    ("r" rpgdm-ironsworn-asset-stat-roll "roll asset as modifier"))
 #+END_SRC
 
 I'd like to repurpose the RPGDM Hydra to be more specific to Ironsworn, so this has both the instructions on how to use it and the key-to-function mapping. A pattern I would like to follow is that a uppercase letters indicate altering something.
@@ -1630,10 +1814,10 @@ But we roll some of these more than others, especially since "moves" does most o
     "
       ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
    ------------------------------------------------------------------------------------------------------------------------------
-      _D_: Roll Dice  _p_: Progress      _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
-      _e_: Roll Edge  _h_: Roll Shadow   _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
-      _r_: Roll Heart _w_: Roll Wits     _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
-      _i_: Roll Iron  _m_: Make Move       _M_: Momentum   _d_: Delve Actions   _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
+      _D_: Roll Dice  _h_: Roll Shadow       _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
+      _e_: Roll Edge  _w_: Roll Wits         _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
+      _r_: Roll Heart _p_/_a_: Progress/Assets _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
+      _i_: Roll Iron  _m_: Make Move           _M_: Momentum   _d_: Delve Actions   _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
     ("D" rpgdm-ironsworn-roll)
     ("z" rpgdm-ironsworn-oracle)  ("Z" rpgdm-yes-and-50/50)
 
@@ -1656,6 +1840,7 @@ But we roll some of these more than others, especially since "moves" does most o
 
     ("d" hydra-rpgdm-delve/body)
     ("p" hydra-rpgdm-progress/body)
+    ("a" hydra-rpgdm-assets/body)
 
     ("o" ace-link)                 ("N" org-narrow-to-subtree)   ("W" widen)
     ("K" scroll-down :color pink)  ("J" scroll-up :color pink)
@@ -1695,6 +1880,18 @@ We set all of these values in the current tree using [[help:org-set-property][or
       (org-set-property prop value)))
 #+END_SRC
 
+Oh, but what if we want to store a value for a /default stat/? This needs to go to the top-level header first:
+#+BEGIN_SRC emacs-lisp
+  (defun rpgdm-ironsworn-store-default-character-state (stat value)
+    "Store the VALUE of a character's STAT in the top-level org tree property.
+  Note that STAT should be a symbol, like `supply' and VALUE should be a
+  number, but doesn't have to be."
+    (save-excursion
+      (org-up-heading)
+      (while (> (org-heading-level) 1)
+        (org-up-heading))
+      (rpgdm-ironsworn-store-character-state stat value)))
+#+END_SRC
 *** Property Key Conversions and Predicates
 Loading state means looking at properties, and we distinguish Ironsworn-specific with a few functions:
 
