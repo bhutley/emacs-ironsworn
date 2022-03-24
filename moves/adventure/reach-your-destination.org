@@ -29,5 +29,5 @@ If you are traveling with allies, one of you makes this move. Each of you benefi
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

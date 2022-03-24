@@ -54,5 +54,5 @@ A miss on [[file:delve-the-depths.org][Delve the Depths]] should trigger a dange
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

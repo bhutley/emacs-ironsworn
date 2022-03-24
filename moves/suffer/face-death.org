@@ -25,5 +25,5 @@ On a *miss*, you are dead. Envision what awaits you. You may begin again with a 
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

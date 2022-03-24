@@ -17,5 +17,5 @@ If you have abandoned a quest which is central to your character’s motivations
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

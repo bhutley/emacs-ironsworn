@@ -36,5 +36,5 @@ Bonds can also be made between allies. One of you makes the move, and both of yo
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

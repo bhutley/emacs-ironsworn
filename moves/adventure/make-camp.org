@@ -30,5 +30,5 @@ On a *miss*, you gain no benefits of your downtime. Perhaps you suffered troubli
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

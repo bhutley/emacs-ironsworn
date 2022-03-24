@@ -45,5 +45,5 @@ On a *miss*, something goes wrong. You are not welcomed. The citizens are hostil
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -34,5 +34,5 @@ When allies join together to *Swear an Iron Vow*, one of you speaks for the grou
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

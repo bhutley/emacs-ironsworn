@@ -19,5 +19,5 @@ Narratively, this is a dramatic moment. Focus on it. Envision your character’s
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

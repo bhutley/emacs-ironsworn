@@ -59,5 +59,5 @@ If you score a *miss* and your debilities are already marked, you have no choice
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

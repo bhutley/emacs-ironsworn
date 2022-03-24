@@ -35,5 +35,5 @@ On a *miss*, a turn of events finds you defeated or your true goal is suddenly b
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

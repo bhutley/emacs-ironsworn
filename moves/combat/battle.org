@@ -39,5 +39,5 @@ On a *strong hit*, all of you benefit from the narrative success, but only the c
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

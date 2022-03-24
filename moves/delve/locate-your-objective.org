@@ -34,5 +34,5 @@ Finally, consider how the objective impacts your quest. If this is a milestone, 
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

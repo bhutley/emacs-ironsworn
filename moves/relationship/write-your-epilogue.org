@@ -23,5 +23,5 @@ Based on the result of this move, envision how you spend the remainder of your d
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

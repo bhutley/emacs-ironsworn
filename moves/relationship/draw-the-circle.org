@@ -30,5 +30,5 @@ Duels may also be to the death. If one of the combatants declares their intent t
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -39,5 +39,5 @@ When you and your allies are fighting against a common foe, you share a progress
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -61,5 +61,5 @@ However, don't bend the fiction to a breaking point by trying to justify a move 
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

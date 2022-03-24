@@ -23,5 +23,5 @@ Don’t ping pong this move back and forth between two characters in an attempt 
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -41,5 +41,5 @@ Since this move is not essential to resolving your exploration of a site, you ca
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

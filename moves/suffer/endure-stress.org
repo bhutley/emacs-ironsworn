@@ -53,5 +53,5 @@ As with the [[file:endure-harm.org][Endure Harm]] move, when you score a *miss* 
 If you’ve scored a *miss* and your debilities are both marked, you must roll on the table to determine your fate.
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

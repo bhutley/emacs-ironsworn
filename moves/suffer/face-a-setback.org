@@ -16,5 +16,5 @@ If your health, spirit, and supply are all at 0, you have no choice. You must cl
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -69,5 +69,5 @@ In guided play, your GM is the oracle. You won’t make this move unless you are
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -26,5 +26,5 @@ On a *miss*, some event or person acts against you, a dangerous new threat is re
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

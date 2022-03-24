@@ -13,5 +13,5 @@ While you are unprepared, you cannot increase your supply track. If you suffer a
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

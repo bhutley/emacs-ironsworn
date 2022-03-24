@@ -28,5 +28,5 @@ On a *miss*, you must [[file:../fate/pay-the-price.org][Pay the Price]]. Your op
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

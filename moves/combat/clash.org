@@ -33,5 +33,5 @@ If you ever respond to an attack by just taking the hit, that’s not a move. Th
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

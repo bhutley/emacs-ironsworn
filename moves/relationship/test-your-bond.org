@@ -23,5 +23,5 @@ If you and your allies share a bond with an NPC or community, and you act togeth
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

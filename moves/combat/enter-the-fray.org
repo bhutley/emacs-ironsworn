@@ -37,5 +37,5 @@ If you are fighting a group of troublesome or dangerous foes, you can combine th
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -34,5 +34,5 @@ A miss means your attempt to gain advantage has backfired. You acted too slowly,
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

@@ -22,5 +22,5 @@ If you have the unprepared condition marked, you can’t resupply. Instead, you 
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:

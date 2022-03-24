@@ -35,5 +35,5 @@ A miss means you are thwarted in your action, fail to oppose the threat, or make
 
 #+STARTUP: showall
 # Local Variables:
-# eval: (writegood-mode -1)
+# eval: (flycheck-mode -1)
 # End:
