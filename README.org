@@ -77,9 +77,10 @@ While the interface may change (and I may not update that screenshot too often),
   - ~m~ lets you choose a move, display the details, and lets you roll against it.
     #+ATTR_HTML: :width 1100px
     [[file:images/list-of-moves.png]]
-  - ~d~ lets you choose a Delve-specific actions, chosen after you’ve performed the move.
+  - ~d~ lets you choose a Delve-specific actions, chosen after you’ve performed a Delve-specific move.
     #+ATTR_ORG: :width 1627px
     [[file:images/ui-delve.png]]
+  - ~a~ lets you work with an /asset-related/ stat, like a companion’s health, or how the [[file:assets/paths/commander.org][Commander]] as a /Strength/ value for her warband.
   - ~z~ let's you ask a yes/no question, choosing how likely it is. Good for both solo play as well as turning it back on your players, "How likely do you think the moor is haunted?"
   - ~c~ displays a list of random tables to roll against:
     #+ATTR_HTML: :width 1100px
@@ -1937,9 +1938,6 @@ A test is always explanatory for how this function should behave:
 #+END_SRC
 Why do we need it? Well, when we will want this when we /re-set/ the property.
 *** Locating the Properties
-:PROPERTIES:
-:foobar:   5
-:END:
 As I've mentioned before, the code needs to walk "up" an Org Tree looking for properties. The crux is using the /internal/ [[help:org-element--get-node-properties][org-element--get-node-properties]] function, which returns a [[info:elisp#Property Lists][property list]] /iff/ the point is on a header.
 
 So the general idea is:
