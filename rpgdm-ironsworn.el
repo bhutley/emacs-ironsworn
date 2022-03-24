@@ -111,12 +111,11 @@ a random name is generated for the purposes of the template."
   "Given a FILENAME of an Ironsworn asset, return an Asset label."
   (cl-flet* ((convert (str) (s-replace "-" " " str))
              (uppity   (str) (s-titleize (convert str))))
-    (when (string-match (rx (one-or-more any)
-                            "/"
-                            (group (one-or-more (not "/")))    ; parent directory
-                            "/"
-                            (group (one-or-more (not "/")))    ; base filename
-                            ".org")
+    (when (string-match (rx (one-or-more any) "/"
+                            ;; parent directory
+                            (group (one-or-more (not "/"))) "/"
+                            ;; base filename
+                            (group (one-or-more (not "/"))) ".org")
                         filename)
       (format "%s :: %s"
               (uppity  (match-string 1 filename))
@@ -177,7 +176,7 @@ That is, all are unique, only one companion, etc."
 If NUMBER is nil, then return 3."
   (unless number
     (setq number 3))
-  (loop for x from 1 to number
+  (cl-loop for x from 1 to number
         collect (seq-random-elt asset-filenames)))
 
 (defun rpgdm-ironsworn--random-character-assets (&optional number-of-assets)
@@ -265,12 +264,12 @@ which should be using the `org-mode' major mode."
   "Colorized the STAT from a CHARACTER hash containing it.
 See `rpgdm-ironsworn-character-display'."
   (let* ((value (gethash stat character))
-	 (s-val (number-to-string value))
-	 (color (cond
-		 ((< value 1) "red")
-		 ((< value 3) "orange")
-		 ((< value 4) "yellow")
-		 (t "green"))))
+         (s-val (number-to-string value))
+         (color (cond
+                 ((< value 1) "red")
+                 ((< value 3) "orange")
+                 ((< value 4) "yellow")
+                 (t "green"))))
     (propertize s-val 'face `(:foreground ,color))))
 
 (defun rpgdm-ironsworn-character-display ()
@@ -278,18 +277,19 @@ See `rpgdm-ironsworn-character-display'."
   (interactive)
   (let ((character (rpgdm-ironsworn-current-character-state)))
     (rpgdm-message "Edge: %d  Heart: %d  Iron: %d  Shadow: %d  Wits: %d
-Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
-		   (rpgdm-ironsworn-character-stat 'edge character)
-		   (rpgdm-ironsworn-character-stat 'heart character)
-		   (rpgdm-ironsworn-character-stat 'iron character)
-		   (rpgdm-ironsworn-character-stat 'shadow character)
-		   (rpgdm-ironsworn-character-stat 'wits character)
+Health: %s  Spirit: %s  Supply: %s  Momentum: %d  %s"
+                   (rpgdm-ironsworn-character-stat 'edge character)
+                   (rpgdm-ironsworn-character-stat 'heart character)
+                   (rpgdm-ironsworn-character-stat 'iron character)
+                   (rpgdm-ironsworn-character-stat 'shadow character)
+                   (rpgdm-ironsworn-character-stat 'wits character)
 
-		   (rpgdm-ironsworn--display-stat 'health character)
-		   (rpgdm-ironsworn--display-stat 'spirit character)
-		   (rpgdm-ironsworn--display-stat 'supply character)
+                   (rpgdm-ironsworn--display-stat 'health character)
+                   (rpgdm-ironsworn--display-stat 'spirit character)
+                   (rpgdm-ironsworn--display-stat 'supply character)
 
-		   (gethash 'momentum character 5))))
+                   (gethash 'momentum character 5)
+                   (rpgdm-ironsworn--asset-stat-show-all character))))
 
 (defun rpgdm-ironsworn-to-string (a)
   "Return a lowercase string from either A, a string, keyword or symbol."
@@ -301,7 +301,8 @@ Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
 
 (define-hash-table-test 'str-or-keys
   (lambda (a b)
-    (string-equal (rpgdm-ironsworn-to-string a) (rpgdm-ironsworn-to-string b)))
+    (string-equal (rpgdm-ironsworn-to-string a)
+                  (rpgdm-ironsworn-to-string b)))
 
   (lambda (s) (sxhash-equal (rpgdm-ironsworn-to-string s))))
 
@@ -309,9 +310,9 @@ Health: %s  Spirit: %s  Supply: %s  Momentum: %d"
   "Return integer value associated with a character's STAT.
 If CHARACTER doesn't refer to a character hash, then this calls
 the `rpgdm-ironsworn-current-character-state' function."
-  (when (null character)
+  (unless character
     (setq character (rpgdm-ironsworn-current-character-state)))
-  (gethash stat character 1))
+  (gethash stat character 0))
 
 (defun rpgdm-ironsworn--read-stat (label)
   "A `read-string', but for the changeable value associated with LABEL.
@@ -339,7 +340,7 @@ the default for that stat."
 
 (defun rpgdm-ironsworn-adjust-stat (stat &optional default)
   "Increase or decrease the current character's STAT by ADJ.
-  If the STAT isn't found, returns DEFAULT."
+If the STAT isn't found, returns DEFAULT."
   (let* ((tuple (rpgdm-ironsworn--read-stat stat))
 	 (curr  (rpgdm-ironsworn-character-stat stat))
 	 (oper  (first tuple))
@@ -423,6 +424,85 @@ the default for that stat."
   (interactive)
   (rpgdm-ironsworn-progress-roll
    (rpgdm-ironsworn-character-stat :supply)))
+
+(defun rpgdm-ironsworn--asset-stat-key (name)
+  "Convert a string, NAME, into an `asset-str' symbol."
+  (thread-last name
+    (s-replace-regexp (rx space) "-")
+    (s-replace-regexp (rx (one-or-more (not (any "-" alphanumeric)))) "")
+    (downcase)
+    (format "asset-%s")
+    (make-symbol)))
+
+(defun rpgdm-ironsworn--asset-stat-name (stat)
+  "Convert an asset-related STAT symbol into a readable name."
+  (let ((no-asset (thread-first stat
+                    (symbol-name)
+                    (substring 6))))
+    (thread-last no-asset
+      (string-replace "-" " ")
+      (s-titleize))))
+
+(defun rpgdm-ironsworn-asset-stat-create (name value)
+  "Create a special stat associated with an asset.
+Note that this is created as an org property value at the
+top-most heading. The NAME is a short string for the name of the
+asset, and VALUE is the initial value, probably an integer
+value."
+  (interactive (list (read-string "Asset stat name: ")
+                     (read-string "Initial asset stat value: ")))
+  (unless (s-blank? name)
+    (let ((stat (rpgdm-ironsworn--asset-stat-key name)))
+      (rpgdm-ironsworn-store-default-character-state stat value))))
+
+(defun rpgdm-ironsworn--asset-stat-alist (&optional stats)
+  "Return alist of all defined asset-related STATS."
+  (unless stats
+    (setq stats (rpgdm-ironsworn-current-character-state)))
+  (let* ((keys  (thread-last stats
+                  (hash-table-keys)
+                  (--filter (string-prefix-p "asset-" (symbol-name it)))))
+         (names (-map 'rpgdm-ironsworn--asset-stat-name keys)))
+    (-zip names keys)))
+
+(defun rpgdm-ironsworn--asset-stat-choose ()
+  "Display all asset-related stats, allowing user to choose one.
+Return the symbol, `asset-xyz."
+  (let* ((choices (rpgdm-ironsworn--asset-stat-alist))
+         (choice  (completing-read "Choose Asset Stat: " choices)))
+    (alist-get choice choices 0 nil 'equal)))
+
+(defun rpgdm-ironsworn-asset-stat-adjust (stat)
+  "Adjust an asset-related STAT, after choosing that.
+Note that the stat must have already been defined."
+  (interactive (list (rpgdm-ironsworn--asset-stat-choose)))
+  (rpgdm-ironsworn-adjust-stat stat))
+
+(defun rpgdm-ironsworn-asset-stat-show (stat)
+  "Display an asset STAT after selecting it from those created."
+  (interactive (list (rpgdm-ironsworn--asset-stat-choose)))
+  (message "%d" (rpgdm-ironsworn-character-stat stat)))
+
+(defun rpgdm-ironsworn--asset-stat-show-all (&optional stats)
+  "Return string showing all asset-related STATS and their values.
+Note that if STATS is nil, the stats are acquired by calling
+`rpgdm-ironsworn-current-character-state'."
+  (unless stats
+    (setq stats (rpgdm-ironsworn-current-character-state)))
+
+  (cl-flet ((convert (stat) (cons (car stat)
+                                  (rpgdm-ironsworn-character-stat (cdr stat)))))
+    (thread-last stats
+      (rpgdm-ironsworn--asset-stat-alist)
+      (-map #'convert)
+      (--map (format "%s: %s" (car it) (cdr it)))
+      (s-join "  "))))
+
+(defun rpgdm-ironsworn-asset-stat-roll (stat modifier)
+  "Use an asset-related stat as a modifier for a standard roll."
+  (interactive (list (rpgdm-ironsworn--asset-stat-choose)
+                     (read-string "Other modifier: ")))
+  (rpgdm-ironsworn-roll-stat stat modifier))
 
 (defun rpgdm-ironsworn--move-tuple (file)
   "Return a list of a string representation of FILE, and FILE.
@@ -970,14 +1050,22 @@ You'll need to pick and choose what works and discard what doesn't."
   ("x" rpgdm-ironsworn-progress-delete "delete")
   ("r" rpgdm-ironsworn-progress-roll   "roll"))
 
+(defhydra hydra-rpgdm-assets (:color blue)
+  "Progress Tracks"
+  ("A" rpgdm-ironsworn-insert-character-asset "insert new asset")
+  ("a" rpgdm-ironsworn-asset-stat-adjust "adjust asset stat")
+  ("n" rpgdm-ironsworn-asset-stat-create "new asset stat")
+  ("s" rpgdm-ironsworn-asset-stat-show   "show")
+  ("r" rpgdm-ironsworn-asset-stat-roll "roll asset as modifier"))
+
 (defhydra hydra-rpgdm (:color blue :hint nil)
   "
     ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
  ------------------------------------------------------------------------------------------------------------------------------
-    _D_: Roll Dice  _p_: Progress      _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
-    _e_: Roll Edge  _h_: Roll Shadow   _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
-    _r_: Roll Heart _w_: Roll Wits     _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
-    _i_: Roll Iron  _m_: Make Move       _M_: Momentum   _d_: Delve Actions   _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
+    _D_: Roll Dice  _h_: Roll Shadow       _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
+    _e_: Roll Edge  _w_: Roll Wits         _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
+    _r_: Roll Heart _p_/_a_: Progress/Assets _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
+    _i_: Roll Iron  _m_: Make Move           _M_: Momentum   _d_: Delve Actions   _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
   ("D" rpgdm-ironsworn-roll)
   ("z" rpgdm-ironsworn-oracle)  ("Z" rpgdm-yes-and-50/50)
 
@@ -1000,6 +1088,7 @@ You'll need to pick and choose what works and discard what doesn't."
 
   ("d" hydra-rpgdm-delve/body)
   ("p" hydra-rpgdm-progress/body)
+  ("a" hydra-rpgdm-assets/body)
 
   ("o" ace-link)                 ("N" org-narrow-to-subtree)   ("W" widen)
   ("K" scroll-down :color pink)  ("J" scroll-up :color pink)
@@ -1025,6 +1114,16 @@ number, but doesn't have to be."
     (when (numberp value)
       (setq value (number-to-string value)))
     (org-set-property prop value)))
+
+(defun rpgdm-ironsworn-store-default-character-state (stat value)
+  "Store the VALUE of a character's STAT in the top-level org tree property.
+Note that STAT should be a symbol, like `supply' and VALUE should be a
+number, but doesn't have to be."
+  (save-excursion
+    (org-up-heading)
+    (while (> (org-heading-level) 1)
+      (org-up-heading))
+    (rpgdm-ironsworn-store-character-state stat value)))
 
 (defun rpgdm-ironsworn--property-p (prop)
   "Given a symbol PROP, return non-nil if it is an ironsworn keyword.
@@ -1054,6 +1153,12 @@ Return 0 if not at a heading, or above first headline."
       level-str
     0))
 
+(defun org-up-heading ()
+  "Move the point to next parent heading, unless already at the top-level."
+  (if (= 0 (org-heading-level))
+      (outline-up-heading 0)
+    (outline-up-heading 1)))
+
 (defun rpgdm-ironsworn--current-character-state (results)
   "Recursive helper to insert current header properties in RESULTS.
 Calls itself if it is not looking at the top level header in the
@@ -1065,20 +1170,21 @@ precendence over similar settings in higher headers."
 
   (defun value-convert (value)
     (if (string-match (rx bos (one-or-more digit) eos) value)
-	(string-to-number value)
+        (string-to-number value)
       value))
 
   (let ((props (org-element--get-node-properties)))
-    (loop for (k v) on props by (function cddr) do
-	  ;; If key is ironsworn property, but isn't in the table...
-	  (when (rpgdm-ironsworn--property-p k)
-	    (let ((key (key-convert k))
-		  (val (value-convert v)))
-	      (unless (gethash key results)
-		(puthash key val results)))))
+    (cl-loop for (k v) on props by (function cddr) do
+          ;; If key is ironsworn property, but isn't in the table...
+          (when (rpgdm-ironsworn--property-p k)
+            (let ((key (key-convert k))
+                  (val (value-convert v)))
+              (message "Found %s : %s" key val)
+              (unless (gethash key results)
+                (puthash key val results)))))
 
     (unless (= (org-heading-level) 1)
-      (org-up-element)
+      (org-up-heading)
       (rpgdm-ironsworn--current-character-state results))))
 
 (defun rpgdm-ironsworn-current-character-state ()
@@ -1088,14 +1194,15 @@ lower levels of the tree headings take precedence."
   (save-excursion
     (let ((results (make-hash-table :test 'str-or-keys)))
       (unless (org-at-heading-p)
-	(org-up-element))
+        (org-up-heading))
 
       ;; Put the lowest heading title in the results hashtable:
       (puthash 'title (thread-first
-			 (org-element-at-point)
-			 (second)
-			 (plist-get :raw-value))
-	       results)
+                         (org-element-at-point)
+                         (second)
+                         (plist-get :raw-value))
+               results)
+      (message "Hash: %s" results)
       (rpgdm-ironsworn--current-character-state results)
       results)))
 
@@ -1128,7 +1235,7 @@ and the current progress of the track."
 (defun rpgdm-ironsworn--mark-progress-track (str)
   "Given a progress track's name, STR, update its progress mark."
   (let ((props (org-element--get-node-properties)))
-    (loop for (k v) on props by (function cddr) do
+    (cl-loop for (k v) on props by (function cddr) do
           (when (rpgdm-ironsworn--progress-p k)
             (-let* (((label level progress) (rpgdm-ironsworn--progress-values v)))
               (when (equal str label)
@@ -1139,7 +1246,7 @@ and the current progress of the track."
 
   ;; Did not find a match at this level, let's pop up one and try again:
   (unless (= (org-heading-level) 1)
-    (org-up-element)
+    (org-up-heading)
     (rpgdm-ironsworn--mark-progress-track str)))
 
 (defun rpgdm-ironsworn-mark-progress-track (label)

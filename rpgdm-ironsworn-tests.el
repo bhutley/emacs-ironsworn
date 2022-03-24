@@ -67,6 +67,48 @@
   (cl-letf (((symbol-function 'read-string) (lambda (s) "go back")))
     (should (equal (rpgdm-ironsworn--read-stat 'momentum) '(:reset 0)))))
 
+(ert-deftest rpgdm-ironsworn--asset-stat-key-test ()
+  (should (symbolp (rpgdm-ironsworn--asset-stat-key "Foo bar")))
+  (should (string= 'asset-foo-bar (rpgdm-ironsworn--asset-stat-key "Foo bar")))
+  (should (string= 'asset-foos-bar (rpgdm-ironsworn--asset-stat-key "Foo's bar"))))
+
+(ert-deftest rpgdm-ironsworn--asset-stat-name-test ()
+  (should (string= "Foo Bar" (rpgdm-ironsworn--asset-stat-name 'asset-foo-bar))))
+
+(ert-deftest rpgdm-ironsworn--asset-stat-alist-test ()
+  (let* ((stats #s(hash-table size 65 test str-or-keys rehash-size 1.5 rehash-threshold 0.8125 data
+                              (title "Travels of Kannan"
+                                     edge 2 heart 1 iron 1 shadow 2 wits 3
+                                     health 5 spirit 5 supply 5 momentum 2
+                                     asset-mammoth-health 5
+                                     asset-invoke-level 3)))
+         (assets (rpgdm-ironsworn--asset-stat-alist stats)))
+    (should (= (length assets) 2))
+    (should (eq (alist-get "Mammoth Health" assets 0 nil 'equal) 'asset-mammoth-health))
+    (should (eq (alist-get "Invoke Level" assets 0 nil 'equal) 'asset-invoke-level))))
+
+(ert-deftest rpgdm-ironsworn--asset-stat-alist-test ()
+  ;; Using Lisp to `mock' the function to get an stat value:
+  (cl-letf (((symbol-function 'rpgdm-ironsworn-character-stat) (lambda (s) 3)))
+
+    (let* ((stats #s(hash-table size 65 test str-or-keys rehash-size 1.5
+                                rehash-threshold 0.8125 data
+                                (title "Travels of Kannan"
+                                       edge 2 heart 1 iron 1 shadow 2 wits 3
+                                       health 5 spirit 5 supply 5 momentum 2
+                                       asset-mammoth-health 3
+                                       asset-invoke-level 3))))
+      (should (string= "Mammoth Health: 3  Invoke Level: 3"
+                       (rpgdm-ironsworn--asset-stat-show-all stats))))
+
+    ;; Return an empty string if there are not asset-related stats:
+    (let* ((stats #s(hash-table size 65 test str-or-keys rehash-size 1.5
+                                rehash-threshold 0.8125 data
+                                (title "Travels of Kannan"
+                                       edge 2 heart 1 iron 1 shadow 2 wits 3
+                                       health 5 spirit 5 supply 5 momentum 2))))
+      (should (string= "" (rpgdm-ironsworn--asset-stat-show-all stats))))))
+
 (ert-deftest rpgdm-ironsworn--move-tuple-test ()
   (let ((file "moves/fate/ask-the-oracle.org")
         (full "~/other/over/here/moves/fate/ask-the-oracle.org"))

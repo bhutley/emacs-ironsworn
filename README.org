@@ -16,6 +16,7 @@ While my original goal for creating my [[https://gitlab.com/howardabrams/emacs-r
 However, the struggles for getting friends to play online proved as challenging as getting them around the table, so I started looking for [[https://www.dicebreaker.com/categories/roleplaying-game/how-to/how-to-play-tabletop-rpgs-by-yourself][solo rpg options]] and discovered [[https://www.ironswornrpg.com/][Ironsworn RPG]]. The bulk of the game is its /moves/ and its /oracles/ (random tables for /everything/). I easily copied sections of the [[https://docs.google.com/document/d/11ypqt6GfLuBhGDJuBGWKlHa-Ru48Tf3G_6zbrYKmXgY/edit#heading=h.xl9vk0d7wwn3][SRD]] into org files, [[file:tables][tables]].
 
 After listening to the author, [[https://twitter.com/ShawnTomkin][Shawn Tomkin]], play the game in his podcast, [[https://ironsworn.podbean.com/][Ask the Oracle]], he used [[https://roll20.net][Roll20]]. The [[https://wiki.roll20.net/Ironsworn][character sheet]] was brilliant, as each move was /described/ along with being able to roll on them. While I love physically rolling dice, perhaps mimicking the approach in org files in Emacs for [[https://www.ironswornrpg.com/products-ironsworn][solo play]] may be ideal.
+
 * Getting Started
 Neither this, nor the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm project]] are currently in MELPA, so if you wish to follow along at home, you'll need to clone both repos, and add them to your =load-path= variable with =add-to-list=:
 
@@ -179,8 +180,8 @@ To begin, we'll need the [[https://gitlab.com/howardabrams/emacs-rpgdm][rpgdm pr
 We also need the name of the directory for this project, so that we can load tables and other documentation.
 
 #+BEGIN_SRC emacs-lisp
-    (defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
-      "The root directory to the rpgdm-ironsworn project.")
+  (defvar rpgdm-ironsworn-project (file-name-directory load-file-name)
+    "The root directory to the rpgdm-ironsworn project.")
 #+END_SRC
 ** Dice Roller
 In *Ironsworn*, all dice rolls follow a pattern where you set the challenge level for a check by rolling /challenge dice/ (two d10s) and compare that against rolling an /action die/ (a single d6 ... adding all modifiers to that six-sided die).
@@ -330,12 +331,11 @@ We store the assets in a collection of org files in the [[file:assets/][assets]]
     "Given a FILENAME of an Ironsworn asset, return an Asset label."
     (cl-flet* ((convert (str) (s-replace "-" " " str))
                (uppity   (str) (s-titleize (convert str))))
-      (when (string-match (rx (one-or-more any)
-                              "/"
-                              (group (one-or-more (not "/")))    ; parent directory
-                              "/"
-                              (group (one-or-more (not "/")))    ; base filename
-                              ".org")
+      (when (string-match (rx (one-or-more any) "/"
+                              ;; parent directory
+                              (group (one-or-more (not "/"))) "/"
+                              ;; base filename
+                              (group (one-or-more (not "/"))) ".org")
                           filename)
         (format "%s :: %s"
                 (uppity  (match-string 1 filename))
@@ -434,7 +434,7 @@ The rules say to start off with three assets, so let's have a function that can 
   If NUMBER is nil, then return 3."
     (unless number
       (setq number 3))
-    (loop for x from 1 to number
+    (cl-loop for x from 1 to number
           collect (seq-random-elt asset-filenames)))
 #+END_SRC
 
@@ -557,12 +557,12 @@ Sure, you could open up the appropriate drawer to see a character's stats, but w
     "Colorized the STAT from a CHARACTER hash containing it.
   See `rpgdm-ironsworn-character-display'."
     (let* ((value (gethash stat character))
-	   (s-val (number-to-string value))
-	   (color (cond
-		   ((< value 1) "red")
-		   ((< value 3) "orange")
-		   ((< value 4) "yellow")
-		   (t "green"))))
+           (s-val (number-to-string value))
+           (color (cond
+                   ((< value 1) "red")
+                   ((< value 3) "orange")
+                   ((< value 4) "yellow")
+                   (t "green"))))
       (propertize s-val 'face `(:foreground ,color))))
 
   (defun rpgdm-ironsworn-character-display ()
@@ -597,7 +597,8 @@ We need an /internal representation/ of a character using a hash table of the at
 
   (define-hash-table-test 'str-or-keys
     (lambda (a b)
-      (string-equal (rpgdm-ironsworn-to-string a) (rpgdm-ironsworn-to-string b)))
+      (string-equal (rpgdm-ironsworn-to-string a)
+                    (rpgdm-ironsworn-to-string b)))
 
     (lambda (s) (sxhash-equal (rpgdm-ironsworn-to-string s))))
 #+END_SRC
@@ -610,9 +611,9 @@ And a help function to retrieve the stats of the character is just a wrapper aro
     "Return integer value associated with a character's STAT.
   If CHARACTER doesn't refer to a character hash, then this calls
   the `rpgdm-ironsworn-current-character-state' function."
-    (when (null character)
+    (unless character
       (setq character (rpgdm-ironsworn-current-character-state)))
-    (gethash stat character 1))
+    (gethash stat character 0))
 #+END_SRC
 
 Just to prove it to ourselves, all of the following expressions return the same number (however, only run this in an org file that has a character properly formatted in it):
@@ -709,7 +710,7 @@ The =rpgdm-ironsworn-adjust-stat= function takes one of the four stats, like =�
 #+BEGIN_SRC emacs-lisp :results silent
   (defun rpgdm-ironsworn-adjust-stat (stat &optional default)
     "Increase or decrease the current character's STAT by ADJ.
-    If the STAT isn't found, returns DEFAULT."
+  If the STAT isn't found, returns DEFAULT."
     (let* ((tuple (rpgdm-ironsworn--read-stat stat))
 	   (curr  (rpgdm-ironsworn-character-stat stat))
 	   (oper  (first tuple))
@@ -747,7 +748,7 @@ A few sugar functions for adding to our interface for each of the four stats:
     (rpgdm-ironsworn-adjust-stat 'momentum 2))
 #+END_SRC
 ** Roll against Character Stats
-Which allows us to create character stat-specific rolling functions:
+The previous functions allows us to create character stat-specific rolling functions:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-roll-stat (stat modifier)
@@ -1745,7 +1746,7 @@ Why do we need it? Well, when we will want this when we /re-set/ the property.
 As I've mentioned before, the code needs to walk "up" an Org Tree looking for properties. The crux is using the /internal/ [[help:org-element--get-node-properties][org-element--get-node-properties]] function, which returns a [[info:elisp#Property Lists][property list]] /iff/ the point is on a header.
 
 So the general idea is:
-  - Move to the previous header, e.g. [[help:org-up-element][org-up-element]]
+  - Move to the previous header
   - Collect the properties
   - Move up to that header's parent
   - Collect its properties, etc.
@@ -1754,12 +1755,22 @@ So the general idea is:
 Since we need to know if we are at the top-level, we could have a function, =org-heading-level= that returns =1= if we are at the top-level, and =0= if we aren't at any level:
 
 #+BEGIN_SRC emacs-lisp
-    (defun org-heading-level ()
-      "Return heading level of the element at the point.
-    Return 0 if not at a heading, or above first headline."
-      (if-let ((level-str (org-element-property :level (org-element-at-point))))
-	  level-str
-	0))
+  (defun org-heading-level ()
+    "Return heading level of the element at the point.
+  Return 0 if not at a heading, or above first headline."
+    (if-let ((level-str (org-element-property :level (org-element-at-point))))
+        level-str
+      0))
+#+END_SRC
+
+Since [[help:org-up-element][org-up-element]]’s behavior has changed, and [[help:outline-up-heading][outline-up-heading]] doesn’t go to the next heading if it is already on a heading, we need to make a little helper:
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-up-heading ()
+    "Move the point to next parent heading, unless already at the top-level."
+    (if (= 0 (org-heading-level))
+        (outline-up-heading 0)
+      (outline-up-heading 1)))
 #+END_SRC
 
 Enough chit-chat, let's write this function. While we are at it, let's convert the property symbols into short symbols, e.g. =:IRONSWORN-SHADOW= should just be =shadow=, and number values should be numeric:
@@ -1776,21 +1787,22 @@ Enough chit-chat, let's write this function. While we are at it, let's convert t
 
     (defun value-convert (value)
       (if (string-match (rx bos (one-or-more digit) eos) value)
-	  (string-to-number value)
-	value))
+          (string-to-number value)
+        value))
 
     (let ((props (org-element--get-node-properties)))
-      (loop for (k v) on props by (function cddr) do
-	    ;; If key is ironsworn property, but isn't in the table...
-	    (when (rpgdm-ironsworn--property-p k)
-	      (let ((key (key-convert k))
-		    (val (value-convert v)))
-		(unless (gethash key results)
-		  (puthash key val results)))))
+      (cl-loop for (k v) on props by (function cddr) do
+            ;; If key is ironsworn property, but isn't in the table...
+            (when (rpgdm-ironsworn--property-p k)
+              (let ((key (key-convert k))
+                    (val (value-convert v)))
+                (message "Found %s : %s" key val)
+                (unless (gethash key results)
+                  (puthash key val results)))))
 
       (unless (= (org-heading-level) 1)
-	(org-up-element)
-	(rpgdm-ironsworn--current-character-state results))))
+        (org-up-heading)
+        (rpgdm-ironsworn--current-character-state results))))
 
   (defun rpgdm-ironsworn-current-character-state ()
     "Return all set properties based on cursor position in org doc.
@@ -1799,16 +1811,17 @@ Enough chit-chat, let's write this function. While we are at it, let's convert t
     (save-excursion
       (let ((results (make-hash-table :test 'str-or-keys)))
         (unless (org-at-heading-p)
-	  (org-up-element))
+          (org-up-heading))
 
         ;; Put the lowest heading title in the results hashtable:
-	(puthash 'title (thread-first
-			   (org-element-at-point)
-			   (second)
-			   (plist-get :raw-value))
-		 results)
-	(rpgdm-ironsworn--current-character-state results)
-	results)))
+        (puthash 'title (thread-first
+                           (org-element-at-point)
+                           (second)
+                           (plist-get :raw-value))
+                 results)
+        (message "Hash: %s" results)
+        (rpgdm-ironsworn--current-character-state results)
+        results)))
 #+END_SRC
 ***  Reading Progress Tracks from Org Files
 A progress track looks like this:
@@ -1860,13 +1873,13 @@ The function works fine for [[help:completing-read][completing-read]], as it acc
 
 Unlike the =rpgdm-ironsworn-store-character-state= function, we want up update the /location/ in the org file where a progress track is defined and stored.
 
-I like the recursive notion of walking higher in the org file using [[help:org-up-element][org-up-element]], however, having a function use both Common Lisp's [[help:cl-loop][loop]] as well as the Clojure-inspired [[help:-let*][-let*]] really shows the fusion that Emacs has become:
+I like the recursive notion of walking higher in the org file using [[help:outline-up-heading][org-up-heading]], however, having a function use both Common Lisp's [[help:cl-loop][loop]] as well as the Clojure-inspired [[help:-let*][-let*]] really shows the fusion that Emacs has become:
 
 #+BEGIN_SRC emacs-lisp
    (defun rpgdm-ironsworn--mark-progress-track (str)
      "Given a progress track's name, STR, update its progress mark."
      (let ((props (org-element--get-node-properties)))
-       (loop for (k v) on props by (function cddr) do
+       (cl-loop for (k v) on props by (function cddr) do
              (when (rpgdm-ironsworn--progress-p k)
                (-let* (((label level progress) (rpgdm-ironsworn--progress-values v)))
                  (when (equal str label)
@@ -1877,7 +1890,7 @@ I like the recursive notion of walking higher in the org file using [[help:org-u
 
      ;; Did not find a match at this level, let's pop up one and try again:
      (unless (= (org-heading-level) 1)
-       (org-up-element)
+       (org-up-heading)
        (rpgdm-ironsworn--mark-progress-track str)))
 #+END_SRC
 
