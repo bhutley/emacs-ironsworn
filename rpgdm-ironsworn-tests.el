@@ -15,6 +15,10 @@
 
 (ert-deftest rpgdm-ironsworn--good-character-assets-test ()
   (should (rpgdm-ironsworn--good-character-assets     '("foo" "bar" "baz")))
+  (should (rpgdm-ironsworn--good-character-assets     '(("Companions :: Dog" . "assets/companions/dog.org")
+                                                        ("Paths :: Good Guy" . "assets/paths/good-guy.org")
+                                                        ("Ritual :: Booboo" . "assets/ritual/booboo.org"))))
+  (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "paths/shadow-kin.org")))
   (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "foo")))
   (should-not (rpgdm-ironsworn--good-character-assets '("assets/companions/dog.org"
                                                         "assets/paths/good-guy.org"

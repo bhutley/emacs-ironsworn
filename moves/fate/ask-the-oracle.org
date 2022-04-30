@@ -4,7 +4,7 @@ When you seek to resolve questions, discover details in the world, determine how
 
   - Draw a conclusion :: Decide the answer based on the most interesting and obvious result.
   - Ask a yes/no question :: Decide the odds of a ‘yes’, and roll on the table below to check the answer.
-  - Pick two :: Envision two options. Rate one as ‘likely’, and [[elisp:(rpgdm-ironsworn-oracle)][roll on the table]] below to see if it is true. If not, it is the other.
+  - Pick two :: Envision two options. Rate one as ‘likely’, and [[elisp:rpgdm-ironsworn-oracle][roll on the table]] below to see if it is true. If not, it is the other.
   - Spark an idea :: Brainstorm or use a random prompt.
 
 | Odds           | The answer is ‘yes’ if you roll... |
@@ -68,6 +68,3 @@ When you’re unsure what a match might mean, you can roll on another oracle tab
 In guided play, your GM is the oracle. You won’t make this move unless you are talking things out and need a random result or a bit of inspiration. Your GM can use this move (or ask you to make it) to help guide the story.
 
 #+STARTUP: showall
-# Local Variables:
-# eval: (flycheck-mode -1)
-# End:

@@ -58,6 +58,13 @@ What I do, is add the following "code" somewhere in my Ironsworn-specific org fi
 # End:
 #+END_SRC
 
+Finally, many of the displayed org files contain embedded hyperlinks that actually call functions (defined below). I find it helpful to ignore the constant prompts for selecting this links by setting the [[help:org-link-elisp-skip-confirm-regexp][org-link-elisp-skip-confirm-regexp]] variable, as in:
+#+BEGIN_SRC emacs-lisp :tangle no
+  (setq org-link-elisp-skip-confirm-regexp (rx string-start (optional "(") "rpgdm-"
+                                               (or "tables-" "ironsworn-")
+                                               (one-or-more any)))
+#+END_SRC
+
 Finally, define your character. While I describe the details later, first, load an org-mode file and hit ~M-x~ to type: =rpgdm-ironsworn-new-character= and answer the questions. This will create the necessary formatting and you are ready to play with either your key-binding (or ~F6~) to bring up the Hydra of commands:
 
 #+ATTR_HTML: :width 1100px
@@ -96,6 +103,72 @@ While the interface may change (and I may not update that screenshot too often),
   - And ~q~ (or ~F6~) dismisses the UI.
 
 This may be sufficient, but the rest of this document goes into details about how to use this, as well as the code to make it.
+** File Organization
+I really didn’t want to dictate how Ironsworn notes should be organized, but I wanted the /progress tracks/ to be relevant. Sure, one can mark progress on one or more tracks, but I didn’t want see tracks that were old. I toyed with the idea of deleting, or just closing, old tracks, but I realized that progress tracks are really just arcs in the stories plot. Some of long, like a character /inciting vow/ and others are short, like a battle with a Cave Lion, but they are all nested in a hierarchical tree.
+
+Let me explain with an illustration:
+        #+BEGIN_SRC dot :file images/progress-tracks-tree.png :exports file :results file
+          digraph G {
+                bgcolor="transparent";
+                node [fillcolor="white" style="filled" fontname="Arial"];
+
+                Background [label="Background / Theme"]
+                Arc1 [label="Story Arc"]
+                Arc2 [label="Story Arc"]
+                Arc3 [label="Story Arc"]
+                Scene1 [label="Scene"]
+                Scene2 [label="Montage"]
+                Scene3 [label="Montage"]
+                Scene4 [label="Scene"]
+                Scene5 [label="Scene"]
+                Scene6 [label="Montage"]
+                Event1 [label="Event"]
+                Event2 [label="Challenge"]
+                Event3 [label="Event"]
+                Event4 [label="Challenge"]
+                Event5 [label="Event"]
+                Event6 [label="Challenge"]
+                Event7 [label="Event"]
+                Event8 [label="Challenge"]
+                Event9 [label="Event"]
+                Event10 [label="Challenge"]
+                Event11 [label="Event"]
+                Event12 [label="Challenge"]
+
+                Background -> Arc1;
+                Background -> Arc2;
+                Background -> Arc3;
+
+                Arc1 -> Scene1;
+                Arc1 -> Scene2;
+                Arc2 -> Scene3;
+                Arc2 -> Scene4;
+                Arc3 -> Scene5;
+                Arc3 -> Scene6;
+
+                Scene1 -> Event1;
+                Scene1 -> Event2;
+                Scene2 -> Event3;
+                Scene3 -> Event4;
+                Scene3 -> Event5;
+                Scene3 -> Event6;
+                Scene4 -> Event7;
+                Scene5 -> Event8;
+                Scene5 -> Event9;
+                Scene6 -> Event10;
+                Scene6 -> Event11;
+                Scene6 -> Event12;
+              }
+          #+END_SRC
+[[file:images/progress-tracks-tree.png]]
+
+A character or party has a theme or premise that drives the entire story, like Destroying the One Ring of Power or, teenagers solving mysteries with a talking dog. In Ironsworn, this is referred to as an /Epic Vow/. This epic story is broken into long-running arcs or character goals … perhaps they could be packaged into three books to make a Trilogy, or even seven books for each year in a school. These are the [[file:moves/quest/swear-an-iron-vow.org][various vows]], like the initial /Inciting Vow/.
+
+These, in turn, are further divided into scenes like Journeying to Bree, Escaping Moria, or even each Saturday morning episode. In Ironsworn, these are moves like [[file:moves/adventure/undertake-a-journey.org][Undertake a Journey]] or [[file:moves/delve/delve-the-depths.org][Delve the Depths]]. And these segments can be punctuated by conflict and combat. These tracks are not concern with the length of a progress, as a battle with an Elder Beast will conclude before arriving at Grandma’s House, even those the Elder Beast was /formidable/ and the journey was merely /troublesome/.
+
+Notice that this structure works well with the outline of a typical document, and by choosing this structure and tying a progress track to a header, completed tracks would disappear on their own, and I didn’t have to manage old tracks. As you call the progress functions, these prompt with a question:
+[[file:images/progress-placement-prompt.png]]
+
 ** Character Sheets
 A character sheet, for this project, is just an org mode file where you take notes, and =:PROPERTIES:= drawers contain the current stats for your character. While most of it is /whatever you like it to be/ ... you need to keep a few things in mind.
 
@@ -207,7 +280,7 @@ Oh, and if the same number shows on both d10s, you should introduce a significan
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--results (action modifier one-challenge two-challenge
-				   &optional momentum)
+                                   &optional momentum)
     "Return formatted string for an Ironsworn dice roll results.
   The ACTION is the d6 which is added to the MODIFIER (which can
   have character attribute values as well as any bonuses.  The sum
@@ -219,45 +292,45 @@ Oh, and if the same number shows on both d10s, you should introduce a significan
       (setq momentum 0))
 
     (cl-flet ((strong-p (value dice1 dice2) (and (> value dice1) (> value dice2)))
-	      (weak-p   (value dice1 dice2)  (or (> value dice1) (> value dice2)))
-	      (miss-p   (value dice1 dice2) (and (<= value dice1) (<= value dice2)))
-	      (faded    (str) (propertize str 'face '(:foreground "#888")))
-	      (noted    (str) (propertize str 'face '(:foreground "light blue")))
-	      (strong   (str) (propertize str 'face '(:foreground "green")))
-	      (weak     (str) (propertize str 'face '(:foreground "yellow")))
-	      (interest (str) (propertize str 'face '(:foreground "orange")))
-	      (miss     (str) (propertize str 'face '(:foreground "red"))))
+              (weak-p   (value dice1 dice2)  (or (> value dice1) (> value dice2)))
+              (miss-p   (value dice1 dice2) (and (<= value dice1) (<= value dice2)))
+              (faded    (str) (propertize str 'face '(:foreground "#888")))
+              (noted    (str) (propertize str 'face '(:foreground "light blue")))
+              (strong   (str) (propertize str 'face '(:foreground "green")))
+              (weak     (str) (propertize str 'face '(:foreground "yellow")))
+              (interest (str) (propertize str 'face '(:foreground "orange")))
+              (miss     (str) (propertize str 'face '(:foreground "red"))))
 
       (let* ((action-results (+ action modifier))
-	     (str-results (cond
-			   ((strong-p action-results one-challenge two-challenge)
-			    (strong "Strong hit"))
-			   ((weak-p action-results one-challenge two-challenge)
-			    (weak "Weak hit"))
-			   (t (miss "Miss"))))
-	     (burn-msg     (if (> momentum action-results)
-			       (cond
-				((and (strong-p momentum one-challenge two-challenge)
-				      (not (strong-p action-results one-challenge two-challenge)))
-				 (concat " -- Burn momentum for a " (strong "Strong hit")))
-				((and (weak-p momentum one-challenge two-challenge)
-				      (miss-p action-results one-challenge two-challenge))
-				 (concat " -- Burn momentum for a " (weak "Weak hit")))
-				(t ""))
-			     ""))
-	     (matched-msg  (if (= one-challenge two-challenge)
-			       (concat " ← " (interest "Create a Twist"))
-			     "")))
+             (str-results (cond
+                           ((strong-p action-results one-challenge two-challenge)
+                            (strong "Strong hit"))
+                           ((weak-p action-results one-challenge two-challenge)
+                            (weak "Weak hit"))
+                           (t (miss "Miss"))))
+             (burn-msg     (if (> momentum action-results)
+                               (cond
+                                ((and (strong-p momentum one-challenge two-challenge)
+                                      (not (strong-p action-results one-challenge two-challenge)))
+                                 (concat " -- Burn momentum for a " (strong "Strong hit")))
+                                ((and (weak-p momentum one-challenge two-challenge)
+                                      (miss-p action-results one-challenge two-challenge))
+                                 (concat " -- Burn momentum for a " (weak "Weak hit")))
+                                (t ""))
+                             ""))
+             (matched-msg  (if (= one-challenge two-challenge)
+                               (concat " ← " (interest "Create a Twist"))
+                             "")))
 
-	(format "%s %s %d %s%d %s %d%s %s %d %s %d%s%s"
-		str-results         (faded "::")
-		(+ action modifier) (faded "(")
-		action              (faded "+")
-		modifier            (faded ")")
-		(noted "→")
-		one-challenge       (faded "/")
-		two-challenge
-		matched-msg burn-msg))))
+        (format "%s %s %d %s%d %s %d%s %s %d %s %d%s%s"
+                str-results         (faded "::")
+                (+ action modifier) (faded "(")
+                action              (faded "+")
+                modifier            (faded ")")
+                (noted "→")
+                one-challenge       (faded "/")
+                two-challenge
+                matched-msg burn-msg))))
 #+END_SRC
 
 So the following messages, given various /rolls/ should cover those possibilities with text properties:
@@ -325,7 +398,7 @@ We assume you have created an org-file, and the /template/ will just append some
   ")))
 #+END_SRC
 **** Character Assets
-We store the assets in a collection of org files in the [[file:assets/][assets]] directory. We'd like the user to choose an asset, so we convert a filename into something nicer to read based on extracting the /description/ from the /filename/, for instance, =:
+We store the assets in a collection of org files in the [[file:assets/][assets]] directory. We'd like the user to choose an asset, so we convert a filename into something nicer to read based on extracting the /description/ from the /filename/, for instance:
 
 #+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn--character-asset-label (filename)
@@ -410,19 +483,30 @@ Hrm. Perhaps we just want to /look/ at an asset before inserting it, similar to 
 When you start a character, you choose three assets, but what if we choose them randomly from our asset list? Could be fun, however, I don't want duplicates, or two companions, or ... well, I may come up with more rules, but I codify those rules into a function that returns a list, if it is good, or =nil= otherwise:
 
 #+BEGIN_SRC emacs-lisp
-  (defun rpgdm-ironsworn--good-character-assets (asset-files)
+  (defun rpgdm-ironsworn--good-character-assets (assets)
     "Return ASSET-FILES if all given are _good enough_.
-  That is, all are unique, only one companion, etc."
-    (cl-flet ((companion-p (entry)
-                           (when (consp entry)
-                             (setq entry (cdr entry)))
-                           (string-match (rx "companions") entry)))
-      (when (and
-             (equal asset-files (seq-uniq asset-files))
-             (<= (seq-length
-                  (seq-filter #'companion-p asset-files))
-                 1))
-        asset-files)))
+    That is, all are unique, only one companion, etc."
+    (cl-flet ((only-files (entry) (if (consp entry) (cdr entry) entry))
+              (is-companion? (file) (string-match (rx "companions") file))
+              (not-at-first? (file) (when (or (s-ends-with? "revenant.org" file)
+                                              (s-ends-with? "weaponmaster.org" file)
+                                              (s-ends-with? "masked.org" file)
+                                              (s-ends-with? "battle-scarred.org" file)
+                                              (s-ends-with? "ritualist.org" file)
+                                              (s-ends-with? "shadow-kin.org" file)
+                                              (s-ends-with? "oathbreaker.org" file))
+                                      t)))
+      (let* ((asset-files (-map #'only-files assets))
+             (num-of-companions (seq-count #'is-companion? asset-files)))
+        (when (and
+               ;; Are all the assets in the list unique?
+               (equal asset-files (seq-uniq asset-files))
+               ;; Does the list only include first-time-only?
+               (-none? #'not-at-first? asset-files)
+               ;; Does the list include, at most, one companion?
+               (<= num-of-companions 1))
+          assets))))
+
 #+END_SRC
 
 And I can write a little unit test to verify my test cases:
@@ -430,6 +514,10 @@ And I can write a little unit test to verify my test cases:
 #+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn--good-character-assets-test ()
     (should (rpgdm-ironsworn--good-character-assets     '("foo" "bar" "baz")))
+    (should (rpgdm-ironsworn--good-character-assets     '(("Companions :: Dog" . "assets/companions/dog.org")
+                                                          ("Paths :: Good Guy" . "assets/paths/good-guy.org")
+                                                          ("Ritual :: Booboo" . "assets/ritual/booboo.org"))))
+    (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "paths/shadow-kin.org")))
     (should-not (rpgdm-ironsworn--good-character-assets '("foo" "bar" "foo")))
     (should-not (rpgdm-ironsworn--good-character-assets '("assets/companions/dog.org"
                                                           "assets/paths/good-guy.org"
@@ -736,7 +824,7 @@ Best if we wrote some unit tests to both explain and verify this function. This 
 
 The =rpgdm-ironsworn-adjust-stat= function takes one of the four stats, like =’health= or =’momentum=, as well as its =default= or /starting/ value, collects the /current value/ (the =curr= variable), and then creates a new value based on the /operator/ determined by the input from =rpgdm-ironsworn--read-stat=. It sets the new stat by calling =rpgdm-ironsworn-store-character-state= defined below.
 
-#+BEGIN_SRC emacs-lisp :results silent
+#+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-adjust-stat (stat &optional default)
     "Increase or decrease the current character's STAT by ADJ.
   If the STAT isn't found, returns DEFAULT."
@@ -791,7 +879,7 @@ The previous functions allows us to create character stat-specific rolling funct
 #+END_SRC
 
 And we could have a function for each:
-#+BEGIN_SRC emacs-lisp :results silent
+#+BEGIN_SRC emacs-lisp
   (defun rpgdm-ironsworn-roll-edge (modifier)
     "Roll an action based on a loaded character's Edge stat with a MODIFIER."
     (interactive (list (read-string "Edge + Modifier: ")))
