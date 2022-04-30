@@ -1,14 +1,6 @@
 ** Undertake a Journey
 
-When you travel across hazardous or unfamiliar lands, first set the rank of your journey.
-
-  - Troublesome journey :: 3 progress per waypoint.
-  - Dangerous journey :: 2 progress per waypoint.
-  - Formidable journey :: 1 progress per waypoint.
-  - Extreme journey :: 2 ticks per waypoint.
-  - Epic journey :: 1 tick per waypoint.
-
-Then, for each segment of your journey, roll +wits. If you are setting off from a community with which you share a bond, add +1 to your initial roll.
+For each segment of your journey, roll +wits. If you are just setting off from a community with which you share a bond (see the [[file:begin-a-journey.org][Begin a Journey]] move), add +1 to your initial roll.
 
 On a *strong hit*, you reach a waypoint. If the waypoint is unknown to you, envision it or roll the [[elisp:(rpgdm-tables-choose "locations")][locations]] or [[elisp:(rpgdm-tables-choose "location-descriptors")][descriptors]] tables (or [[elisp:(kill-new (format "- %s %s" (rpgdm-tables-choose "location-descriptors") (rpgdm-tables-choose "locations")))][both]]), or even the site-specific [[elisp:(rpgdm-tables-choose "site-name-detail")][detail]] or [[elisp:(rpgdm-tables-choose "site-name-description")][description]]s, to help describe the waypoint. Then, choose one:
 

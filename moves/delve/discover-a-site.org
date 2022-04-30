@@ -14,6 +14,7 @@ Then, [[file:delve-the-depths.org][Delve the Depths]] to explore this place.
 
 *** Details
 :PROPERTIES:
+:move-stats: track
 :VISIBILITY: folded
 :END:
 

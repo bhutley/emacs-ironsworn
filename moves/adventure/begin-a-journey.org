@@ -1,0 +1,31 @@
+** Begin a Journey
+
+When you travel across hazardous or unfamiliar lands, first set the rank of your journey.
+
+  - Troublesome journey :: 3 progress per waypoint.
+  - Dangerous journey :: 2 progress per waypoint.
+  - Formidable journey :: 1 progress per waypoint.
+  - Extreme journey :: 2 ticks per waypoint.
+  - Epic journey :: 1 tick per waypoint.
+
+Then, for each segment of your journey, make the [[file:undertake-a-journey.org][Undertake a Journey]] move.
+
+*** Details
+:PROPERTIES:
+:move-stats: track
+:VISIBILITY: folded
+:END:
+
+This is Ironsworn’s travel move. When you set off toward a destination, make this move.
+
+First, give your journey a rank. Decide how far—and how hazardous—it is based on the established fiction. If you’re unsure, [[file:../fate/ask-the-oracle.org][Ask the Oracle]]. Most of your journeys should be troublesome or dangerous. Formidable or extreme journeys might require weeks within your narrative, with appropriate stops, side quests, and adventures along the way. An epic journey is one of months, or even years. It is the journey of a lifetime.
+
+If the journey is mundane—a relatively short distance through safe territory, —don’t make this move. Just narrate the trip and jump to what happens or what you do when you arrive.
+**** Along for the Ride?
+If you are part of a caravan or party of NPCs, and aren’t an active participant in the planning or execution of the journey, you won’t make this move or track progress. The journey will be resolved in the fiction. You can [[file:../fate/ask-the-oracle.org][Ask the Oracle]] to determine what happens en route or when you arrive.
+**** Allies and Journeys
+If you are traveling with allies, one of you makes the *Undertake a Journey* roll for each segment, and you share a progress track. The responsibility for leading the journey can switch from segment to segment as you like.
+
+Your fellow travelers can assist by making the [[file:../relationship/aid-your-ally.org][Aid Your Ally]] move. Perhaps they are scouting ahead or sustaining you with a lively song. They can also Resupply to represent foraging or hunting for supplies en route. Everyone should offer narrative color for what they do and see on the journey, even if they are not making moves.
+
+Only the character making the move takes the momentum bonus on a *strong hit*. But, because your supply track is shared, each of you mark -1 supply when the acting character makes that choice on a *strong hit* or when they suffer a *weak hit*.

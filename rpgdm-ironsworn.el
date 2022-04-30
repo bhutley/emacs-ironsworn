@@ -10,8 +10,8 @@
 ;;
 ;;; Commentary:
 ;;
-;;    This file is conspicuously absent from commentary or even
-;;    comments.  This is because this file is created from tangling
+;;    This file is conspicuously absent of commentary or even
+;;    comments.  This is because we create this file by tangling
 ;;    the README.org file in this directory.
 ;;
 ;;; Code:
@@ -96,16 +96,16 @@ a random name is generated for the purposes of the template."
     (setq name (rpgdm-tables-choose "name/ironlander")))
 
   (let ((frmt (seq-random-elt '("* The Adventures of %s"
-				"* The Journeys of %s"
-				"* %s, an Epic Saga"
-				"* The Epic of %s"
-				"* Travels of %s"))))
+                                "* The Journeys of %s"
+                                "* %s, an Epic Saga"
+                                "* The Epic of %s"
+                                "* Travels of %s"))))
     (goto-char (point-max))
-    (insert "# Local Variables:
-# eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode))
-# End:
-")
-    (insert (format frmt name))))
+    ;; (insert "# Local Variables: # eval: (progn (require 'rpgdm-ironsworn) (rpgdm-mode)) # End: ")
+    (insert (format frmt name))
+    (insert "
+
+")))
 
 (defun rpgdm-ironsworn--character-asset-label (filename)
   "Given a FILENAME of an Ironsworn asset, return an Asset label."
@@ -142,7 +142,7 @@ the `assets' directory, otherwise, we return a cached version."
 
 (defun rpgdm-ironsworn--pick-character-asset ()
   "Completing read for an Ironsworn asset."
-  (let ((choice (completing-read "Which asset? " (rpgdm-ironsworn-character-assets))))
+  (let ((choice (completing-read "Which asset: " (rpgdm-ironsworn-character-assets))))
     (thread-first choice
       (assoc rpgdm-ironsworn-character-assets 'equal)
       (cdr))))
@@ -150,6 +150,7 @@ the `assets' directory, otherwise, we return a cached version."
 (defun rpgdm-ironsworn-insert-character-asset (asset)
   "Choose and insert the contents of an ASSET in the current buffer."
   (interactive (list (rpgdm-ironsworn--pick-character-asset)))
+  (when rpgdm-ironsworn-new-character (goto-char (point-max)))
   (let ((file (if (consp asset) (cdr asset) asset)))
     (insert-file-contents file nil)
 
@@ -221,17 +222,16 @@ Note: The stats are added as properties using the
     (rpgdm-ironsworn-store-character-state stat 5))
   (rpgdm-ironsworn-store-character-state 'momentum 2)
 
-  (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow? ") 1)
+  (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow: ") 1)
   (rpgdm-ironsworn-progress-create "Bonds" 1)
   (rpgdm-ironsworn-progress-mark "Bonds")
-  (search-forward ":END:")
-  (end-of-line)
   (insert "\n** Bonds\n")
   (insert (format "  - Your home settlement of %s\n" (rpgdm-tables-choose "settlement/name"))))
 
 (defun rpgdm-ironsworn--new-character-stats-first (&optional name)
   "Insert a new character template for character, NAME.
 The character stats are first queried, and then assets inserted."
+  (goto-char (point-max))
   (rpgdm-ironsworn--new-character-stats)
   (rpgdm-ironsworn--new-character-assets))
 
@@ -240,9 +240,10 @@ The character stats are first queried, and then assets inserted."
 The assets are inserted first, and then character stats are queried."
   ;; Saving and restoring point, means the properties should be in the
   ;; correct, top-level position.
-  (save-excursion
-    (rpgdm-ironsworn--new-character-assets))
-  (rpgdm-ironsworn--new-character-stats))
+  (let ((p (point)))
+    (rpgdm-ironsworn--new-character-assets)
+    (goto-char p)
+    (rpgdm-ironsworn--new-character-stats)))
 
 (defun rpgdm-ironsworn-new-character (name order)
   "Interactively query the user for a new character's attribute.
@@ -254,11 +255,15 @@ which should be using the `org-mode' major mode."
                 (read-string "What is the new character's name? ")
                 (completing-read "What order should we build this? " '("Statistics first" "Assets first"))))
 
+  (setq rpgdm-ironsworn-new-character t)
   (rpgdm-ironsworn--new-character-template name)
   (if (equal order "Assets first")
       (rpgdm-ironsworn--new-character-assets-first)
     (rpgdm-ironsworn--new-character-stats-first))
+  (setq rpgdm-ironsworn-new-character nil)
   (message "Alright, the template is complete. Edit away!" name))
+
+(defvar rpgdm-ironsworn-new-character nil "Are we in the process of creating a new character?")
 
 (defun rpgdm-ironsworn--display-stat (stat character)
   "Colorized the STAT from a CHARACTER hash containing it.
@@ -350,7 +355,7 @@ If the STAT isn't found, returns DEFAULT."
 		  (:decrease (- curr numb))
 		  (:absolute numb)
 		  (t         default))))
-    (message "Combining curr %d with %d with %s operator" curr numb oper)
+    ;; (message "Combining curr %d with %d with %s operator" curr numb oper)
     (rpgdm-ironsworn-store-character-state stat new)))
 
 (defun rpgdm-ironsworn-adjust-health ()
@@ -574,19 +579,29 @@ on the properties in the file."
     (rpgdm-ironsworn--store-move title (rpgdm-ironsworn--make-move props))))
 
 (defun rpgdm-ironsworn--make-move (move-props)
-  "Query user for rolls based on the MOVE-PROPS."
- (let* ((props (s-split " " (or move-props "")))
-        (count (seq-length props))
-        (stats (seq-filter (lambda (s) (string-match (rx (one-or-more alpha)) s)) props))
-        (first (first props)))
-   (cond
-    ((seq-empty-p stats)       nil)
-    ((equal first "progress")  (call-interactively 'rpgdm-ironsworn-progress-roll))
-    ((= count 1)               (rpgdm-ironsworn-roll-with first))
-    ((equal first ">")         (rpgdm-ironsworn-roll-best stats))
-    (t                         (rpgdm-ironsworn-roll-stat
-                                (completing-read "Stat Choice: " stats)
-                                (read-string "Modifier: "))))))
+  "Query user for rolls based on one or series of MOVE-PROPS."
+  (if (string-match (rx (group (1+ alpha)) "|" (group (1+ any))) move-props)
+      (let ((first (match-string 1 move-props))
+            (rest  (match-string 2 move-props)))
+        (rpgdm-ironsworn--make-single-move first)
+        (rpgdm-ironsworn--make-move        rest))
+    (rpgdm-ironsworn--make-single-move move-props)))
+
+(defun rpgdm-ironsworn--make-single-move (move-props)
+  "Query user for rolls based on one MOVE-PROPS."
+  (let* ((props (s-split " " (or move-props "")))
+         (count (seq-length props))
+         (stats (seq-filter (lambda (s) (string-match (rx (one-or-more alpha)) s)) props))
+         (first (first props)))
+    (cond
+     ((seq-empty-p stats)       nil)
+     ((equal first "track")     (call-interactively 'rpgdm-ironsworn-progress-create))
+     ((equal first "progress")  (call-interactively 'rpgdm-ironsworn-progress-roll))
+     ((= count 1)               (rpgdm-ironsworn-roll-with first))
+     ((equal first ">")         (rpgdm-ironsworn-roll-best stats))
+     (t                         (rpgdm-ironsworn-roll-stat
+                                 (completing-read "Stat Choice: " stats)
+                                 (read-string "Modifier: "))))))
 
 (defun rpgdm-ironsworn-roll-with (stat)
   "Roll against a character STAT, as a string, and prompt for modifier.
@@ -655,7 +670,7 @@ NAME should be a short title, not a description."
          (title       (org-get-heading))
          (option      '(("At the same level as a sibling?" same-level)
                         ("As a subheading to this?" subheading)
-                        ("No new heading. Re-use this." no))))
+                        ("No new heading. Re-use this?" no))))
 
     (when (called-interactively-p)
       (cl-case (completing-read-value "Create a new heading? " option)
@@ -846,7 +861,7 @@ The STAT should be the symbol, 'wits, 'shadow, or 'edge."
   (interactive (list (completing-read "Stat Choice: "
 				      '("wits" "shadow" "edge"))))
   (let ((table-name (format "delve/weak-hit/%s" stat)))
-    (message "Rolling on %s" table-name)
+    ;; (message "Rolling on %s" table-name)
     (rpgdm-tables-choose table-name)))
 
 (defun rpgdm-ironsworn-delve-the-depths-weak-edge ()
@@ -871,14 +886,19 @@ or domain tables, this reads the `site-theme' and `site-domain'
 properties in the current org file, and rolls on the appropriate
 chart."
   (let* ((theme (rpgdm-ironsworn-character-stat 'site-theme))
-	 (domain (rpgdm-ironsworn-character-stat 'site-domain))
-	 (danger (rpgdm-tables-choose "danger")))
+         (domain (rpgdm-ironsworn-character-stat 'site-domain))
+         (danger (rpgdm-tables-choose "danger")))
     (cond
      ((equal danger "Check the theme card.")
       (rpgdm-tables-choose (format "danger/theme/%s" theme)))
 
      ((equal danger "Check the domain card.")
-      (rpgdm-tables-choose (format "danger/domain/%s" theme)))
+      (rpgdm-tables-choose (format "danger/domain/%s" domain)))
+
+     ((s-starts-with? "Roll twice" danger)
+      (format "%s <AND> %s"
+              (rpgdm-ironsworn--reveal-a-danger)
+              (rpgdm-ironsworn--reveal-a-danger)))
 
      (t   danger))))
 
@@ -1156,7 +1176,7 @@ Return 0 if not at a heading, or above first headline."
 (defun org-up-heading ()
   "Move the point to next parent heading, unless already at the top-level."
   (if (= 0 (org-heading-level))
-      (outline-up-heading 0)
+      (org-previous-visible-heading 1)
     (outline-up-heading 1)))
 
 (defun rpgdm-ironsworn--current-character-state (results)
@@ -1179,7 +1199,6 @@ precendence over similar settings in higher headers."
           (when (rpgdm-ironsworn--property-p k)
             (let ((key (key-convert k))
                   (val (value-convert v)))
-              (message "Found %s : %s" key val)
               (unless (gethash key results)
                 (puthash key val results)))))
 
@@ -1202,7 +1221,6 @@ lower levels of the tree headings take precedence."
                          (second)
                          (plist-get :raw-value))
                results)
-      (message "Hash: %s" results)
       (rpgdm-ironsworn--current-character-state results)
       results)))
 

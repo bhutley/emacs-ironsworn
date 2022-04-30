@@ -29,7 +29,7 @@ On a *miss*, also suffer -1 momentum. If you are at 0 health, you must mark woun
 
 *** Details
 :PROPERTIES:
-:move-stats: > heart iron
+:move-stats: > health iron
 :VISIBILITY: folded
 :END:
 

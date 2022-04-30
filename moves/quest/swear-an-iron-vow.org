@@ -12,7 +12,7 @@ On a *miss*, you face a significant obstacle before you can begin your quest. En
 
 *** Details
 :PROPERTIES:
-:move-stats: heart
+:move-stats: track|heart
 :VISIBILITY: folded
 :END:
 

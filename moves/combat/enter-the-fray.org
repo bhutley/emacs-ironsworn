@@ -25,7 +25,7 @@ On a *miss*, combat begins with you at a disadvantage. [[file:../fate/pay-the-pr
 
 *** Details
 :PROPERTIES:
-:move-stats: heart shadow wits
+:move-stats: track|heart shadow wits
 :VISIBILITY: folded
 :END:
 
