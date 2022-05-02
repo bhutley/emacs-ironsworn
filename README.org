@@ -616,7 +616,9 @@ This function will query the user for all of the stats and other properties that
     (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow: ") 1)
     (rpgdm-ironsworn-progress-create "Bonds" 1)
     (rpgdm-ironsworn-progress-mark "Bonds")
-    (next-line)
+
+    (org-top-heading)
+    (re-search-forward (rx line-start (zero-or-more space) line-end))
     (insert "\n** Bonds\n")
     (insert (format "  - My home settlement of %s\n" (rpgdm-tables-choose "settlement/name"))))
 #+END_SRC
@@ -1946,7 +1948,7 @@ But we roll some of these more than others, especially since "moves" does most o
 #+begin_src emacs-lisp
   (defhydra hydra-rpgdm (:color pink :hint nil)
     "
-      ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
+      ^Dice^     0=d100 1=d10 6=d6         ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
    ------------------------------------------------------------------------------------------------------------------------------
       _D_: Roll Dice  _h_: Roll Shadow       _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
       _e_: Roll Edge  _w_: Roll Wits         _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
@@ -2028,9 +2030,7 @@ But since most character stats do not simply /go away/ but are constantly in flu
   Note that STAT should be a symbol, like `supply' and VALUE should be a
   number, but doesn't have to be."
     (save-excursion
-      (org-up-heading)
-      (while (> (org-heading-level) 1)
-        (org-up-heading))
+      (org-top-heading)
       (rpgdm-ironsworn-store-character-temp-state stat value)))
 #+END_SRC
 
@@ -2110,11 +2110,23 @@ Since [[help:org-up-element][org-up-element]]’s behavior has changed, and [[he
 #+BEGIN_SRC emacs-lisp
   (defun org-up-heading ()
     "Move the point to next parent heading, unless already at the top-level."
-    (if (= 0 (org-heading-level))
-        (org-previous-visible-heading 1)
-      (outline-up-heading 1)))
+    (interactive)
+    (cl-case (org-heading-level)
+     (0 (org-previous-visible-heading 1))
+     (1 nil)
+     (t (outline-up-heading 1))))
 #+END_SRC
 
+And a function to move the point to the top-most heading (where we store the character’s details:
+#+BEGIN_SRC emacs-lisp
+  (defun org-top-heading ()
+    "Move the point to the top-most heading in the org document.
+  Note that this is based on the current point position."
+    (interactive)
+    (org-up-heading)
+    (while (> (org-heading-level) 1)
+      (org-up-heading)))
+#+END_SRC
 Enough chit-chat, let's write this function. While we are at it, let's convert the property symbols into short symbols, e.g. =:IRONSWORN-SHADOW= should just be =shadow=, and number values should be numeric:
 
 #+BEGIN_SRC emacs-lisp

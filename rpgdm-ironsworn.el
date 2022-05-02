@@ -248,7 +248,9 @@ Note: The stats are added as properties using the
   (rpgdm-ironsworn-progress-create (read-string "What title should we give this new character's Epic vow: ") 1)
   (rpgdm-ironsworn-progress-create "Bonds" 1)
   (rpgdm-ironsworn-progress-mark "Bonds")
-  (next-line)
+
+  (org-top-heading)
+  (re-search-forward (rx line-start (zero-or-more space) line-end))
   (insert "\n** Bonds\n")
   (insert (format "  - My home settlement of %s\n" (rpgdm-tables-choose "settlement/name"))))
 
@@ -1105,7 +1107,7 @@ You'll need to pick and choose what works and discard what doesn't."
 
 (defhydra hydra-rpgdm (:color pink :hint nil)
   "
-    ^Dice^     0=d100 1=d10 6=d6     ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
+    ^Dice^     0=d100 1=d10 6=d6         ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
  ------------------------------------------------------------------------------------------------------------------------------
     _D_: Roll Dice  _h_: Roll Shadow       _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
     _e_: Roll Edge  _w_: Roll Wits         _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
@@ -1166,9 +1168,7 @@ number, but doesn't have to be."
 Note that STAT should be a symbol, like `supply' and VALUE should be a
 number, but doesn't have to be."
   (save-excursion
-    (org-up-heading)
-    (while (> (org-heading-level) 1)
-      (org-up-heading))
+    (org-top-heading)
     (rpgdm-ironsworn-store-character-temp-state stat value)))
 
 (defalias 'rpgdm-ironsworn-store-default-character-state
@@ -1204,9 +1204,19 @@ Return 0 if not at a heading, or above first headline."
 
 (defun org-up-heading ()
   "Move the point to next parent heading, unless already at the top-level."
-  (if (= 0 (org-heading-level))
-      (org-previous-visible-heading 1)
-    (outline-up-heading 1)))
+  (interactive)
+  (cl-case (org-heading-level)
+   (0 (org-previous-visible-heading 1))
+   (1 nil)
+   (t (outline-up-heading 1))))
+
+(defun org-top-heading ()
+  "Move the point to the top-most heading in the org document.
+Note that this is based on the current point position."
+  (interactive)
+  (org-up-heading)
+  (while (> (org-heading-level) 1)
+    (org-up-heading)))
 
 (defun rpgdm-ironsworn--current-character-state (results)
   "Recursive helper to insert current header properties in RESULTS.
