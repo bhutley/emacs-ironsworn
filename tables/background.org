@@ -1,0 +1,8 @@
+# Taken from SpiderSandals on the Ironsworn Discord
+# https://drive.google.com/file/d/1P3v-WkMYEo00ZYbPOVLGTtMaLSH-RACT/view?usp=drivesdk
+
+    - <<background/story>> <<background/fulcrum>>
+    - <<background/nature>> <<background/fulcrum>>
+    - <<background/deed>> <<background/fulcrum>>
+    - <<background/deed>> <<background/story>> <<background/fulcrum>>
+    - <<background/deed>> <<background/hinge>> <<background/story>> <<background/fulcrum>>

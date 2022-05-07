@@ -1,0 +1,11 @@
+
+  - needs
+  - wants
+  - desires
+  - longs for
+  - hates
+  - loves
+  - fears
+  - lacks
+  - avoids
+  - despises

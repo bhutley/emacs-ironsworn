@@ -1,0 +1,6 @@
+
+  - with
+  - for
+  - by
+  - without
+  - against

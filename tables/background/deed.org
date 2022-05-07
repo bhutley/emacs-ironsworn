@@ -1,0 +1,21 @@
+
+  - abandoned
+  - betrayed
+  - continued
+  - defended
+  - ended
+  - endured
+  - escaped
+  - felled
+  - fought
+  - found
+  - kept
+  - left
+  - protected
+  - restored
+  - sought
+  - suffered
+  - supported
+  - wasted
+  - witheld
+  - withstood

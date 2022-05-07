@@ -1,0 +1,25 @@
+
+  - altered
+  - angered
+  - beloved
+  - cold
+  - destroyed
+  - divine
+  - failed
+  - fallen
+  - feared
+  - fierce
+  - final
+  - fleeting
+  - forgotten
+  - hated
+  - lost
+  - magical
+  - mysterious
+  - necessary
+  - negligent
+  - new
+  - old
+  - past
+  - taken
+  - unknown
