@@ -1,0 +1,23 @@
+#+TITLE: Features in an Infested Location
+
+Roll on Table: d20
+  |   1-4 | Inhabited nest                        |
+  |   5-8 | Abandoned nest                        |
+  |  9-12 | Ravaged terrain or architecture       |
+  | 13-16 | Remains or carrion                    |
+  | 17-20 | Hoarded food                          |
+#+TITLE: Features of a Barrow
+
+Roll on Table: d80 + 20
+  | 21-43 | Burial chambers                  |
+  | 44-56 | Maze of narrow passages          |
+  | 57-64 | Shrine                           |
+  | 65-68 | Stately vault                    |
+  | 69-72 | Offerings to the dead            |
+  | 73-76 | Statuary or tapestries           |
+  | 77-80 | Remains of a grave robber        |
+  | 81-84 | Mass grave                       |
+  | 85-88 | Exhumed corpses                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

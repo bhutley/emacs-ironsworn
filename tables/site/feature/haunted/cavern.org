@@ -1,0 +1,23 @@
+#+TITLE: Features in a Haunted Place
+
+Roll on Table: d20
+  |   1-4 | Tomb or burial site                   |
+  |   5-8 | Blood was spilled here                |
+  |  9-12 | Unnatural mists or darkness           |
+  | 13-16 | Messages from beyond the grave        |
+  | 17-20 | Apparitions of a person or event      |
+#+TITLE: Features in a Cavern
+
+Roll on Table: d80 + 20
+  | 21-43 | Twisting passages                |
+  | 44-56 | Cramped caves                    |
+  | 57-64 | Vast chamber                     |
+  | 65-68 | Subterranean waterway            |
+  | 69-72 | Cave pool                        |
+  | 73-76 | Natural bridge                   |
+  | 77-80 | Towering stone formations        |
+  | 81-84 | Natural illumination             |
+  | 85-88 | Dark pit                         |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

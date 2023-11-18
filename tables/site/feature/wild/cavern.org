@@ -1,0 +1,23 @@
+#+TITLE: Features of a Wild Place
+
+Roll on Table: d20
+  |   1-4 | Denizen’s lair                         |
+  |   5-8 | Territorial markings                   |
+  |  9-12 | Impressive flora or fauna              |
+  | 13-16 | Hunting ground or watering hole        |
+  | 17-20 | Remains or carrion                     |
+#+TITLE: Features in a Cavern
+
+Roll on Table: d80 + 20
+  | 21-43 | Twisting passages                |
+  | 44-56 | Cramped caves                    |
+  | 57-64 | Vast chamber                     |
+  | 65-68 | Subterranean waterway            |
+  | 69-72 | Cave pool                        |
+  | 73-76 | Natural bridge                   |
+  | 77-80 | Towering stone formations        |
+  | 81-84 | Natural illumination             |
+  | 85-88 | Dark pit                         |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

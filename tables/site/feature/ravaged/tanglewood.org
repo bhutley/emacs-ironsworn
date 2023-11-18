@@ -1,0 +1,23 @@
+#+TITLE: Features of a Ravaged Land
+
+Roll on Table: d20
+  |   1-4 | Path of destruction                    |
+  |   5-8 | Abandoned or ruined dwelling           |
+  |  9-12 | Untouched or preserved area            |
+  | 13-16 | Traces of what was lost                |
+  | 17-20 | Ill-fated victims                      |
+#+TITLE: Features in a Tangled Wood
+
+Roll on Table: d80 + 20
+  | 21-43 | Dense thicket                    |
+  | 44-56 | Overgrown path                   |
+  | 57-64 | Waterway                         |
+  | 65-68 | Clearing                         |
+  | 69-72 | Elder tree                       |
+  | 73-76 | Brambles                         |
+  | 77-80 | Overgrown structure              |
+  | 81-84 | Rocky outcrop                    |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

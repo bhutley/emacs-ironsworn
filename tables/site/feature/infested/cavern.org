@@ -1,0 +1,23 @@
+#+TITLE: Features in an Infested Location
+
+Roll on Table: d20
+  |   1-4 | Inhabited nest                        |
+  |   5-8 | Abandoned nest                        |
+  |  9-12 | Ravaged terrain or architecture       |
+  | 13-16 | Remains or carrion                    |
+  | 17-20 | Hoarded food                          |
+#+TITLE: Features in a Cavern
+
+Roll on Table: d80 + 20
+  | 21-43 | Twisting passages                |
+  | 44-56 | Cramped caves                    |
+  | 57-64 | Vast chamber                     |
+  | 65-68 | Subterranean waterway            |
+  | 69-72 | Cave pool                        |
+  | 73-76 | Natural bridge                   |
+  | 77-80 | Towering stone formations        |
+  | 81-84 | Natural illumination             |
+  | 85-88 | Dark pit                         |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

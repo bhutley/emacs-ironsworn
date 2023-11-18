@@ -1,0 +1,23 @@
+#+TITLE: Features in a Fortified Location
+
+Roll on Table: d20
+  |   1-4 | Camp or quarters                     |
+  |   5-8 | Guarded location                     |
+  |  9-12 | Storage or repository                |
+  | 13-16 | Work or training area                |
+  | 17-20 | Command center or leadership         |
+#+TITLE: Features of an Underkeep
+
+Roll on Table: d80 + 20
+  | 21-43 | Carved passages                   |
+  | 44-56 | Hall or chamber                   |
+  | 57-64 | Stairs into the depths            |
+  | 65-68 | Grand doorway or entrance         |
+  | 69-72 | Tomb or catacombs                 |
+  | 73-76 | Rough-hewn cave                   |
+  | 77-80 | Foundry or workshop               |
+  | 81-84 | Shrine or temple                  |
+  | 85-88 | Imposing architecture or artistry |
+  | 89-98 | Something unusual or unexpected   |
+  |    99 | You transition into a new theme   |
+  |   100 | You transition into a new domain  |

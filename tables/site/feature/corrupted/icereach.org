@@ -1,0 +1,23 @@
+#+TITLE: Features in a Corrupted Location
+
+Roll on Table: d20
+  |   1-4 | Mystic focus or conduit               |
+  |   5-8 | Strange environmental disturbances    |
+  |  9-12 | Mystic runes or markings              |
+  | 13-16 | Blight or decay                       |
+  | 17-20 | Evidence of a foul ritual             |
+#+TITLE: Features on an Icereach
+
+Roll on Table: d80 + 20
+  | 21-43 | Plains of ice and snow           |
+  | 44-56 | Seawater channel                 |
+  | 57-64 | Icy highlands                    |
+  | 65-68 | Crevasse                         |
+  | 69-72 | Ice floes                        |
+  | 73-76 | Ship trapped in ice              |
+  | 77-80 | Animal herd or habitat           |
+  | 81-84 | Frozen carcass                   |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

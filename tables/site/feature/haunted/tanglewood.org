@@ -1,0 +1,23 @@
+#+TITLE: Features in a Haunted Place
+
+Roll on Table: d20
+  |   1-4 | Tomb or burial site                   |
+  |   5-8 | Blood was spilled here                |
+  |  9-12 | Unnatural mists or darkness           |
+  | 13-16 | Messages from beyond the grave        |
+  | 17-20 | Apparitions of a person or event      |
+#+TITLE: Features in a Tangled Wood
+
+Roll on Table: d80 + 20
+  | 21-43 | Dense thicket                    |
+  | 44-56 | Overgrown path                   |
+  | 57-64 | Waterway                         |
+  | 65-68 | Clearing                         |
+  | 69-72 | Elder tree                       |
+  | 73-76 | Brambles                         |
+  | 77-80 | Overgrown structure              |
+  | 81-84 | Rocky outcrop                    |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

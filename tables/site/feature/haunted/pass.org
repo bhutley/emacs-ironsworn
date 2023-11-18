@@ -1,0 +1,23 @@
+#+TITLE: Features in a Haunted Place
+
+Roll on Table: d20
+  |   1-4 | Tomb or burial site                   |
+  |   5-8 | Blood was spilled here                |
+  |  9-12 | Unnatural mists or darkness           |
+  | 13-16 | Messages from beyond the grave        |
+  | 17-20 | Apparitions of a person or event      |
+#+TITLE: Features of a Pass
+
+Roll on Table: d80 + 20
+  | 21-43 | Winding mountain path            |
+  | 44-56 | Snowfield or glacial rocks       |
+  | 57-64 | River gorge                      |
+  | 65-68 | Crashing waterfall               |
+  | 69-72 | Highland lake                    |
+  | 73-76 | Forgotten cairn                  |
+  | 77-80 | Bridge                           |
+  | 81-84 | Overlook                         |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

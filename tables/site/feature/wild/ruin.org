@@ -1,0 +1,20 @@
+#+TITLE: Features of a Wild Ruin
+
+Roll on Table: d100
+  |   1-4 | Denizen’s lair                   |
+  |   5-8 | Territorial markings             |
+  |  9-12 | Impressive flora or fauna        |
+  | 13-16 | Hunting ground or watering hole  |
+  | 17-20 | Remains or carrion               |
+  | 21-43 | Crumbling corridors and chambers |
+  | 44-56 | Collapsed architecture           |
+  | 57-64 | Rubble-choked hall               |
+  | 65-68 | Courtyard                        |
+  | 69-72 | Archive or library               |
+  | 73-76 | Broken statuary or fading murals |
+  | 77-80 | Preserved vault                  |
+  | 81-84 | Temple to forgotten gods         |
+  | 85-88 | Mausoleum                        |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

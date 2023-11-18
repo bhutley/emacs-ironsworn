@@ -1,0 +1,23 @@
+#+TITLE: Features of a Ravaged Land
+
+Roll on Table: d20
+  |   1-4 | Path of destruction                    |
+  |   5-8 | Abandoned or ruined dwelling           |
+  |  9-12 | Untouched or preserved area            |
+  | 13-16 | Traces of what was lost                |
+  | 17-20 | Ill-fated victims                      |
+#+TITLE: Features in a Frozen Cavern
+
+Roll on Table: d80 + 20
+  | 21-43 | Maze of icy tunnels              |
+  | 44-56 | Glistening cave                  |
+  | 57-64 | Vast chamber                     |
+  | 65-68 | Frigid waterway                  |
+  | 69-72 | Icy pools                        |
+  | 73-76 | Magnificent ice formations       |
+  | 77-80 | Frozen waterfall                 |
+  | 81-84 | Deep crevasses                   |
+  | 85-88 | Discovery locked in the ice      |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

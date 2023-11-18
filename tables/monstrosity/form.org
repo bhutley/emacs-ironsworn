@@ -1,0 +1,21 @@
+#+title: Primary Form of a Monstrosity
+
+Roll on Table: d100
+  |  1-15 | Beast / mammal                             |
+  | 16-25 | Humanoid                                   |
+  | 26-31 | Bird                                       |
+  | 32-37 | Spider                                     |
+  | 38-43 | Snake                                      |
+  | 44-49 | Worm / slug                                |
+  | 50-55 | Lizard                                     |
+  | 56-61 | Insect                                     |
+  | 67-69 | Crustacean                                 |
+  | 70-71 | Fish                                       |
+  | 72-73 | Octopoid                                   |
+  | 74-75 | Amphibian                                  |
+  | 76-77 | Plant                                      |
+  |    78 | Incorporeal                                |
+  |    79 | Mineral                                    |
+  |    80 | Elemental                                  |
+  | 62-66 | Amorphous                                  |
+  | 81-00 | Hybrid: <<monstrosity/form>> / <<monstosity/form>> |

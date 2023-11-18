@@ -1,0 +1,23 @@
+#+TITLE: Features of a Ravaged Land
+
+Roll on Table: d20
+  |   1-4 | Path of destruction                    |
+  |   5-8 | Abandoned or ruined dwelling           |
+  |  9-12 | Untouched or preserved area            |
+  | 13-16 | Traces of what was lost                |
+  | 17-20 | Ill-fated victims                      |
+#+TITLE: Features in a Stronghold
+
+Roll on Table: d80 + 20
+  | 21-43 | Connecting passageways           |
+  | 44-56 | Barracks or common quarters      |
+  | 57-64 | Large hall                       |
+  | 65-68 | Workshop or library              |
+  | 69-72 | Command center or leadership     |
+  | 73-76 | Ladder or stairwell              |
+  | 77-80 | Storage                          |
+  | 81-84 | Kitchen or larder                |
+  | 85-88 | Courtyard                        |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

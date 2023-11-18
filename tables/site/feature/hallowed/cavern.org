@@ -1,0 +1,23 @@
+#+TITLE: Features in a Hallowed Location
+
+Roll on Table: d20
+  |   1-4 | Temple or altar              |
+  |   5-8 | Offerings or atonements      |
+  |  9-12 | Religious relic or idol      |
+  | 13-16 | Consecrated ground           |
+  | 17-20 | Dwellings or gathering place |
+#+TITLE: Features in a Cavern
+
+Roll on Table: d80 + 20
+  | 21-43 | Twisting passages                |
+  | 44-56 | Cramped caves                    |
+  | 57-64 | Vast chamber                     |
+  | 65-68 | Subterranean waterway            |
+  | 69-72 | Cave pool                        |
+  | 73-76 | Natural bridge                   |
+  | 77-80 | Towering stone formations        |
+  | 81-84 | Natural illumination             |
+  | 85-88 | Dark pit                         |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

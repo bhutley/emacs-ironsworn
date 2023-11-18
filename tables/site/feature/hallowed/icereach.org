@@ -1,0 +1,23 @@
+#+TITLE: Features in a Hallowed Location
+
+Roll on Table: d20
+  |   1-4 | Temple or altar              |
+  |   5-8 | Offerings or atonements      |
+  |  9-12 | Religious relic or idol      |
+  | 13-16 | Consecrated ground           |
+  | 17-20 | Dwellings or gathering place |
+#+TITLE: Features on an Icereach
+
+Roll on Table: d80 + 20
+  | 21-43 | Plains of ice and snow           |
+  | 44-56 | Seawater channel                 |
+  | 57-64 | Icy highlands                    |
+  | 65-68 | Crevasse                         |
+  | 69-72 | Ice floes                        |
+  | 73-76 | Ship trapped in ice              |
+  | 77-80 | Animal herd or habitat           |
+  | 81-84 | Frozen carcass                   |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

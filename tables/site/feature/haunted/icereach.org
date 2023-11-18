@@ -1,0 +1,23 @@
+#+TITLE: Features in a Haunted Place
+
+Roll on Table: d20
+  |   1-4 | Tomb or burial site                   |
+  |   5-8 | Blood was spilled here                |
+  |  9-12 | Unnatural mists or darkness           |
+  | 13-16 | Messages from beyond the grave        |
+  | 17-20 | Apparitions of a person or event      |
+#+TITLE: Features on an Icereach
+
+Roll on Table: d80 + 20
+  | 21-43 | Plains of ice and snow           |
+  | 44-56 | Seawater channel                 |
+  | 57-64 | Icy highlands                    |
+  | 65-68 | Crevasse                         |
+  | 69-72 | Ice floes                        |
+  | 73-76 | Ship trapped in ice              |
+  | 77-80 | Animal herd or habitat           |
+  | 81-84 | Frozen carcass                   |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

@@ -1,0 +1,9 @@
+#+title: Size of a Monstrosity
+
+Roll on Table: d100
+  |   1-5 | Tiny (rodent-sized)        |
+  |  6-30 | Small (hound-sized)        |
+  | 31-65 | Medium (person-sized)      |
+  | 66-94 | Large (giant-sized)        |
+  | 95-99 | Huge (whale-sized)         |
+  |   100 | Titanic (incomprehensible) |

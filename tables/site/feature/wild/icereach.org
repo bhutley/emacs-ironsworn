@@ -1,0 +1,23 @@
+#+TITLE: Features of a Wild Place
+
+Roll on Table: d20
+  |   1-4 | Denizen’s lair                         |
+  |   5-8 | Territorial markings                   |
+  |  9-12 | Impressive flora or fauna              |
+  | 13-16 | Hunting ground or watering hole        |
+  | 17-20 | Remains or carrion                     |
+#+TITLE: Features on an Icereach
+
+Roll on Table: d80 + 20
+  | 21-43 | Plains of ice and snow           |
+  | 44-56 | Seawater channel                 |
+  | 57-64 | Icy highlands                    |
+  | 65-68 | Crevasse                         |
+  | 69-72 | Ice floes                        |
+  | 73-76 | Ship trapped in ice              |
+  | 77-80 | Animal herd or habitat           |
+  | 81-84 | Frozen carcass                   |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |

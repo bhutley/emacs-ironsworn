@@ -1,0 +1,23 @@
+#+TITLE: Features of a Ravaged Land
+
+Roll on Table: d20
+  |   1-4 | Path of destruction                    |
+  |   5-8 | Abandoned or ruined dwelling           |
+  |  9-12 | Untouched or preserved area            |
+  | 13-16 | Traces of what was lost                |
+  | 17-20 | Ill-fated victims                      |
+#+TITLE: Features on an Icereach
+
+Roll on Table: d80 + 20
+  | 21-43 | Plains of ice and snow           |
+  | 44-56 | Seawater channel                 |
+  | 57-64 | Icy highlands                    |
+  | 65-68 | Crevasse                         |
+  | 69-72 | Ice floes                        |
+  | 73-76 | Ship trapped in ice              |
+  | 77-80 | Animal herd or habitat           |
+  | 81-84 | Frozen carcass                   |
+  | 85-88 | Camp or outpost                  |
+  | 89-98 | Something unusual or unexpected  |
+  |    99 | You transition into a new theme  |
+  |   100 | You transition into a new domain |
