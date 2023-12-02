@@ -226,7 +226,7 @@ Again, the UI will attempt to update all of these values, so you don't need to c
 Details? Did someone say details? Let's talk about the code ... all the code that makes this work.
 * Code
 #+BEGIN_SRC emacs-lisp :exports none
-  ;;; rpgdm-ironsworn -- Functions for integrating Ironsworn with Org
+  ;;; rpgdm-ironsworn.el --- Functions for integrating Ironsworn with Org
   ;;
   ;; Copyright (C) 2020 Howard X. Abrams
   ;;
@@ -363,11 +363,11 @@ The basic interface will query for a modifer, roll all three dice, and then disp
   results."
     (interactive "nModifier: ")
     (let ((one-challenge (rpgdm--roll-die 10))
-	  (two-challenge (rpgdm--roll-die 10))
-	  (action-roll   (rpgdm--roll-die 6)))
+          (two-challenge (rpgdm--roll-die 10))
+          (action-roll   (rpgdm--roll-die 6)))
       (rpgdm-message (rpgdm-ironsworn--results action-roll modifier
-					       one-challenge two-challenge
-					       momentum))))
+                                               one-challenge two-challenge
+                                               momentum))))
 #+END_SRC
 
 ** Character Information
@@ -764,20 +764,20 @@ This function will be used for =interactive= to return a tuple of both the /oper
   but decrements any other stats by `1'.  Any other value means to take
   the default for that stat."
     (let ((value (read-string (format "Adjustment to %s (+/-/= for absolute value): " label)))
-	  (rxnum (rx (group (optional (or "+" "-" "="))) (* space) (group (+ digit)) (* space))))
+          (rxnum (rx (group (optional (or "+" "-" "="))) (* space) (group (+ digit)) (* space))))
 
       (if (string-match rxnum value)
-	  (let ((sign                   (match-string 1 value))
-		(numb (string-to-number (match-string 2 value))))
-	    (cond
-	     ((equal sign "-") `(:decrease ,numb))
-	     ((equal sign "+") `(:increase ,numb))
-	     ((equal sign "=") `(:absolute ,numb))
-	     (t                (if (eq label `momentum) `(:increase ,numb) `(:decrease ,numb)))))
+          (let ((sign                   (match-string 1 value))
+                (numb (string-to-number (match-string 2 value))))
+            (cond
+             ((equal sign "-") `(:decrease ,numb))
+             ((equal sign "+") `(:increase ,numb))
+             ((equal sign "=") `(:absolute ,numb))
+             (t                (if (eq label `momentum) `(:increase ,numb) `(:decrease ,numb)))))
 
-	(if (string-blank-p value)
-	    (if (eq label 'momentum) '(:increase 1) '(:decrease 1))
-	  '(:reset 0)))))
+        (if (string-blank-p value)
+            (if (eq label 'momentum) '(:increase 1) '(:decrease 1))
+          '(:reset 0)))))
 #+END_SRC
 
 Best if we wrote some unit tests to both explain and verify this function. This test uses the [[help:cl-letf][letf]], which allows us to override the [[help:read-string][read-string]] function for my tests. Why yes, this is clever way of doing what other languages would need a /mock/ object.
@@ -831,14 +831,14 @@ The =rpgdm-ironsworn-adjust-stat= function takes one of the four stats, like =â€
     "Increase or decrease the current character's STAT by ADJ.
   If the STAT isn't found, returns DEFAULT."
     (let* ((tuple (rpgdm-ironsworn--read-stat stat))
-	   (curr  (rpgdm-ironsworn-character-stat stat))
-	   (oper  (first tuple))
-	   (numb  (second tuple))
-	   (new   (cl-case oper
-		    (:increase (+ curr numb))
-		    (:decrease (- curr numb))
-		    (:absolute numb)
-		    (t         default))))
+           (curr  (rpgdm-ironsworn-character-stat stat))
+           (oper  (first tuple))
+           (numb  (second tuple))
+           (new   (cl-case oper
+                    (:increase (+ curr numb))
+                    (:decrease (- curr numb))
+                    (:absolute numb)
+                    (t         default))))
       ;; (message "Combining curr %d with %d with %s operator" curr numb oper)
       (rpgdm-ironsworn-store-character-state stat new)))
 #+END_SRC
@@ -1113,17 +1113,17 @@ The [[file:moves][moves]] directory contains one org file for each move. These f
   The string representation is created by looking at the parent
   directory and file name."
     (let* ((regx (rx "moves/"
-		     (group (one-or-more (not "/")))
-		     "/"
-		     (group (one-or-more (not ".")))
-		     ".org" eol))
-	   (mtch (string-match regx file))
-	   (type (thread-last file
-		   (match-string 1)
-		   (s-titleize)))
-	   (name (thread-last file
-		   (match-string 2)
-		   (s-replace-regexp "-" " "))))
+                     (group (one-or-more (not "/")))
+                     "/"
+                     (group (one-or-more (not ".")))
+                     ".org" eol))
+           (mtch (string-match regx file))
+           (type (thread-last file
+                   (match-string 1)
+                   (s-titleize)))
+           (name (thread-last file
+                   (match-string 2)
+                   (s-replace-regexp "-" " "))))
       (list (format "%s :: %s" type name) file)))
 #+END_SRC
 
@@ -1156,9 +1156,9 @@ Oh, one issue... how do I know where the data files for the moves are?
   will return a cached copy."
     (unless rpgdm-ironsworn-moves
       (setq rpgdm-ironsworn-moves
-	    (mapcar 'rpgdm-ironsworn--move-tuple
-		    (directory-files-recursively
-		     (f-join rpgdm-ironsworn-project "moves")
+            (mapcar 'rpgdm-ironsworn--move-tuple
+                    (directory-files-recursively
+                     (f-join rpgdm-ironsworn-project "moves")
                      (rx (1+ any) ".org" eos)))))
     rpgdm-ironsworn-moves)
 #+END_SRC
@@ -1211,7 +1211,7 @@ Now, let's do the Move interface. We need to load the documentation, and retriev
     ;; Normally, we'd call `save-window-excursion', however, that buries the file
     ;; we show, and I think we should leave it up for study.
     (let (props title
-	  (orig-buf (window-buffer)))
+          (orig-buf (window-buffer)))
       (find-file-other-window move-file)
       (goto-char (point-min))
       (setq title (cdr (assoc "ITEM" (org-entry-properties))))
@@ -1329,14 +1329,14 @@ A helper function for allowing the user to choose which track to mark progress a
   allows the user to choose the number of squares that have been
   marked against some progress."
     (let* ((other "<other>")
-	   (tracks  (rpgdm-ironsworn-character-progresses))
-	   (choices (if allow-other
-			(append tracks (list other))
-		      tracks))
-	   (original (completing-read "Progress Track: " choices)))
+           (tracks  (rpgdm-ironsworn-character-progresses))
+           (choices (if allow-other
+                        (append tracks (list other))
+                      tracks))
+           (original (completing-read "Progress Track: " choices)))
       (if (and allow-other (equal original other))
-	  (read-number "Completed Track Amount [0-10]: ")
-	original)))
+          (read-number "Completed Track Amount [0-10]: ")
+        original)))
 #+END_SRC
 
 Adding a progress to a character amounts to an arbitrary name, and the number of ticks, that amount to a /level/. For instance, we want to mark two boxes against a /dangerous/ track, which is =8= ticks. We store this in the character's hash-table, under the key, =progress-tracks=:
@@ -1540,25 +1540,25 @@ Requires a =place-type= to help limit the values that can be in /place/ and then
   The PLACE-TYPE is something like 'shadowfen or 'sea-cave,
   and helps to make the new name more meaningful to the place."
     (interactive (list (completing-read "Place type: "
-					'(barrow cavern icereach mine pass ruin
-					  sea-cave shadowfen stronghold
-					  tanglewood underkeep))))
+                                        '(barrow cavern icereach mine pass ruin
+                                          sea-cave shadowfen stronghold
+                                          tanglewood underkeep))))
     (unless place-type
       (setq place-type "unknown"))
     (let ((description (rpgdm-tables-choose "site/name/description"))
-	  (detail (rpgdm-tables-choose "site/name/detail"))
-	  (namesake (rpgdm-tables-choose "site/name/namesake"))
-	  (place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
-	  (roll   (rpgdm--roll-die 100)))
+          (detail (rpgdm-tables-choose "site/name/detail"))
+          (namesake (rpgdm-tables-choose "site/name/namesake"))
+          (place  (rpgdm-tables-choose (format "site/name/place/%s" (downcase place-type))))
+          (roll   (rpgdm--roll-die 100)))
       (rpgdm-message
        (cond
-	((<= roll 25) (format "%s %s" description place))
-	((<= roll 50) (format "%s of %s" place detail))
-	((<= roll 70) (format "%s of %s %s" place description detail))
-	((<= roll 80) (format "%s of %s's %s" place namesake detail))
-	((<= roll 85) (format "%s's %s" namesake place))
-	((<= roll 95) (format "%s %s of %s" description place namesake))
-	(t            (format "%s of %s" place namesake))))))
+        ((<= roll 25) (format "%s %s" description place))
+        ((<= roll 50) (format "%s of %s" place detail))
+        ((<= roll 70) (format "%s of %s %s" place description detail))
+        ((<= roll 80) (format "%s of %s's %s" place namesake detail))
+        ((<= roll 85) (format "%s's %s" namesake place))
+        ((<= roll 95) (format "%s %s of %s" description place namesake))
+        (t            (format "%s of %s" place namesake))))))
 #+END_SRC
 While the following functions can take advantage of this function, we also want to place it in our normal =rpgdm-tables= hash, so that we can choose it there:
 
@@ -1594,9 +1594,9 @@ Notice we also generate a name for the place.
   The nature is a combination of theme and domain."
     (interactive)
     (let* ((theme  (rpgdm-tables-choose "site/theme"))
-	   (domain (rpgdm-tables-choose "site/domain"))
-	   (place  (downcase domain))
-	   (name   (rpgdm-ironsworn-oracle-site-name place)))
+           (domain (rpgdm-tables-choose "site/domain"))
+           (place  (downcase domain))
+           (name   (rpgdm-ironsworn-oracle-site-name place)))
       (rpgdm-message "%s %s :: %s" theme domain name)))
 #+END_SRC
 
@@ -1644,7 +1644,7 @@ With these properties in place, we can now do a much better job with the [[file:
     "Return random result from weak hit table for Delve the Depths.
   The STAT should be the symbol, 'wits, 'shadow, or 'edge."
     (interactive (list (completing-read "Stat Choice: "
-					'("wits" "shadow" "edge"))))
+                                        '("wits" "shadow" "edge"))))
     (let ((table-name (format "delve/weak-hit/%s" stat)))
       ;; (message "Rolling on %s" table-name)
       (rpgdm-tables-choose table-name)))
@@ -1712,12 +1712,12 @@ Some tables contain /code/ we need, so letâ€™s gather those. The /trick/ is that
 #+BEGIN_SRC emacs-lisp
   (defvar rpgdm-ironsworn-site-themes
     (progn (rpgdm-tables-choose "site/theme")
-	   (gethash "site/theme" rpgdm-tables))
+           (gethash "site/theme" rpgdm-tables))
   "A list of the Delve site themes.")
 
   (defvar rpgdm-ironsworn-site-domains
     (progn (rpgdm-tables-choose "site/domain")
-	   (gethash "site/domain" rpgdm-tables))
+           (gethash "site/domain" rpgdm-tables))
   "A list of the Delve site domains.")
 #+END_SRC
 He designed many of the tables to work together, for instance, you should roll on both the [[file:tables/actions.org][actions]] and [[file:tables/themes.org][themes]] and combine the result to kick-start your ideas.
@@ -1769,8 +1769,8 @@ The [[file:tables/combat-action.org][combat action]] table isn't often tactical,
     "Return combat response combined from three combat tables."
     (interactive)
     (let ((action (rpgdm-tables-choose "combat/action"))
-	  (method (rpgdm-tables-choose "combat/event-method"))
-	  (target (rpgdm-tables-choose "combat/event-target")))
+          (method (rpgdm-tables-choose "combat/event-method"))
+          (target (rpgdm-tables-choose "combat/event-target")))
       (rpgdm-message "%s %s or %s" method target action)))
 
   (puthash "combat" 'rpgdm-ironsworn-oracle-combat rpgdm-tables)
