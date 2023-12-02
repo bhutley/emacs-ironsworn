@@ -674,13 +674,16 @@ Sure, you could open up the appropriate drawer to see a character's stats, but w
   (defun rpgdm-ironsworn--display-stat (stat character)
     "Colorized the STAT from a CHARACTER hash containing it.
   See `rpgdm-ironsworn-character-display'."
-    (let* ((value (gethash stat character))
-           (s-val (number-to-string value))
-           (color (cond
-                   ((< value 1) "red")
-                   ((< value 3) "orange")
-                   ((< value 4) "yellow")
-                   (t "green"))))
+    (let ((value (gethash stat character))
+          s-val color)
+      (if value
+          (setq s-val (number-to-string value)
+                color (cond
+                       ((< value 1) "red")
+                       ((< value 3) "orange")
+                       ((< value 4) "yellow")
+                       (t "green")))
+        (setq s-val "??" color "purple"))
       (propertize s-val 'face `(:foreground ,color))))
 
   (defun rpgdm-ironsworn-character-display ()
@@ -1507,7 +1510,7 @@ When we've finished a track, we can remove it from the hash to not clutter the i
 
 Let's make sure these function work as we expect (keep in mind, these can only be run in an Org file):
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle rpgdm-ironsworn-tests.el
   (ert-deftest rpgdm-ironsworn-progress-test ()
     (let ((track "Battling a Grue"))
       (rpgdm-ironsworn-progress-delete track)
@@ -1950,7 +1953,7 @@ But we roll some of these more than others, especially since "moves" does most o
     "
       ^Dice^     0=d100 1=d10 6=d6         ^Roll/Adjust^   ^Oracles/Tables^       ^Moving/Editing^      ^Messages^
    ------------------------------------------------------------------------------------------------------------------------------
-      _D_: Roll Dice  _h_: Roll Shadow       _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links            ⌘-h: Show Stats
+      _D_: Roll Dice  _h_: Roll Shadow       _l_/_L_: Health   _z_/_Z_: Yes/No Oracle   _o_: Links              _A_: Show Stats
       _e_: Roll Edge  _w_: Roll Wits         _t_/_T_: Spirit   _c_/_C_: Show Oracle     _J_/_K_: Page up/dn     ⌘-l: Last Results
       _r_: Roll Heart _p_/_a_: Progress/Assets _s_/_S_: Supply     _O_: Load Oracles    _N_/_W_: Narrow/Widen   ⌘-k: ↑ Previous
       _i_: Roll Iron  _m_: Make Move           _M_: Momentum   _d_: Delve Actions   _y_/_Y_: Yank/Move      ⌘-j: ↓ Next   "
@@ -1981,7 +1984,7 @@ But we roll some of these more than others, especially since "moves" does most o
     ("o" ace-link)                 ("N" org-narrow-to-subtree)   ("W" widen)
     ("K" scroll-down :color pink)  ("J" scroll-up :color pink)
     ("y" rpgdm-paste-last-message) ("Y" rpgdm-ironsworn-paste-last-move)
-    ("s-h" rpgdm-ironsworn-character-display)
+    ("A" rpgdm-ironsworn-character-display)
     ("C-m" rpgdm-last-results :color pink)
     ("C-n" rpgdm-last-results-next :color pink)
     ("C-p" rpgdm-last-results-previous :color pink)
