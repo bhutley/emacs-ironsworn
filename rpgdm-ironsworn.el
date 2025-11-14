@@ -1,4 +1,4 @@
-;;; rpgdm-ironsworn -- Functions for integrating Ironsworn with Org
+;;; rpgdm-ironsworn -- Functions for integrating Ironsworn with Org  -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2020 Howard X. Abrams
 ;;
